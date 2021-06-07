@@ -1,0 +1,74 @@
+import("opencamera.gni")
+
+group("default") {
+  testonly = true
+  deps = [ ":opencamera" ]
+
+  #  deps += [ "examples" ]
+  #  deps += [ "test" ]
+}
+
+config("library_impl_config") {
+  defines = [ "OC_LIBRARY_IMPL" ]
+}
+
+config("common_inherited_config") {
+  defines = []
+  configs = []
+  ldflags = []
+
+  if (oc_enable_ffmpeg) {
+    defines += [ "OC_FFMPEG" ]
+  }
+
+  if (oc_enable_ffmpeg_demuxer) {
+    defines += [ "OC_FFMPEG_DEMUXER" ]
+  }
+
+  if (oc_enable_ffmpeg_decoder) {
+    defines += [ "OC_FFMPEG_DECODER" ]
+  }
+}
+
+config("no_exit_time_destructors") {
+  if (is_clang) {
+    cflags = [ "-Wno-exit-time-destructors" ]
+  }
+}
+
+config("no_global_constructors") {
+  if (is_clang) {
+    cflags = [ "-Wno-global-constructors" ]
+  }
+}
+
+config("oc_prod_config") {
+  if (is_clang) {
+    cflags = [
+      "-Wexit-time-destructors",
+      "-Wglobal-constructors",
+    ]
+  }
+}
+
+config("common_config") {
+  cflags = []
+  cflags_c = []
+  cflags_cc = []
+  cflags_objc = []
+  defines = []
+}
+
+oc_static_library("opencamera") {
+  sources = []
+
+  complete_static_lib = true
+
+  defines = []
+  deps = []
+
+  deps += [
+    "//base",
+    "//common",
+  ]
+}

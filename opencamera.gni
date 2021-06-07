@@ -1,0 +1,263 @@
+import("//build/config/arm.gni")
+import("//build/config/features.gni")
+import("//build/config/mips.gni")
+import("//build/config/sanitizers/sanitizers.gni")
+import("//build/config/sysroot.gni")
+import("//build/config/ui.gni")
+import("//build_overrides/build.gni")
+
+declare_args() {
+  enable_ffmpeg = true
+  enable_ffmpeg_demuxer = true
+  enable_ffmpeg_decoder = true
+}
+
+declare_args() {
+  oc_enable_ffmpeg = enable_ffmpeg
+  oc_enable_ffmpeg_demuxer = enable_ffmpeg && enable_ffmpeg_demuxer
+  oc_enable_ffmpeg_decoder = enable_ffmpeg && enable_ffmpeg_decoder
+}
+
+oc_root = get_path_info(".", "abspath")
+
+oc_common_configs = [ oc_root + ":common_config" ]
+
+# Global public configuration that should be applied to all WebRTC targets. You
+# normally shouldn't need to include this in your target as it's automatically
+# included when using the oc_* templates. It set the defines, include paths and
+# compilation warnings that should be propagated to dependents of the targets
+# depending on the target having this config.
+oc_common_inherited_config = oc_root + ":common_inherited_config"
+
+# Common configs to remove or add in all oc targets.
+oc_remove_configs = []
+
+if (is_clang) {
+  oc_remove_configs += [ "//build/config/clang:find_bad_constructs" ]
+}
+oc_add_configs = oc_common_configs
+oc_add_configs += [ "//build/config/compiler:rtti" ]
+
+oc_prod_configs = [ oc_root + ":oc_prod_config" ]
+
+oc_library_impl_config = [ oc_root + ":library_impl_config" ]
+
+set_defaults("oc_test") {
+  configs = oc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("oc_library") {
+  configs = oc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("oc_source_set") {
+  configs = oc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("oc_static_library") {
+  configs = oc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("oc_executable") {
+  configs = oc_add_configs
+  suppressed_configs = []
+}
+
+set_defaults("oc_shared_library") {
+  configs = oc_add_configs
+  suppressed_configs = []
+}
+
+oc_default_visibility = [ oc_root + "/*" ]
+
+template("oc_test") {
+  test(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "is_xctest",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+
+    # Always override to public because when target_os is Android the `test`
+    # template can override it to [ "*" ] and we want to avoid conditional
+    # visibility.
+    visibility = [ "*" ]
+    configs += invoker.configs
+    configs -= oc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [
+      oc_common_inherited_config,
+      absl_include_config,
+      absl_define_config,
+      absl_flags_config,
+    ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+
+    if (using_sanitizer) {
+      if (is_linux) {
+        if (!defined(invoker.data)) {
+          data = []
+        }
+        data +=
+            [ "//third_party/llvm-build/Release+Asserts/lib/libstdc++.so.6" ]
+      }
+    }
+  }
+}
+
+template("oc_source_set") {
+  source_set(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = oc_default_visibility
+    }
+
+    if (!defined(testonly) || !testonly) {
+      configs += oc_prod_configs
+    }
+
+    configs += invoker.configs
+    configs += oc_library_impl_config
+    configs -= oc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [ oc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+template("oc_static_library") {
+  static_library(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = oc_default_visibility
+    }
+
+    if (!defined(testonly) || !testonly) {
+      configs += oc_prod_configs
+    }
+
+    configs += invoker.configs
+    configs += oc_library_impl_config
+    configs -= oc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [ oc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+template("oc_library") {
+  if (is_component_build || (defined(invoker.testonly) && invoker.testonly)) {
+    target_type = "source_set"
+  } else {
+    target_type = "static_library"
+  }
+  target(target_type, target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = oc_default_visibility
+    }
+
+    if (!defined(testonly) || !testonly) {
+      configs += oc_prod_configs
+    }
+
+    configs += invoker.configs
+    configs += oc_library_impl_config
+    configs -= oc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [ oc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+template("oc_executable") {
+  executable(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "deps",
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = oc_default_visibility
+    }
+    configs += invoker.configs
+    configs -= oc_remove_configs
+    configs -= invoker.suppressed_configs
+    deps = invoker.deps
+
+    public_configs = [ oc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
+
+template("oc_shared_library") {
+  shared_library(target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "configs",
+                             "public_configs",
+                             "suppressed_configs",
+                             "visibility",
+                           ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(visibility)) {
+      visibility = oc_default_visibility
+    }
+
+    configs += invoker.configs
+    configs -= oc_remove_configs
+    configs -= invoker.suppressed_configs
+    public_configs = [ oc_common_inherited_config ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}

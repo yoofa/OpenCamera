@@ -1,0 +1,12 @@
+import("//opencamera.gni")
+
+group("rtsp") {
+  deps = [ ":rtspserver" ]
+}
+
+oc_library("rtspserver") {
+  sources = [
+    "rtsp_server.cc",
+    "rtsp_server.h",
+  ]
+}

@@ -2,7 +2,10 @@ import("opencamera.gni")
 
 group("default") {
   testonly = true
-  deps = [ ":opencamera" ]
+  deps = [
+    ":opencamera",
+    "app",
+  ]
 
   #  deps += [ "examples" ]
   #  deps += [ "test" ]
@@ -59,16 +62,17 @@ config("common_config") {
   defines = []
 }
 
-oc_static_library("opencamera") {
+oc_library("opencamera") {
   sources = []
-
-  complete_static_lib = true
 
   defines = []
   deps = []
 
   deps += [
+    "//app:oc",
     "//base",
     "//common",
+    "//onvif",
+    "//rtsp",
   ]
 }

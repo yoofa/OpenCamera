@@ -1,3 +1,30 @@
-executable("main") {
+import("//opencamera.gni")
+
+group("app") {
+  deps = [
+    ":oc",
+    ":somnus",
+  ]
+}
+
+oc_library("oc") {
+  sources = [
+    "app_config.h",
+    "conductor.cc",
+    "conductor.h",
+  ]
+  deps = [
+    "//base:logging",
+    "//common:foundation",
+    "//onvif:onvifserver",
+    "//rtsp:rtspserver",
+  ]
+}
+
+executable("somnus") {
   sources = [ "main.cc" ]
+  deps = [
+    ":oc",
+    "//base:logging",
+  ]
 }

@@ -1,0 +1,12 @@
+import("//opencamera.gni")
+
+group("onvif") {
+  deps = [ ":onvifserver" ]
+}
+
+oc_library("onvifserver") {
+  sources = [
+    "onvif_server.cc",
+    "onvif_server.h",
+  ]
+}

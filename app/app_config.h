@@ -9,13 +9,31 @@
 #define APP_CONFIG_H
 
 #include "base/types.h"
+#include "third_party/inih/src/INIReader.h"
 
 namespace avp {
 struct AppConfig {
-  bool health() { return true; }
+  // oc info
+  float version;
+
+  // rtsp
+
+  // onvif
+
+  // no parth error
+  bool noError;
 
   static AppConfig CreateAppConfigFromFile(const char* path) {
     AppConfig appConfig;
+    INIReader reader(path);
+    if (reader.ParseError() != 0) {
+      appConfig.noError = false;
+      return appConfig;
+    }
+    appConfig.noError = true;
+
+    appConfig.version = reader.GetFloat("oc", "version", 0.0);
+
     return appConfig;
   }
 };

@@ -15,7 +15,7 @@ namespace oc {
 
 Conductor::Conductor(AppConfig appConfig)
     : mConfig(appConfig), mLooper(std::make_shared<Looper>()) {
-  DCHECK(mConfig.health());
+  DCHECK(mConfig.noError);
   mLooper->setName("conductor");
 }
 

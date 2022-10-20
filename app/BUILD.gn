@@ -19,6 +19,8 @@ oc_library("oc") {
     "//onvif:onvifserver",
     "//rtsp:rtspserver",
   ]
+
+  public_deps = [ "//third_party/inih" ]
 }
 
 executable("somnus") {

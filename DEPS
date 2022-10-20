@@ -81,6 +81,10 @@ deps = {
     'https://chromium.googlesource.com/chromium/src/tools@2a1184f6a084142fedae1f0b9e44ae1ec4431fc3',
   'src/tools/swarming_client':
     'https://chromium.googlesource.com/infra/luci/client-py.git@d46ea7635f2911208268170512cb611412488fd8',
+
+  # inih
+  'src/third_party/inih/src':
+    'https://github.com/jtilly/inih.git@4a6fde9dd6e1bc129ed307a8cad96bebdd090c80',
 }
 
 hooks = [

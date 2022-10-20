@@ -1,0 +1,9 @@
+source_set("inih") {
+  sources = [ "src/INIReader.h" ]
+
+  public_configs = [ ":inih_config" ]
+}
+
+config("inih_config") {
+  cflags_cc = [ "-Wno-extra-semi" ]
+}

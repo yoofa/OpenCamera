@@ -66,6 +66,8 @@ int main(int argc, char** argv) {
   auto conductor = std::make_shared<Conductor>(config);
   conductor->init();
 
+  conductor->start();
+
   conductor->waitingFinished();
 
   return 0;

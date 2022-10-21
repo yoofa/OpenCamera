@@ -17,6 +17,7 @@
 #include "common/looper.h"
 #include "common/message.h"
 #include "onvif/onvif_server.h"
+#include "rtsp/h264_file_source.h"
 #include "rtsp/rtsp_server.h"
 
 namespace avp {
@@ -28,6 +29,7 @@ class Conductor : public Handler {
   virtual ~Conductor();
 
   void init();
+  void start();
   void waitingFinished();
 
  private:
@@ -45,6 +47,8 @@ class Conductor : public Handler {
   std::shared_ptr<Looper> mLooper;
   std::shared_ptr<RtspServer> mRtspServer;
   std::shared_ptr<OnvifServer> mOnvifServer;
+
+  std::shared_ptr<MediaSource> mVideoSource;
 
   std::mutex mLock;
   std::condition_variable mCondition;

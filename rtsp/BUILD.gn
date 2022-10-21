@@ -9,4 +9,14 @@ oc_library("rtspserver") {
     "rtsp_server.cc",
     "rtsp_server.h",
   ]
+  deps = [ "//common" ]
+  public_deps = [ "//third_party/rtsp_server" ]
+}
+
+oc_library("h264_file_source") {
+  sources = [
+    "h264_file_source.cc",
+    "h264_file_source.h",
+  ]
+  deps = [ "//common" ]
 }

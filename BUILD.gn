@@ -75,5 +75,6 @@ oc_library("opencamera") {
     "//onvif",
     "//rtsp",
     "//third_party/inih",
+    "//third_party/rtsp_server",
   ]
 }

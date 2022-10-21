@@ -13,9 +13,9 @@ vars = {
 deps = {
   # avp
   'src/base':
-    'git@github.com:vsyf/base.git@82135b7a22ffb22cbce753a0d013f7be0783b1b6',
+    'git@github.com:vsyf/base.git@94be50f34797c2ddb0fd6d0e1650e1915e7a7d12',
   'src/common':
-    'git@github.com:vsyf/media_common.git@125ca5169827dc6f7afc99d8ce5a595b94d74926',
+    'git@github.com:vsyf/media_common.git@33dc2251dbbe0b20bf0c7a8b2b35df37e923b707',
 
   # chromium 
   'src/build':
@@ -85,6 +85,10 @@ deps = {
   # inih
   'src/third_party/inih/src':
     'https://github.com/jtilly/inih.git@4a6fde9dd6e1bc129ed307a8cad96bebdd090c80',
+
+  # RtspServer
+  'src/third_party/rtsp_server/src':
+    'https://github.com/PHZ76/RtspServer.git@1fe0ac9a0a9d417d09c2125b6fd2c1627beea186',
 }
 
 hooks = [

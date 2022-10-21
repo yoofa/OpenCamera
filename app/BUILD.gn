@@ -17,10 +17,13 @@ oc_library("oc") {
     "//base:logging",
     "//common:foundation",
     "//onvif:onvifserver",
-    "//rtsp:rtspserver",
+    "//rtsp:h264_file_source",
   ]
 
-  public_deps = [ "//third_party/inih" ]
+  public_deps = [
+    "//rtsp:rtspserver",
+    "//third_party/inih",
+  ]
 }
 
 executable("somnus") {

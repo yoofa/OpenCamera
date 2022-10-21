@@ -1,0 +1,110 @@
+group("rtsp_server") {
+  deps = [
+    ":md5",
+    ":net",
+    ":xop",
+  ]
+  public_configs = [ ":rtsp_server_config" ]
+}
+
+source_set("md5") {
+  sources = [ "src/src/3rdpart/md5/md5.hpp" ]
+}
+
+static_library("net") {
+  sources = [
+    "src/src/net/Acceptor.cpp",
+    "src/src/net/Acceptor.h",
+    "src/src/net/BufferReader.cpp",
+    "src/src/net/BufferReader.h",
+    "src/src/net/BufferWriter.cpp",
+    "src/src/net/BufferWriter.h",
+    "src/src/net/Channel.h",
+    "src/src/net/EpollTaskScheduler.cpp",
+    "src/src/net/EpollTaskScheduler.h",
+    "src/src/net/EventLoop.cpp",
+    "src/src/net/EventLoop.h",
+    "src/src/net/Logger.cpp",
+    "src/src/net/Logger.h",
+    "src/src/net/MemoryManager.cpp",
+    "src/src/net/MemoryManager.h",
+    "src/src/net/NetInterface.cpp",
+    "src/src/net/NetInterface.h",
+    "src/src/net/Pipe.cpp",
+    "src/src/net/Pipe.h",
+    "src/src/net/RingBuffer.h",
+    "src/src/net/SelectTaskScheduler.cpp",
+    "src/src/net/SelectTaskScheduler.h",
+    "src/src/net/Socket.h",
+    "src/src/net/SocketUtil.cpp",
+    "src/src/net/SocketUtil.h",
+    "src/src/net/TaskScheduler.cpp",
+    "src/src/net/TaskScheduler.h",
+    "src/src/net/TcpConnection.cpp",
+    "src/src/net/TcpConnection.h",
+    "src/src/net/TcpServer.cpp",
+    "src/src/net/TcpServer.h",
+    "src/src/net/TcpSocket.cpp",
+    "src/src/net/TcpSocket.h",
+    "src/src/net/Timer.cpp",
+    "src/src/net/Timer.h",
+    "src/src/net/Timestamp.cpp",
+    "src/src/net/Timestamp.h",
+    "src/src/net/log.h",
+  ]
+
+  public_configs = [ ":rtsp_server_config" ]
+}
+
+static_library("xop") {
+  sources = [
+    "src/src/xop/AACSource.cpp",
+    "src/src/xop/AACSource.h",
+    "src/src/xop/DigestAuthentication.cpp",
+    "src/src/xop/DigestAuthentication.h",
+    "src/src/xop/G711ASource.cpp",
+    "src/src/xop/G711ASource.h",
+    "src/src/xop/H264Parser.cpp",
+    "src/src/xop/H264Parser.h",
+    "src/src/xop/H264Source.cpp",
+    "src/src/xop/H264Source.h",
+    "src/src/xop/H265Source.cpp",
+    "src/src/xop/H265Source.h",
+    "src/src/xop/MediaSession.cpp",
+    "src/src/xop/MediaSession.h",
+    "src/src/xop/MediaSource.h",
+    "src/src/xop/RtpConnection.cpp",
+    "src/src/xop/RtpConnection.h",
+    "src/src/xop/RtspConnection.cpp",
+    "src/src/xop/RtspConnection.h",
+    "src/src/xop/RtspMessage.cpp",
+    "src/src/xop/RtspMessage.h",
+    "src/src/xop/RtspPusher.cpp",
+    "src/src/xop/RtspPusher.h",
+    "src/src/xop/RtspServer.cpp",
+    "src/src/xop/RtspServer.h",
+    "src/src/xop/VP8Source.cpp",
+    "src/src/xop/VP8Source.h",
+    "src/src/xop/media.h",
+    "src/src/xop/rtp.h",
+    "src/src/xop/rtsp.h",
+  ]
+
+  public_configs = [ ":rtsp_server_config" ]
+}
+
+config("rtsp_server_config") {
+  include_dirs = [
+    "src/src",
+    "src/src/3rdpart",
+  ]
+  cflags_cc = [
+    "-Wno-extra-semi",
+    "-Wno-unused-variable",
+    "-Wno-tautological-constant-out-of-range-compare",
+    "-Wno-pessimizing-move",
+    "-Wno-missing-braces",
+    "-Wno-unused-lambda-capture",
+    "-Wno-exit-time-destructors",
+  ]
+}

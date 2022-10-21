@@ -14,7 +14,9 @@ namespace avp {
 namespace oc {
 
 Conductor::Conductor(AppConfig appConfig)
-    : mConfig(appConfig), mLooper(std::make_shared<Looper>()) {
+    : mConfig(appConfig),
+      mLooper(std::make_shared<Looper>()),
+      mVideoSource(std::make_shared<H264FileSource>("data/h264.bin")) {
   DCHECK(mConfig.noError);
   mLooper->setName("conductor");
 }
@@ -25,17 +27,23 @@ Conductor::~Conductor() {
 }
 
 void Conductor::init() {
-  LOG(LS_INFO) << "init";
   mLooper->start();
   mLooper->registerHandler(shared_from_this());
 
   auto msg = std::make_shared<Message>(kWhatRtspNotify, shared_from_this());
   mRtspServer = std::make_shared<RtspServer>(msg);
+
   msg = std::make_shared<Message>(kWhatOnvifNotify, shared_from_this());
   mOnvifServer = std::make_shared<OnvifServer>(msg);
 
   mRtspServer->init();
   mOnvifServer->init();
+
+  mRtspServer->addMediaSource(mVideoSource);
+}
+
+void Conductor::start() {
+  mRtspServer->start();
 }
 
 void Conductor::waitingFinished() {

@@ -6,7 +6,15 @@ group("onvif") {
 
 oc_library("onvifserver") {
   sources = [
+    "onvif_device_binding_service.cc",
+    "onvif_device_binding_service.h",
+    "onvif_media_binding_service.cc",
+    "onvif_media_binding_service.h",
+    "onvif_ptz_binding_service.cc",
+    "onvif_ptz_binding_service.h",
     "onvif_server.cc",
     "onvif_server.h",
   ]
+  deps = [ "//common" ]
+  public_deps = [ "//third_party/onvif_srvd:onvif_srv" ]
 }

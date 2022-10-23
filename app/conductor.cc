@@ -34,7 +34,7 @@ void Conductor::init() {
   mRtspServer = std::make_shared<RtspServer>(msg);
 
   msg = std::make_shared<Message>(kWhatOnvifNotify, shared_from_this());
-  mOnvifServer = std::make_shared<OnvifServer>(msg);
+  mOnvifServer = std::make_shared<OnvifServer>(mConfig, msg);
 
   mRtspServer->init();
   mOnvifServer->init();
@@ -44,6 +44,7 @@ void Conductor::init() {
 
 void Conductor::start() {
   mRtspServer->start();
+  mOnvifServer->start();
 }
 
 void Conductor::waitingFinished() {

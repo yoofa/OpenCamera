@@ -19,6 +19,7 @@ struct AppConfig {
   // rtsp
 
   // onvif
+  int onvifPort;
 
   // no parth error
   bool noError;
@@ -33,6 +34,7 @@ struct AppConfig {
     appConfig.noError = true;
 
     appConfig.version = reader.GetFloat("oc", "version", 0.0);
+    appConfig.onvifPort = reader.GetInteger("onvif", "onvif_port", 0);
 
     return appConfig;
   }

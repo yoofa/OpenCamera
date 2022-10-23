@@ -5,6 +5,8 @@ group("default") {
   deps = [
     ":opencamera",
     "app",
+    "//third_party/onvif_srvd",
+    "//third_party/openssl",
   ]
 
   #  deps += [ "examples" ]
@@ -75,6 +77,8 @@ oc_library("opencamera") {
     "//onvif",
     "//rtsp",
     "//third_party/inih",
+    "//third_party/onvif_srvd:onvif_srv",
+    "//third_party/openssl:libssl_static",
     "//third_party/rtsp_server",
   ]
 }

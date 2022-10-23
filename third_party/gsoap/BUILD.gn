@@ -1,0 +1,60 @@
+import("//opencamera.gni")
+
+group("gsoap") {
+  deps = [ ":stdsoap2" ]
+}
+
+oc_source_set("stdsoap2") {
+  sources = []
+
+  # stdsoap2
+  sources += [
+    "src/gsoap/dom.cpp",
+    "src/gsoap/extras/soapdefs.h",
+    "src/gsoap/stdsoap2.cpp",
+    "src/gsoap/stdsoap2.h",
+  ]
+
+  # custom
+  sources += [
+    "src/gsoap/custom/duration.cc",
+    "src/gsoap/custom/duration.h",
+    "src/gsoap/custom/struct_timeval.cc",
+    "src/gsoap/custom/struct_timeval.h",
+  ]
+
+  # plugin
+  sources += [
+    "src/gsoap/plugin/mecevp.c",
+    "src/gsoap/plugin/mecevp.h",
+    "src/gsoap/plugin/smdevp.c",
+    "src/gsoap/plugin/smdevp.h",
+    "src/gsoap/plugin/wsaapi.cc",
+    "src/gsoap/plugin/wsaapi.h",
+    "src/gsoap/plugin/wsseapi.cpp",
+    "src/gsoap/plugin/wsseapi.h",
+  ]
+
+  public_deps = [ "//third_party/openssl:libssl_static" ]
+
+  # import
+
+  public_configs = [ ":gsoap_config" ]
+}
+
+config("gsoap_config") {
+  include_dirs = [
+    "src/gsoap",
+    "src/gsoap/src",
+    "src/gsoap/extras",
+    "//third_party/onvif_srvd/src/generated",
+  ]
+
+  cflags = [
+    "-Wno-unreachable-code",
+    "-Wno-implicit-function-declaration",
+    "-Wno-format",
+  ]
+
+  defines = [ "WITH_OPENSSL" ]
+}

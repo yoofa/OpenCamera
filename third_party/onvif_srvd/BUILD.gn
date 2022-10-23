@@ -1,0 +1,88 @@
+import("//opencamera.gni")
+
+group("onvif") {
+  deps = [
+    ":onvif_srv",
+    ":onvif_srvd",
+  ]
+}
+
+config("generated_config") {
+  include_dirs = [ "generated" ]
+  cflags_cc = [ "-Wno-extra-semi" ]
+}
+
+oc_source_set("generated") {
+  sources = [
+    "src/generated/DeviceBinding_nsmap.h",
+    "src/generated/onvif.h",
+    "src/generated/soapC.cpp",
+    "src/generated/soapDeviceBindingService.cpp",
+    "src/generated/soapDeviceBindingService.h",
+    "src/generated/soapH.h",
+    "src/generated/soapMediaBindingService.cpp",
+    "src/generated/soapMediaBindingService.h",
+    "src/generated/soapPTZBindingService.cpp",
+    "src/generated/soapPTZBindingService.h",
+    "src/generated/soapStub.h",
+  ]
+  public_deps = [ "//third_party/gsoap:stdsoap2" ]
+  configs += [ ":generated_config" ]
+}
+
+config("onvif_config") {
+  include_dirs = [ "src/src" ]
+
+  if (is_debug) {
+    defines = [ "DEBUG" ]
+  }
+
+  cflags_cc = [ "-Wno-unused-result" ]
+}
+
+oc_library("onvif_srv") {
+  sources = [
+    "src/src/ServiceContext.cpp",
+    "src/src/ServiceContext.h",
+    "src/src/ServiceDevice.cpp",
+    "src/src/ServiceMedia.cpp",
+    "src/src/ServicePTZ.cpp",
+    "src/src/eth_dev_param.cpp",
+    "src/src/eth_dev_param.h",
+    "src/src/smacros.h",
+    "src/src/stools.h",
+  ]
+
+  deps = [ ":generated" ]
+
+  public_configs = [
+    ":generated_config",
+    ":onvif_config",
+  ]
+
+  public_deps = [ "//third_party/gsoap:stdsoap2" ]
+
+  defines = [ "WITH_OPENSSL" ]
+}
+
+oc_executable("onvif_srvd") {
+  sources = [
+    "src/src/daemon.cc",
+    "src/src/daemon.h",
+    "src/src/onvif_srvd.cpp",
+  ]
+
+  configs += [ ":onvif_config" ]
+
+  deps = [ ":onvif_srv" ]
+
+  defines = [
+    "DAEMON_NAME = \"onvif_srvd\"",
+    "DAEMON_NO_CLOSE_STDIO = 1",
+  ]
+
+  cflags_cc = [
+    "-Wno-tautological-constant-out-of-range-compare",
+    "-Wno-implicit-fallthrough",
+  ]
+}

@@ -89,6 +89,18 @@ deps = {
   # RtspServer
   'src/third_party/rtsp_server/src':
     'https://github.com/PHZ76/RtspServer.git@1fe0ac9a0a9d417d09c2125b6fd2c1627beea186',
+
+  # openssl
+  'src/third_party/openssl':
+    'git@github.com:vsyf/third_party_openssl.git@a3d1b4e0d3dbc909695d1277c946ac51d196195b',
+
+  # gsoap
+  'src/third_party/gsoap/src':
+    'git@github.com:vsyf/gsoap.git@0a6ee6c2a69c5f8c50cc390e2253a9a2154bfd08',
+
+  # onvif_srvd
+  'src/third_party/onvif_srvd/src':
+    'git@github.com:vsyf/onvif_srvd.git@9c8c9bdad2438129a592440c9ada620372dc3c39',
 }
 
 hooks = [

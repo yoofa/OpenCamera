@@ -99,9 +99,9 @@ status_t RtspServer::addMediaSource(std::shared_ptr<MediaSource> mediaSource) {
 }
 
 void RtspServer::onClientConnected(const std::shared_ptr<Message>& msg) {
-  int32_t sessionId;
-  std::string ip;
-  int32_t port;
+  int32_t sessionId = 0;
+  std::string ip{};
+  int32_t port = 0;
   DCHECK(msg->findInt32("sessionId", &sessionId));
   DCHECK(msg->findString("ip", ip));
   DCHECK(msg->findInt32("port", &port));
@@ -110,9 +110,9 @@ void RtspServer::onClientConnected(const std::shared_ptr<Message>& msg) {
 }
 
 void RtspServer::onClientDisconnected(const std::shared_ptr<Message>& msg) {
-  int32_t sessionId;
-  std::string ip;
-  int32_t port;
+  int32_t sessionId = 0;
+  std::string ip{};
+  int32_t port = 0;
   DCHECK(msg->findInt32("sessionId", &sessionId));
   DCHECK(msg->findString("ip", ip));
   DCHECK(msg->findInt32("port", &port));
@@ -174,7 +174,7 @@ void RtspServer::onPullAudioSource() {
     xop::AVFrame frame = {0};
     frame.type = xop::AUDIO_FRAME;
     frame.size = buffer->size();
-    int64_t pts;
+    int64_t pts = 0;
     DCHECK(buffer->meta()->findInt64("timeUs", &pts));
     frame.timestamp = pts;
 
@@ -203,7 +203,7 @@ void RtspServer::onPullVideoSource() {
     xop::AVFrame frame = {0};
     frame.type = 0;
     frame.size = buffer->size();
-    int64_t pts;
+    int64_t pts = 0;
     DCHECK(buffer->meta()->findInt64("timeUs", &pts));
     frame.timestamp = pts / 1000 * 90;
 

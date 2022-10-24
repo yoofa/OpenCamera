@@ -43,8 +43,13 @@ void Conductor::init() {
 }
 
 void Conductor::start() {
-  mRtspServer->start();
-  mOnvifServer->start();
+  auto msg = std::make_shared<Message>(kWhatStart, shared_from_this());
+  msg->post();
+}
+
+void Conductor::stop() {
+  auto msg = std::make_shared<Message>(kWhatStop, shared_from_this());
+  msg->post();
 }
 
 void Conductor::waitingFinished() {
@@ -71,9 +76,24 @@ void Conductor::onOnvifNotify(const std::shared_ptr<Message>& msg) {
     // TODO
   }
 }
+void Conductor::onStart(const std::shared_ptr<Message>& msg) {
+  mRtspServer->start();
+  mOnvifServer->start();
+}
+void Conductor::onStop(const std::shared_ptr<Message>& msg) {}
 
 void Conductor::onMessageReceived(const std::shared_ptr<Message>& msg) {
   switch (msg->what()) {
+    case kWhatStart: {
+      onStart(msg);
+      break;
+    }
+
+    case kWhatStop: {
+      onStop(msg);
+      break;
+    }
+
     case kWhatRtspNotify: {
       onRtspNotify(msg);
       break;

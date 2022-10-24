@@ -30,15 +30,21 @@ class Conductor : public Handler {
 
   void init();
   void start();
+  void stop();
   void waitingFinished();
 
  private:
   void signalFinished();
   void onRtspNotify(const std::shared_ptr<Message>& message);
   void onOnvifNotify(const std::shared_ptr<Message>& message);
+
+  void onStart(const std::shared_ptr<Message>& message);
+  void onStop(const std::shared_ptr<Message>& message);
   void onMessageReceived(const std::shared_ptr<Message>& message) override;
 
   enum {
+    kWhatStart = 'star',
+    kWhatStop = 'stop',
     kWhatRtspNotify = 'rtsp',
     kWhatOnvifNotify = 'onvf',
   };

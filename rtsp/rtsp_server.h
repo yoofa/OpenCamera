@@ -28,6 +28,10 @@ class RtspServer : public Handler {
   status_t addMediaSource(std::shared_ptr<MediaSource> mediaSource);
 
   enum {
+
+    kWhatStart = 'star',
+    kWhatStop = 'stop',
+
     kWhatClientConnected = 'cnet',
     kWhatClientDisonnected = 'dcnt',
 
@@ -42,6 +46,9 @@ class RtspServer : public Handler {
   void onAddMediaSource(const std::shared_ptr<Message>& msg);
   void onPullAudioSource();
   void onPullVideoSource();
+
+  void onStart(const std::shared_ptr<Message>& message);
+  void onStop(const std::shared_ptr<Message>& message);
   void onMessageReceived(const std::shared_ptr<Message>& message) override;
 
   std::shared_ptr<Message> mNotify;

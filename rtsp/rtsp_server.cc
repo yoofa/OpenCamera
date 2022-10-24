@@ -69,26 +69,13 @@ void RtspServer::init() {
 }
 
 void RtspServer::start() {
-  mServer->Start("0.0.0.0", 8554);
-  std::lock_guard<std::mutex> l(mLock);
-  auto source = mAudioSource;
-  if (source.get() != nullptr) {
-    auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
-    m->post();
-  }
-  source = mVideoSource;
-
-  if (source.get() != nullptr) {
-    auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
-    m->post();
-  }
-  mStarted = true;
+  auto msg = std::make_shared<Message>(kWhatStart, shared_from_this());
+  msg->post();
 }
 
 void RtspServer::stop() {
-  std::lock_guard<std::mutex> l(mLock);
-  mServer->Stop();
-  mStarted = false;
+  auto msg = std::make_shared<Message>(kWhatStop, shared_from_this());
+  msg->post();
 }
 
 status_t RtspServer::addMediaSource(std::shared_ptr<MediaSource> mediaSource) {
@@ -220,9 +207,39 @@ void RtspServer::onPullVideoSource() {
     m->post(40 * 1000);
   }
 }
+void RtspServer::onStart(const std::shared_ptr<Message>& msg) {
+  mServer->Start("0.0.0.0", 8554);
+  auto source = mAudioSource;
+  if (source.get() != nullptr) {
+    auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
+    m->post();
+  }
+  source = mVideoSource;
+
+  if (source.get() != nullptr) {
+    auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
+    m->post();
+  }
+
+  mStarted = true;
+}
+void RtspServer::onStop(const std::shared_ptr<Message>& msg) {
+  mServer->Stop();
+  mStarted = false;
+}
 
 void RtspServer::onMessageReceived(const std::shared_ptr<Message>& msg) {
   switch (msg->what()) {
+    case kWhatStart: {
+      onStart(msg);
+      break;
+    }
+
+    case kWhatStop: {
+      onStop(msg);
+      break;
+    }
+
     case kWhatClientConnected: {
       onClientConnected(msg);
       break;

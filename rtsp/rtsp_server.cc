@@ -34,7 +34,7 @@ RtspServer::~RtspServer() {
   mLooper->stop();
 }
 
-void RtspServer::init() {
+status_t RtspServer::init() {
   std::lock_guard<std::mutex> l(mLock);
   mLooper->start();
   mLooper->registerHandler(shared_from_this());
@@ -66,16 +66,19 @@ void RtspServer::init() {
   });
 
   mSessionId = mServer->AddSession(session);
+  return OK;
 }
 
-void RtspServer::start() {
+status_t RtspServer::start() {
   auto msg = std::make_shared<Message>(kWhatStart, shared_from_this());
   msg->post();
+  return OK;
 }
 
-void RtspServer::stop() {
+status_t RtspServer::stop() {
   auto msg = std::make_shared<Message>(kWhatStop, shared_from_this());
   msg->post();
+  return OK;
 }
 
 status_t RtspServer::addMediaSource(std::shared_ptr<MediaSource> mediaSource) {
@@ -220,6 +223,7 @@ void RtspServer::onStart(const std::shared_ptr<Message>& msg) {
     auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
     m->post();
   }
+  LOG(LS_INFO) << "rtsp server run at 127.0.0.1:8554/live";
 
   mStarted = true;
 }

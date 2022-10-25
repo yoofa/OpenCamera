@@ -17,7 +17,7 @@ Conductor::Conductor(AppConfig appConfig)
     : mConfig(appConfig),
       mLooper(std::make_shared<Looper>()),
       mVideoSource(std::make_shared<H264FileSource>("data/h264.bin")) {
-  DCHECK(mConfig.noError);
+  DCHECK(!mConfig.error);
   mLooper->setName("conductor");
 }
 
@@ -26,7 +26,8 @@ Conductor::~Conductor() {
   mLooper->stop();
 }
 
-void Conductor::init() {
+status_t Conductor::init() {
+  status_t ret = OK;
   mLooper->start();
   mLooper->registerHandler(shared_from_this());
 
@@ -36,20 +37,27 @@ void Conductor::init() {
   msg = std::make_shared<Message>(kWhatOnvifNotify, shared_from_this());
   mOnvifServer = std::make_shared<OnvifServer>(mConfig, msg);
 
-  mRtspServer->init();
-  mOnvifServer->init();
+  if ((ret = mRtspServer->init()) != OK) {
+    return ret;
+  }
+  if ((ret = mOnvifServer->init()) != OK) {
+    return ret;
+  }
 
   mRtspServer->addMediaSource(mVideoSource);
+  return ret;
 }
 
-void Conductor::start() {
+status_t Conductor::start() {
   auto msg = std::make_shared<Message>(kWhatStart, shared_from_this());
   msg->post();
+  return OK;
 }
 
-void Conductor::stop() {
+status_t Conductor::stop() {
   auto msg = std::make_shared<Message>(kWhatStop, shared_from_this());
   msg->post();
+  return OK;
 }
 
 void Conductor::waitingFinished() {

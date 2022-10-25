@@ -21,9 +21,9 @@ class RtspServer : public Handler {
  public:
   RtspServer(std::shared_ptr<Message> notify);
   virtual ~RtspServer();
-  void init();
-  void start();
-  void stop();
+  status_t init();
+  status_t start();
+  status_t stop();
 
   status_t addMediaSource(std::shared_ptr<MediaSource> mediaSource);
 

@@ -28,9 +28,9 @@ class Conductor : public Handler {
   Conductor(AppConfig appConfig);
   virtual ~Conductor();
 
-  void init();
-  void start();
-  void stop();
+  status_t init();
+  status_t start();
+  status_t stop();
   void waitingFinished();
 
  private:

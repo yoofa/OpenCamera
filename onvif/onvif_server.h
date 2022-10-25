@@ -47,6 +47,7 @@ class OnvifServer : public Handler {
   std::shared_ptr<Looper> mLooper;
   std::shared_ptr<Message> mNotify;
 
+  AppConfig mAppConfig;
   std::unique_ptr<ServiceContext> mServicesInfo;
   std::unique_ptr<soap, void (*)(soap*)> mSoap;
   std::unique_ptr<OnvifDeviceBindingService> mDeviceSerivce;

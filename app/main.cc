@@ -10,6 +10,7 @@
 
 #include "app_config.h"
 #include "base/logging.h"
+#include "base/types.h"
 #include "conductor.h"
 
 using avp::AppConfig;
@@ -64,7 +65,9 @@ int main(int argc, char** argv) {
   LOG(avp::LS_INFO) << "app version: " << config.version;
 
   auto conductor = std::make_shared<Conductor>(config);
-  conductor->init();
+  if (conductor->init() != avp::OK) {
+    return -1;
+  }
 
   conductor->start();
 

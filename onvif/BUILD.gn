@@ -1,12 +1,10 @@
 import("//opencamera.gni")
 
 group("onvif") {
-  testonly = true
   deps = [ ":onvifserver" ]
 }
 
 oc_library("onvifserver") {
-  testonly = true
   sources = [
     "onvif_device_binding_service.cc",
     "onvif_device_binding_service.h",

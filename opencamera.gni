@@ -76,8 +76,9 @@ set_defaults("oc_shared_library") {
 
 oc_default_visibility = [ oc_root + "/*" ]
 
+# TODO(youfa) fix test template not found
 template("oc_test") {
-  test(target_name) {
+  executable(target_name) {
     forward_variables_from(invoker,
                            "*",
                            [
@@ -92,15 +93,11 @@ template("oc_test") {
     # template can override it to [ "*" ] and we want to avoid conditional
     # visibility.
     visibility = [ "*" ]
+    testonly = true
     configs += invoker.configs
     configs -= oc_remove_configs
     configs -= invoker.suppressed_configs
-    public_configs = [
-      oc_common_inherited_config,
-      absl_include_config,
-      absl_define_config,
-      absl_flags_config,
-    ]
+    public_configs = [ oc_common_inherited_config ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }

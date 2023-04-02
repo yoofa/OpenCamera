@@ -1,12 +1,10 @@
 import("//opencamera.gni")
 
 group("rtsp") {
-  testonly = true
   deps = [ ":rtspserver" ]
 }
 
 oc_library("rtspserver") {
-  testonly = true
   sources = [
     "rtsp_server.cc",
     "rtsp_server.h",
@@ -16,7 +14,6 @@ oc_library("rtspserver") {
 }
 
 oc_library("h264_file_source") {
-  testonly = true
   sources = [
     "h264_file_source.cc",
     "h264_file_source.h",

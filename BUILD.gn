@@ -11,7 +11,10 @@ group("default") {
 
   #  deps += [ "examples" ]
   if (avp_include_test) {
-    deps += [ "test" ]
+    deps += [
+      "base:base_unittests",
+      "test",
+    ]
   }
 }
 

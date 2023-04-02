@@ -1,7 +1,6 @@
 import("//opencamera.gni")
 
 group("app") {
-  testonly = true
   deps = [
     ":oc",
     ":somnus",
@@ -9,7 +8,6 @@ group("app") {
 }
 
 oc_library("oc") {
-  testonly = true
   sources = [
     "app_config.h",
     "conductor.cc",
@@ -29,7 +27,6 @@ oc_library("oc") {
 }
 
 executable("somnus") {
-  testonly = true
   sources = [ "main.cc" ]
   deps = [
     ":oc",

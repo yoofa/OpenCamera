@@ -10,7 +10,9 @@ group("default") {
   ]
 
   #  deps += [ "examples" ]
-  #  deps += [ "test" ]
+  if (avp_include_test) {
+    deps += [ "test" ]
+  }
 }
 
 config("library_impl_config") {
@@ -65,6 +67,7 @@ config("common_config") {
 }
 
 oc_library("opencamera") {
+  testonly = true
   sources = []
 
   defines = []

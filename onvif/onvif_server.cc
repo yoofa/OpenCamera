@@ -66,63 +66,63 @@ status_t convertConfig(ServiceContext* serviceContext, AppConfig* appConfig) {
 }
 
 OnvifServer::OnvifServer(AppConfig appConfig, std::shared_ptr<Message> notify)
-    : mLooper(std::make_shared<Looper>()),
-      mNotify(std::move(notify)),
-      mAppConfig(appConfig),
-      mServicesInfo(new ServiceContext()),
-      mSoap(soap_new(),
+    : looper_(std::make_shared<Looper>()),
+      notify_(std::move(notify)),
+      app_config_(appConfig),
+      service_info_(new ServiceContext()),
+      soap_(soap_new(),
             [](soap* soap) {
               soap_destroy(soap);
               soap_end(soap);
               soap_done(soap);
             }),
-      mDeviceSerivce(new OnvifDeviceBindingService(mSoap.get())),
-      mMediaService(new OnvifMediaBindingService(mSoap.get())),
-      mPTZService(new OnvifPTZBindingService(mSoap.get())) {
-  DCHECK(!mAppConfig.error);
-  mLooper->setName("OnvifServer");
+      device_service_(new OnvifDeviceBindingService(soap_.get())),
+      media_service_(new OnvifMediaBindingService(soap_.get())),
+      ptz_service_(new OnvifPTZBindingService(soap_.get())) {
+  DCHECK(!app_config_.error);
+  looper_->setName("OnvifServer");
 }
 
 OnvifServer::~OnvifServer() {
-  mLooper->unregisterHandler(id());
-  mLooper->stop();
+  looper_->unregisterHandler(id());
+  looper_->stop();
 }
 
-status_t OnvifServer::init() {
-  mLooper->start();
-  mLooper->registerHandler(shared_from_this());
+status_t OnvifServer::Init() {
+  looper_->start();
+  looper_->registerHandler(shared_from_this());
 
-  status_t err = convertConfig(mServicesInfo.get(), &mAppConfig);
+  status_t err = convertConfig(service_info_.get(), &app_config_);
   if (err) {
     LOG(LS_ERROR) << "init config error";
     return err;
   }
 
   if (!soap_valid_socket(
-          soap_bind(mSoap.get(), NULL, mServicesInfo->port, 10))) {
+          soap_bind(soap_.get(), NULL, service_info_->port, 10))) {
     std::stringstream ss;
-    soap_stream_fault(mSoap.get(), ss);
-    LOG(LS_ERROR) << "bind socket error, port:" << mServicesInfo->port << ", "
+    soap_stream_fault(soap_.get(), ss);
+    LOG(LS_ERROR) << "bind socket error, port:" << service_info_->port << ", "
                   << ss.str();
     return UNKNOWN_ERROR;
   }
 
   // timeout in sec
-  mSoap->send_timeout = 3;
-  mSoap->recv_timeout = 3;
+  soap_->send_timeout = 3;
+  soap_->recv_timeout = 3;
 
-  mSoap->user = this;
+  soap_->user = this;
 
   return OK;
 }
 
-status_t OnvifServer::start() {
+status_t OnvifServer::Start() {
   auto msg = std::make_shared<Message>(kWhatStart, shared_from_this());
   msg->post();
   return OK;
 }
 
-status_t OnvifServer::stop() {
+status_t OnvifServer::Stop() {
   auto msg = std::make_shared<Message>(kWhatStop, shared_from_this());
   msg->post();
   return OK;
@@ -142,44 +142,44 @@ void OnvifServer::onMessageReceived(const std::shared_ptr<Message>& message) {
 }
 
 void OnvifServer::onStart(const std::shared_ptr<Message>& msg) {
-  mSoapThread = std::thread([this]() {
+  soap_thread_ = std::thread([this]() {
     // FIXME stop thread
     while (true) {
       std::stringstream ss;
       // wait new client
-      if (!soap_valid_socket(soap_accept(mSoap.get()))) {
+      if (!soap_valid_socket(soap_accept(soap_.get()))) {
         ss.clear();
-        soap_stream_fault(mSoap.get(), ss);
+        soap_stream_fault(soap_.get(), ss);
         LOG(LS_ERROR) << "start with no valid socket." << ss.str();
         // TODO notify OnvifServer
       }
 
       // process ervices
-      if (soap_begin_serve(mSoap.get())) {
+      if (soap_begin_serve(soap_.get())) {
         ss.clear();
-        soap_stream_fault(mSoap.get(), ss);
+        soap_stream_fault(soap_.get(), ss);
         LOG(LS_ERROR) << ss.str();
-      } else if (mDeviceSerivce->dispatch() != SOAP_NO_METHOD) {
+      } else if (device_service_->dispatch() != SOAP_NO_METHOD) {
         ss.clear();
-        soap_send_fault(mSoap.get());
-        soap_stream_fault(mSoap.get(), ss);
+        soap_send_fault(soap_.get());
+        soap_stream_fault(soap_.get(), ss);
         LOG(LS_ERROR) << ss.str();
-      } else if (mMediaService->dispatch() != SOAP_NO_METHOD) {
+      } else if (media_service_->dispatch() != SOAP_NO_METHOD) {
         ss.clear();
-        soap_send_fault(mSoap.get());
-        soap_stream_fault(mSoap.get(), ss);
+        soap_send_fault(soap_.get());
+        soap_stream_fault(soap_.get(), ss);
         LOG(LS_ERROR) << ss.str();
-      } else if (mPTZService->dispatch() != SOAP_NO_METHOD) {
+      } else if (ptz_service_->dispatch() != SOAP_NO_METHOD) {
         ss.clear();
-        soap_send_fault(mSoap.get());
-        soap_stream_fault(mSoap.get(), ss);
+        soap_send_fault(soap_.get());
+        soap_stream_fault(soap_.get(), ss);
         LOG(LS_ERROR) << ss.str();
       } else {
         LOG(LS_WARNING) << "UNKNOWN SERVICE";
       }
 
-      soap_destroy(mSoap.get());
-      soap_end(mSoap.get());
+      soap_destroy(soap_.get());
+      soap_end(soap_.get());
     }
   });
 }

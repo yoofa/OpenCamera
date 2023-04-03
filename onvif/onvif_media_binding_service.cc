@@ -27,7 +27,7 @@ int OnvifMediaBindingService::GetServiceCapabilities(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
   trt__GetServiceCapabilitiesResponse.Capabilities =
       ctx->getMediaServiceCapabilities(this->soap);
 
@@ -41,7 +41,7 @@ int OnvifMediaBindingService::GetVideoSources(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -82,7 +82,7 @@ int OnvifMediaBindingService::GetProfile(
   int ret = SOAP_FAULT;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
   auto profiles = ctx->get_profiles();
   auto it = profiles.find(trt__GetProfile->ProfileToken);
 
@@ -101,7 +101,7 @@ int OnvifMediaBindingService::GetProfiles(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -252,7 +252,7 @@ int OnvifMediaBindingService::GetVideoSourceConfigurations(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -273,7 +273,7 @@ int OnvifMediaBindingService::GetVideoEncoderConfigurations(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -335,7 +335,7 @@ int OnvifMediaBindingService::GetVideoSourceConfiguration(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -359,7 +359,7 @@ int OnvifMediaBindingService::GetVideoEncoderConfiguration(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -426,7 +426,7 @@ int OnvifMediaBindingService::GetCompatibleVideoEncoderConfigurations(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -452,7 +452,7 @@ int OnvifMediaBindingService::GetCompatibleVideoSourceConfigurations(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -585,7 +585,7 @@ int OnvifMediaBindingService::GetVideoSourceConfigurationOptions(
   int width;
   int height;
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -661,7 +661,7 @@ int OnvifMediaBindingService::GetVideoEncoderConfigurationOptions(
 
   std::string token;
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -836,7 +836,7 @@ int OnvifMediaBindingService::GetGuaranteedNumberOfVideoEncoderInstances(
   LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   auto profiles = ctx->get_profiles();
 
@@ -876,7 +876,7 @@ int OnvifMediaBindingService::GetStreamUri(
   int ret = SOAP_FAULT;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
   auto profiles = ctx->get_profiles();
   auto it = profiles.find(trt__GetStreamUri->ProfileToken);
 
@@ -919,7 +919,7 @@ int OnvifMediaBindingService::GetSnapshotUri(
   int ret = SOAP_FAULT;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
   auto profiles = ctx->get_profiles();
   auto it = profiles.find(trt__GetSnapshotUri->ProfileToken);
 

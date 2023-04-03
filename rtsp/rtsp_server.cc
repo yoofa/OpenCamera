@@ -18,26 +18,26 @@
 namespace avp {
 
 RtspServer::RtspServer(std::shared_ptr<Message> notify)
-    : mNotify(std::move(notify)),
-      mLooper(new Looper()),
-      mEventLoop(new xop::EventLoop()),
-      mServer(xop::RtspServer::Create(mEventLoop.get())),
-      mSessionId(-1),
-      mHasAudio(false),
-      mHasVideo(false),
-      mStarted(false) {
-  mLooper->setName("RtspServer");
+    : notify_(std::move(notify)),
+      looper_(new Looper()),
+      event_loop_(new xop::EventLoop()),
+      server_(xop::RtspServer::Create(event_loop_.get())),
+      session_id_(-1),
+      has_audio_(false),
+      has_video_(false),
+      started_(false) {
+  looper_->setName("RtspServer");
 }
 
 RtspServer::~RtspServer() {
-  mLooper->unregisterHandler(id());
-  mLooper->stop();
+  looper_->unregisterHandler(id());
+  looper_->stop();
 }
 
-status_t RtspServer::init() {
-  std::lock_guard<std::mutex> l(mLock);
-  mLooper->start();
-  mLooper->registerHandler(shared_from_this());
+status_t RtspServer::Init() {
+  std::lock_guard<std::mutex> l(mutex_);
+  looper_->start();
+  looper_->registerHandler(shared_from_this());
 
   xop::MediaSession* session = xop::MediaSession::CreateNew("live");
   session->AddSource(xop::channel_0, xop::H264Source::CreateNew());
@@ -65,30 +65,30 @@ status_t RtspServer::init() {
     msg->post();
   });
 
-  mSessionId = mServer->AddSession(session);
+  session_id_ = server_->AddSession(session);
   return OK;
 }
 
-status_t RtspServer::start() {
+status_t RtspServer::Start() {
   auto msg = std::make_shared<Message>(kWhatStart, shared_from_this());
   msg->post();
   return OK;
 }
 
-status_t RtspServer::stop() {
+status_t RtspServer::Stop() {
   auto msg = std::make_shared<Message>(kWhatStop, shared_from_this());
   msg->post();
   return OK;
 }
 
-status_t RtspServer::addMediaSource(std::shared_ptr<MediaSource> mediaSource) {
+status_t RtspServer::AddMediaSource(std::shared_ptr<MediaSource> mediaSource) {
   auto msg = std::make_shared<Message>(kWhatAddMediaSource, shared_from_this());
   msg->setObject("mediaSource", std::move(mediaSource));
   msg->post();
   return OK;
 }
 
-void RtspServer::onClientConnected(const std::shared_ptr<Message>& msg) {
+void RtspServer::OnClientConnected(const std::shared_ptr<Message>& msg) {
   int32_t sessionId = 0;
   std::string ip{};
   int32_t port = 0;
@@ -99,7 +99,7 @@ void RtspServer::onClientConnected(const std::shared_ptr<Message>& msg) {
                << ", port: " << port;
 }
 
-void RtspServer::onClientDisconnected(const std::shared_ptr<Message>& msg) {
+void RtspServer::OnClientDisconnected(const std::shared_ptr<Message>& msg) {
   int32_t sessionId = 0;
   std::string ip{};
   int32_t port = 0;
@@ -110,7 +110,7 @@ void RtspServer::onClientDisconnected(const std::shared_ptr<Message>& msg) {
                << ", ip: " << ip << ", port: " << port;
 }
 
-void RtspServer::onAddMediaSource(const std::shared_ptr<Message>& msg) {
+void RtspServer::OnAddMediaSource(const std::shared_ptr<Message>& msg) {
   std::shared_ptr<MessageObject> obj;
   DCHECK(msg->findObject("mediaSource", obj));
   std::shared_ptr<MediaSource> source =
@@ -125,41 +125,41 @@ void RtspServer::onAddMediaSource(const std::shared_ptr<Message>& msg) {
   std::string mime;
   DCHECK(format->findString("mime", mime));
   bool isAudio = !strncasecmp("audio/", mime.c_str(), 6);
-  if (isAudio && mHasAudio) {
+  if (isAudio && has_audio_) {
     LOG(LS_WARNING)
         << "add media source failed, only support on audio stream, return";
     return;
   }
 
-  if (!isAudio && mHasVideo) {
+  if (!isAudio && has_video_) {
     LOG(LS_WARNING)
         << "add media source failed, only support on video stream, return";
     return;
   }
   if (isAudio) {
-    mAudioSource = std::move(source);
-    std::lock_guard<std::mutex> l(mLock);
-    if (mStarted) {
+    audio_source_ = std::move(source);
+    std::lock_guard<std::mutex> l(mutex_);
+    if (started_) {
       auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
       m->post();
     }
   } else {
-    mVideoSource = std::move(source);
-    std::lock_guard<std::mutex> l(mLock);
-    if (mStarted) {
+    video_source_ = std::move(source);
+    std::lock_guard<std::mutex> l(mutex_);
+    if (started_) {
       auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
       m->post();
     }
   }
 }
 
-void RtspServer::onPullAudioSource() {
-  if (mAudioSource.get() == nullptr) {
+void RtspServer::OnPullAudioSource() {
+  if (audio_source_.get() == nullptr) {
     return;
   }
 
   std::shared_ptr<Buffer> buffer;
-  status_t ret = mAudioSource->read(buffer);
+  status_t ret = audio_source_->read(buffer);
   if (ret == OK) {
     xop::AVFrame frame = {0};
     frame.type = xop::AUDIO_FRAME;
@@ -171,24 +171,24 @@ void RtspServer::onPullAudioSource() {
     frame.buffer.reset(new uint8_t[frame.size]);
     memcpy(frame.buffer.get(), buffer->data(), frame.size);
 
-    mServer->PushFrame(mSessionId, xop::channel_1, frame);
+    server_->PushFrame(session_id_, xop::channel_1, frame);
   }
 
-  std::lock_guard<std::mutex> l(mLock);
-  if (mStarted) {
+  std::lock_guard<std::mutex> l(mutex_);
+  if (started_) {
     auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
     // TODO calculate delay
     m->post(50 * 1000);
   }
 }
 
-void RtspServer::onPullVideoSource() {
-  if (mVideoSource.get() == nullptr) {
+void RtspServer::OnPullVideoSource() {
+  if (video_source_.get() == nullptr) {
     return;
   }
 
   std::shared_ptr<Buffer> buffer;
-  status_t ret = mVideoSource->read(buffer);
+  status_t ret = video_source_->read(buffer);
   if (ret == OK) {
     xop::AVFrame frame = {0};
     frame.type = 0;
@@ -200,24 +200,24 @@ void RtspServer::onPullVideoSource() {
     frame.buffer.reset(new uint8_t[frame.size]);
     memcpy(frame.buffer.get(), buffer->data(), frame.size);
 
-    mServer->PushFrame(mSessionId, xop::channel_0, frame);
+    server_->PushFrame(session_id_, xop::channel_0, frame);
   }
 
-  std::lock_guard<std::mutex> l(mLock);
-  if (mStarted) {
+  std::lock_guard<std::mutex> l(mutex_);
+  if (started_) {
     auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
     // TODO calculate delay
     m->post(40 * 1000);
   }
 }
-void RtspServer::onStart(const std::shared_ptr<Message>& msg) {
-  mServer->Start("0.0.0.0", 8554);
-  auto source = mAudioSource;
+void RtspServer::OnStart(const std::shared_ptr<Message>& msg) {
+  server_->Start("0.0.0.0", 8554);
+  auto source = audio_source_;
   if (source.get() != nullptr) {
     auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
     m->post();
   }
-  source = mVideoSource;
+  source = video_source_;
 
   if (source.get() != nullptr) {
     auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
@@ -225,45 +225,45 @@ void RtspServer::onStart(const std::shared_ptr<Message>& msg) {
   }
   LOG(LS_INFO) << "rtsp server run at 127.0.0.1:8554/live";
 
-  mStarted = true;
+  started_ = true;
 }
-void RtspServer::onStop(const std::shared_ptr<Message>& msg) {
-  mServer->Stop();
-  mStarted = false;
+void RtspServer::OnStop(const std::shared_ptr<Message>& msg) {
+  server_->Stop();
+  started_ = false;
 }
 
 void RtspServer::onMessageReceived(const std::shared_ptr<Message>& msg) {
   switch (msg->what()) {
     case kWhatStart: {
-      onStart(msg);
+      OnStart(msg);
       break;
     }
 
     case kWhatStop: {
-      onStop(msg);
+      OnStop(msg);
       break;
     }
 
     case kWhatClientConnected: {
-      onClientConnected(msg);
+      OnClientConnected(msg);
       break;
     }
 
     case kWhatClientDisonnected: {
-      onClientDisconnected(msg);
+      OnClientDisconnected(msg);
       break;
     }
 
     case kWhatAddMediaSource: {
-      onAddMediaSource(msg);
+      OnAddMediaSource(msg);
       break;
     }
     case kWhatPullAudio: {
-      onPullAudioSource();
+      OnPullAudioSource();
       break;
     }
     case kWhatPullVideo: {
-      onPullVideoSource();
+      OnPullVideoSource();
       break;
     }
   }

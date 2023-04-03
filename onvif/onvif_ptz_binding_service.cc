@@ -32,7 +32,7 @@ int OnvifPTZBindingService::GetConfigurations(
     _tptz__GetConfigurationsResponse& tptz__GetConfigurationsResponse) {
   LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   tt__PTZConfiguration* pPTZCfg = ctx->GetPTZConfiguration(soap);
   if (pPTZCfg != NULL) {
@@ -93,7 +93,7 @@ int OnvifPTZBindingService::GotoPreset(
   std::string preset_cmd;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   if (tptz__GotoPreset == NULL) {
     return SOAP_OK;
@@ -136,7 +136,7 @@ int OnvifPTZBindingService::GetConfiguration(
     _tptz__GetConfigurationResponse& tptz__GetConfigurationResponse) {
   LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   tt__PTZConfiguration* pPTZCfg = ctx->GetPTZConfiguration(soap);
   if (pPTZCfg) {
@@ -261,7 +261,7 @@ int OnvifPTZBindingService::GetConfigurationOptions(
         tptz__GetConfigurationOptionsResponse) {
   LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   tptz__GetConfigurationOptionsResponse.PTZConfigurationOptions =
       ctx->GetPTZConfigurationOptions(soap);
@@ -278,7 +278,7 @@ int OnvifPTZBindingService::GotoHomePosition(
   std::string preset_cmd;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   if (tptz__GotoHomePosition == NULL) {
     return SOAP_OK;
@@ -319,7 +319,7 @@ int OnvifPTZBindingService::ContinuousMove(
   LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   if (tptz__ContinuousMove == NULL) {
     return SOAP_OK;
@@ -352,7 +352,7 @@ int OnvifPTZBindingService::RelativeMove(
   LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   if (tptz__RelativeMove == NULL) {
     return SOAP_OK;
@@ -405,7 +405,7 @@ int OnvifPTZBindingService::Stop(_tptz__Stop* tptz__Stop,
   LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   system(ctx->get_ptz_node()->get_move_stop().c_str());
 

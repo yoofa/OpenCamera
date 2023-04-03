@@ -50,22 +50,22 @@ static uint8_t* findNextStartCode(uint8_t* buf, int len) {
 }
 
 H264FileSource::H264FileSource(const char* path)
-    : mMeta(std::make_shared<MetaData>()), mBuf(new uint8_t[FRAME_MAX_SIZE]) {
-  mMeta->setCString(kKeyMIMEType, "video/AVC");
-  mMeta->setInt32(kKeyCodecType, kKeyAVCC);
-  mMeta->setInt32(kKeyWidth, 960);
-  mMeta->setInt32(kKeyHeight, 408);
+    : meta_(std::make_shared<MetaData>()), buf_(new uint8_t[FRAME_MAX_SIZE]) {
+  meta_->setCString(kKeyMIMEType, "video/AVC");
+  meta_->setInt32(kKeyCodecType, kKeyAVCC);
+  meta_->setInt32(kKeyWidth, 960);
+  meta_->setInt32(kKeyHeight, 408);
 
-  mFd = open(path, O_LARGEFILE | O_RDONLY);
-  if (mFd <= 0) {
+  fd_ = open(path, O_LARGEFILE | O_RDONLY);
+  if (fd_ <= 0) {
     LOG(LS_ERROR) << "open file error";
   }
 }
 
 H264FileSource::~H264FileSource() {
-  if (mFd > 0) {
-    ::close(mFd);
-    mFd = -1;
+  if (fd_ > 0) {
+    ::close(fd_);
+    fd_ = -1;
   }
 }
 
@@ -78,33 +78,33 @@ status_t H264FileSource::stop() {
 }
 
 std::shared_ptr<MetaData> H264FileSource::getFormat() {
-  return mMeta;
+  return meta_;
 }
 
 status_t H264FileSource::read(std::shared_ptr<Buffer>& buffer,
                               const ReadOptions* options) {
-  if (mFd <= 0) {
+  if (fd_ <= 0) {
     return UNKNOWN_ERROR;
   }
 
   int rSize, frameSize;
   uint8_t* nextStartCodePos;
-  rSize = ::read(mFd, mBuf.get(), FRAME_MAX_SIZE);
-  if (!startCode3(mBuf.get()) && !startCode4(mBuf.get())) {
+  rSize = ::read(fd_, buf_.get(), FRAME_MAX_SIZE);
+  if (!startCode3(buf_.get()) && !startCode4(buf_.get())) {
     return -1;
   }
 
-  nextStartCodePos = findNextStartCode(mBuf.get() + 3, rSize - 3);
+  nextStartCodePos = findNextStartCode(buf_.get() + 3, rSize - 3);
 
   if (!nextStartCodePos) {
-    lseek(mFd, 0, SEEK_SET);
+    lseek(fd_, 0, SEEK_SET);
     frameSize = rSize;
   } else {
-    frameSize = nextStartCodePos - mBuf.get();
-    lseek(mFd, frameSize - rSize, SEEK_CUR);
+    frameSize = nextStartCodePos - buf_.get();
+    lseek(fd_, frameSize - rSize, SEEK_CUR);
   }
   std::shared_ptr<Buffer> buf = std::make_shared<Buffer>(frameSize);
-  memcpy(buf->data(), mBuf.get(), frameSize);
+  memcpy(buf->data(), buf_.get(), frameSize);
   buf->meta()->setInt64("timeUs", Looper::getNowUs());
   buffer = buf;
 

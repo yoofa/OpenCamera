@@ -29,9 +29,9 @@ class OnvifServer : public Handler {
   OnvifServer(AppConfig appConfig, std::shared_ptr<Message> notify);
   virtual ~OnvifServer();
 
-  status_t init();
-  status_t start();
-  status_t stop();
+  status_t Init();
+  status_t Start();
+  status_t Stop();
 
   enum {
     kWhatStart = 'star',
@@ -44,17 +44,17 @@ class OnvifServer : public Handler {
   friend class OnvifMediaBindingService;
   friend class OnvifPTZBindingService;
 
-  std::shared_ptr<Looper> mLooper;
-  std::shared_ptr<Message> mNotify;
+  std::shared_ptr<Looper> looper_;
+  std::shared_ptr<Message> notify_;
 
-  AppConfig mAppConfig;
-  std::unique_ptr<ServiceContext> mServicesInfo;
-  std::unique_ptr<soap, void (*)(soap*)> mSoap;
-  std::unique_ptr<OnvifDeviceBindingService> mDeviceSerivce;
-  std::unique_ptr<OnvifMediaBindingService> mMediaService;
-  std::unique_ptr<OnvifPTZBindingService> mPTZService;
+  AppConfig app_config_;
+  std::unique_ptr<ServiceContext> service_info_;
+  std::unique_ptr<soap, void (*)(soap*)> soap_;
+  std::unique_ptr<OnvifDeviceBindingService> device_service_;
+  std::unique_ptr<OnvifMediaBindingService> media_service_;
+  std::unique_ptr<OnvifPTZBindingService> ptz_service_;
 
-  std::thread mSoapThread;
+  std::thread soap_thread_;
 
   void onMessageReceived(const std::shared_ptr<Message>& msg) override;
   void onStart(const std::shared_ptr<Message>& msg);

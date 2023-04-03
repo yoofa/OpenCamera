@@ -29,7 +29,7 @@ int OnvifDeviceBindingService::GetServices(
   LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   std::string XAddr = ctx->getXAddr(this->soap);
 
@@ -104,7 +104,7 @@ int OnvifDeviceBindingService::GetServiceCapabilities(
   LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
   tds__GetServiceCapabilitiesResponse.Capabilities =
       ctx->getDeviceServiceCapabilities(this->soap);
 
@@ -118,7 +118,7 @@ int OnvifDeviceBindingService::GetDeviceInformation(
   LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
   tds__GetDeviceInformationResponse.Manufacturer = ctx->manufacturer;
   tds__GetDeviceInformationResponse.Model = ctx->model;
   tds__GetDeviceInformationResponse.FirmwareVersion = ctx->firmware_version;
@@ -225,7 +225,7 @@ int OnvifDeviceBindingService::GetScopes(
   LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   for (size_t i = 0; i < ctx->scopes.size(); ++i) {
     tds__GetScopesResponse.Scopes.push_back(soap_new_req_tt__Scope(
@@ -308,7 +308,7 @@ int OnvifDeviceBindingService::GetUsers(
   LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   if (!ctx->user.empty()) {
     tds__GetUsersResponse.User.push_back(soap_new_tt__User(this->soap));
@@ -354,7 +354,7 @@ int OnvifDeviceBindingService::GetCapabilities(
   LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   std::string XAddr = ctx->getXAddr(this->soap);
 
@@ -498,7 +498,7 @@ int OnvifDeviceBindingService::GetNetworkInterfaces(
   LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
-  ServiceContext* ctx = (ServiceContext*)server->mServicesInfo.get();
+  ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
   for (size_t i = 0; i < ctx->eth_ifs.size(); ++i) {
     char tmp_buf[20];

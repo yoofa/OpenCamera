@@ -32,9 +32,9 @@ class H264FileSource : public MediaSource {
                 const ReadOptions* options = nullptr) override;
 
  private:
-  std::shared_ptr<MetaData> mMeta;
-  int mFd;
-  std::unique_ptr<uint8_t[]> mBuf;
+  std::shared_ptr<MetaData> meta_;
+  int fd_;
+  std::unique_ptr<uint8_t[]> buf_;
 
   AVP_DISALLOW_COPY_AND_ASSIGN(H264FileSource);
 };

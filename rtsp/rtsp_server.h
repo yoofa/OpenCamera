@@ -21,11 +21,11 @@ class RtspServer : public Handler {
  public:
   RtspServer(std::shared_ptr<Message> notify);
   virtual ~RtspServer();
-  status_t init();
-  status_t start();
-  status_t stop();
+  status_t Init();
+  status_t Start();
+  status_t Stop();
 
-  status_t addMediaSource(std::shared_ptr<MediaSource> mediaSource);
+  status_t AddMediaSource(std::shared_ptr<MediaSource> mediaSource);
 
   enum {
 
@@ -41,28 +41,30 @@ class RtspServer : public Handler {
   };
 
  private:
-  void onClientConnected(const std::shared_ptr<Message>& msg);
-  void onClientDisconnected(const std::shared_ptr<Message>& msg);
-  void onAddMediaSource(const std::shared_ptr<Message>& msg);
-  void onPullAudioSource();
-  void onPullVideoSource();
+  void OnClientConnected(const std::shared_ptr<Message>& msg);
+  void OnClientDisconnected(const std::shared_ptr<Message>& msg);
+  void OnAddMediaSource(const std::shared_ptr<Message>& msg);
+  void OnPullAudioSource();
+  void OnPullVideoSource();
 
-  void onStart(const std::shared_ptr<Message>& message);
-  void onStop(const std::shared_ptr<Message>& message);
+  void OnStart(const std::shared_ptr<Message>& message);
+  void OnStop(const std::shared_ptr<Message>& message);
+
+  // handler
   void onMessageReceived(const std::shared_ptr<Message>& message) override;
 
-  std::shared_ptr<Message> mNotify;
-  std::shared_ptr<Looper> mLooper;
-  std::shared_ptr<xop::EventLoop> mEventLoop;
-  std::shared_ptr<xop::RtspServer> mServer;
-  xop::MediaSessionId mSessionId;
+  std::shared_ptr<Message> notify_;
+  std::shared_ptr<Looper> looper_;
+  std::shared_ptr<xop::EventLoop> event_loop_;
+  std::shared_ptr<xop::RtspServer> server_;
+  xop::MediaSessionId session_id_;
 
-  bool mHasAudio;
-  bool mHasVideo;
-  bool mStarted;
-  std::shared_ptr<MediaSource> mAudioSource;
-  std::shared_ptr<MediaSource> mVideoSource;
-  std::mutex mLock;
+  bool has_audio_;
+  bool has_video_;
+  bool started_;
+  std::shared_ptr<MediaSource> audio_source_;
+  std::shared_ptr<MediaSource> video_source_;
+  std::mutex mutex_;
 };
 }  // namespace avp
 

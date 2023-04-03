@@ -44,7 +44,7 @@ VideoCapturer::VideoCapturer(std::shared_ptr<Looper> looper,
 VideoCapturer::~VideoCapturer() {}
 
 status_t VideoCapturer::Init() {
-  task_runner_->postTask([this]() {
+  task_runner_->PostTask([this]() {
     looper_->registerHandler(
         std::enable_shared_from_this<Handler>::shared_from_this());
     repeating_task_handler_ = RepeatingTaskHandle::DelayedStart(
@@ -59,7 +59,7 @@ status_t VideoCapturer::Init() {
 }
 
 status_t VideoCapturer::Start() {
-  task_runner_->postTask([this]() {
+  task_runner_->PostTask([this]() {
     MetaData metaData;
     metaData.setInt32(kKeyWidth, 1920);
     metaData.setInt32(kKeyHeight, 1080);
@@ -71,12 +71,12 @@ status_t VideoCapturer::Start() {
 }
 
 status_t VideoCapturer::Stop() {
-  task_runner_->postTask([this]() { video_source_->stop(); });
+  task_runner_->PostTask([this]() { video_source_->stop(); });
   return OK;
 }
 
 status_t VideoCapturer::AddVideoSink(std::shared_ptr<VideoSink> sink) {
-  task_runner_->postTask([this, sink]() {
+  task_runner_->PostTask([this, sink]() {
     for (auto& s : video_sinks_) {
       if (s == sink) {
         return;
@@ -91,7 +91,7 @@ status_t VideoCapturer::AddVideoSink(std::shared_ptr<VideoSink> sink) {
 
 status_t VideoCapturer::SetProcessor(
     std::shared_ptr<VideoProcessor> processor) {
-  task_runner_->postTask([this, processor]() {
+  task_runner_->PostTask([this, processor]() {
     if (processor != nullptr) {
       processor->SetVideoSink(nullptr);
     }
@@ -104,7 +104,7 @@ status_t VideoCapturer::SetProcessor(
 }
 
 void VideoCapturer::OnFrameCaptured(std::shared_ptr<Buffer> buffer) {
-  task_runner_->postTask([this, buffer]() {
+  task_runner_->PostTask([this, buffer]() {
     if (video_processor_ != nullptr) {
       video_processor_->OnProcess(buffer);
     } else {
@@ -135,7 +135,7 @@ void VideoCapturer::OnSinkNotify(std::shared_ptr<Message> notify) {
 }
 
 void VideoCapturer::OnFrame(std::shared_ptr<Buffer> buffer) {
-  task_runner_->postTask([this, &buffer]() {
+  task_runner_->PostTask([this, &buffer]() {
     for (auto& sink : video_sinks_) {
       sink->OnFrame(buffer);
     }

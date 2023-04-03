@@ -29,18 +29,20 @@ class Conductor : public Handler {
   Conductor(AppConfig appConfig);
   virtual ~Conductor();
 
-  status_t init();
-  status_t start();
-  status_t stop();
-  void waitingFinished();
+  status_t Init();
+  status_t Start();
+  status_t Stop();
+  void WaitingFinished();
 
  private:
-  void signalFinished();
-  void onRtspNotify(const std::shared_ptr<Message>& message);
-  void onOnvifNotify(const std::shared_ptr<Message>& message);
+  void SignalFinished();
+  void OnRtspNotify(const std::shared_ptr<Message>& message);
+  void OnOnvifNotify(const std::shared_ptr<Message>& message);
 
-  void onStart(const std::shared_ptr<Message>& message);
-  void onStop(const std::shared_ptr<Message>& message);
+  void OnStart(const std::shared_ptr<Message>& message);
+  void OnStop(const std::shared_ptr<Message>& message);
+
+  // handler
   void onMessageReceived(const std::shared_ptr<Message>& message) override;
 
   enum {
@@ -51,16 +53,16 @@ class Conductor : public Handler {
     kWhatMediaServiceNotify = 'meds',
   };
 
-  AppConfig mConfig;
-  std::shared_ptr<Looper> mLooper;
-  std::shared_ptr<RtspServer> mRtspServer;
-  std::shared_ptr<OnvifServer> mOnvifServer;
-  std::shared_ptr<MediaService> mMediaService;
+  AppConfig config_;
+  std::shared_ptr<Looper> looper_;
+  std::shared_ptr<RtspServer> rtsp_server_;
+  std::shared_ptr<OnvifServer> onvif_server_;
+  std::shared_ptr<MediaService> media_service_;
 
-  std::shared_ptr<MediaSource> mVideoSource;
+  std::shared_ptr<MediaSource> video_source_;
 
-  std::mutex mLock;
-  std::condition_variable mCondition;
+  std::mutex mutex_;
+  std::condition_variable condition_;
 };
 }  // namespace oc
 }  // namespace avp

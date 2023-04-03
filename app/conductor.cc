@@ -16,69 +16,69 @@ namespace avp {
 namespace oc {
 
 Conductor::Conductor(AppConfig appConfig)
-    : mConfig(appConfig),
-      mLooper(std::make_shared<Looper>()),
-      mVideoSource(std::make_shared<H264FileSource>("data/h264.bin")) {
-  DCHECK(!mConfig.error);
-  mLooper->setName("conductor");
+    : config_(appConfig),
+      looper_(std::make_shared<Looper>()),
+      video_source_(std::make_shared<H264FileSource>("data/h264.bin")) {
+  DCHECK(!config_.error);
+  looper_->setName("conductor");
 }
 
 Conductor::~Conductor() {
-  mLooper->unregisterHandler(id());
-  mLooper->stop();
+  looper_->unregisterHandler(id());
+  looper_->stop();
 }
 
-status_t Conductor::init() {
+status_t Conductor::Init() {
   status_t ret = OK;
-  mLooper->start();
-  mLooper->registerHandler(shared_from_this());
+  looper_->start();
+  looper_->registerHandler(shared_from_this());
 
   auto msg = std::make_shared<Message>(kWhatRtspNotify, shared_from_this());
-  mRtspServer = std::make_shared<RtspServer>(msg);
+  rtsp_server_ = std::make_shared<RtspServer>(msg);
 
-  if ((ret = mRtspServer->init()) != OK) {
+  if ((ret = rtsp_server_->Init()) != OK) {
     return ret;
   }
 
   msg = std::make_shared<Message>(kWhatOnvifNotify, shared_from_this());
-  mOnvifServer = std::make_shared<OnvifServer>(mConfig, msg);
+  onvif_server_ = std::make_shared<OnvifServer>(config_, msg);
 
-  if ((ret = mOnvifServer->init()) != OK) {
+  if ((ret = onvif_server_->Init()) != OK) {
     return ret;
   }
 
   msg = std::make_shared<Message>(kWhatMediaServiceNotify, shared_from_this());
-  mMediaService = std::make_shared<MediaService>(mConfig, msg);
-  if ((ret = mMediaService->Init()) != OK) {
+  media_service_ = std::make_shared<MediaService>(config_, msg);
+  if ((ret = media_service_->Init()) != OK) {
     return ret;
   }
 
-  mRtspServer->addMediaSource(mVideoSource);
+  rtsp_server_->AddMediaSource(video_source_);
   return ret;
 }
 
-status_t Conductor::start() {
+status_t Conductor::Start() {
   auto msg = std::make_shared<Message>(kWhatStart, shared_from_this());
   msg->post();
   return OK;
 }
 
-status_t Conductor::stop() {
+status_t Conductor::Stop() {
   auto msg = std::make_shared<Message>(kWhatStop, shared_from_this());
   msg->post();
   return OK;
 }
 
-void Conductor::waitingFinished() {
-  std::unique_lock<std::mutex> l(mLock);
-  mCondition.wait(l);
+void Conductor::WaitingFinished() {
+  std::unique_lock<std::mutex> l(mutex_);
+  condition_.wait(l);
 }
 
-void Conductor::signalFinished() {
-  mCondition.notify_all();
+void Conductor::SignalFinished() {
+  condition_.notify_all();
 }
 
-void Conductor::onRtspNotify(const std::shared_ptr<Message>& msg) {
+void Conductor::OnRtspNotify(const std::shared_ptr<Message>& msg) {
   int32_t what;
   CHECK(msg->findInt32("what", &what));
   switch (what) {
@@ -86,39 +86,39 @@ void Conductor::onRtspNotify(const std::shared_ptr<Message>& msg) {
   }
 }
 
-void Conductor::onOnvifNotify(const std::shared_ptr<Message>& msg) {
+void Conductor::OnOnvifNotify(const std::shared_ptr<Message>& msg) {
   int32_t what;
   CHECK(msg->findInt32("what", &what));
   switch (what) {
     // TODO
   }
 }
-void Conductor::onStart(const std::shared_ptr<Message>& msg) {
-  mRtspServer->start();
-  mOnvifServer->start();
-  mMediaService->Start();
+void Conductor::OnStart(const std::shared_ptr<Message>& msg) {
+  rtsp_server_->Start();
+  onvif_server_->Start();
+  media_service_->Start();
 }
-void Conductor::onStop(const std::shared_ptr<Message>& msg) {}
+void Conductor::OnStop(const std::shared_ptr<Message>& msg) {}
 
 void Conductor::onMessageReceived(const std::shared_ptr<Message>& msg) {
   switch (msg->what()) {
     case kWhatStart: {
-      onStart(msg);
+      OnStart(msg);
       break;
     }
 
     case kWhatStop: {
-      onStop(msg);
+      OnStop(msg);
       break;
     }
 
     case kWhatRtspNotify: {
-      onRtspNotify(msg);
+      OnRtspNotify(msg);
       break;
     }
 
     case kWhatOnvifNotify: {
-      onOnvifNotify(msg);
+      OnOnvifNotify(msg);
       break;
     }
   }

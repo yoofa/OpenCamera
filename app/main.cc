@@ -65,13 +65,13 @@ int main(int argc, char** argv) {
   LOG(avp::LS_INFO) << "app version: " << config.version;
 
   auto conductor = std::make_shared<Conductor>(config);
-  if (conductor->init() != avp::OK) {
+  if (conductor->Init() != avp::OK) {
     return -1;
   }
 
-  conductor->start();
+  conductor->Start();
 
-  conductor->waitingFinished();
+  conductor->WaitingFinished();
 
   return 0;
 }

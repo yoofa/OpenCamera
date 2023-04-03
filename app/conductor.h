@@ -16,6 +16,7 @@
 #include "common/handler.h"
 #include "common/looper.h"
 #include "common/message.h"
+#include "media/media_service.h"
 #include "onvif/onvif_server.h"
 #include "rtsp/h264_file_source.h"
 #include "rtsp/rtsp_server.h"
@@ -47,12 +48,14 @@ class Conductor : public Handler {
     kWhatStop = 'stop',
     kWhatRtspNotify = 'rtsp',
     kWhatOnvifNotify = 'onvf',
+    kWhatMediaServiceNotify = 'meds',
   };
 
   AppConfig mConfig;
   std::shared_ptr<Looper> mLooper;
   std::shared_ptr<RtspServer> mRtspServer;
   std::shared_ptr<OnvifServer> mOnvifServer;
+  std::shared_ptr<MediaService> mMediaService;
 
   std::shared_ptr<MediaSource> mVideoSource;
 

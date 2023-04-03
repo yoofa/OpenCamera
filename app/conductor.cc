@@ -5,10 +5,12 @@
  * Distributed under terms of the GPLv2 license.
  */
 #include "conductor.h"
+#include <memory>
 
 #include "base/checks.h"
 #include "base/logging.h"
 #include "common/message.h"
+#include "media/media_service.h"
 
 namespace avp {
 namespace oc {
@@ -34,13 +36,20 @@ status_t Conductor::init() {
   auto msg = std::make_shared<Message>(kWhatRtspNotify, shared_from_this());
   mRtspServer = std::make_shared<RtspServer>(msg);
 
-  msg = std::make_shared<Message>(kWhatOnvifNotify, shared_from_this());
-  mOnvifServer = std::make_shared<OnvifServer>(mConfig, msg);
-
   if ((ret = mRtspServer->init()) != OK) {
     return ret;
   }
+
+  msg = std::make_shared<Message>(kWhatOnvifNotify, shared_from_this());
+  mOnvifServer = std::make_shared<OnvifServer>(mConfig, msg);
+
   if ((ret = mOnvifServer->init()) != OK) {
+    return ret;
+  }
+
+  msg = std::make_shared<Message>(kWhatMediaServiceNotify, shared_from_this());
+  mMediaService = std::make_shared<MediaService>(mConfig, msg);
+  if ((ret = mMediaService->Init()) != OK) {
     return ret;
   }
 
@@ -87,6 +96,7 @@ void Conductor::onOnvifNotify(const std::shared_ptr<Message>& msg) {
 void Conductor::onStart(const std::shared_ptr<Message>& msg) {
   mRtspServer->start();
   mOnvifServer->start();
+  mMediaService->Start();
 }
 void Conductor::onStop(const std::shared_ptr<Message>& msg) {}
 

@@ -19,6 +19,7 @@ namespace avp {
 struct AppConfig {
   /************ oc info *************/
   float version;
+  std::string v4l2_device;
 
   /************** rtsp **************/
 
@@ -67,6 +68,7 @@ struct AppConfig {
     appConfig.error = false;
 
     appConfig.version = reader.GetFloat("oc", "version", 0.0);
+    appConfig.v4l2_device = reader.Get("oc", "v4l2_device", "/dev/video0");
 
     // onvif device
     appConfig.onvif_port = reader.GetInteger("onvif", "onvif_port", 0);

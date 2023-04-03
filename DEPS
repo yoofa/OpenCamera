@@ -13,7 +13,7 @@ vars = {
 deps = {
   # avp
   'src/base':
-    'git@github.com:vsyf/base.git@47757af61a4827d1f5b94770ded25e6f4b966a67',
+    'git@github.com:vsyf/base.git@084b878a48115ec6cd5fa9f1c13f4e8af65116e6',
   'src/common':
     'git@github.com:vsyf/media_common.git@a2e444b3d73d51246ec5b956ec8a9c55f2e8d7dd',
 

@@ -80,6 +80,7 @@ oc_library("opencamera") {
     "//app:oc",
     "//base",
     "//common",
+    "//media",
     "//onvif",
     "//rtsp",
     "//third_party/inih",

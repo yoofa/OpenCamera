@@ -1,0 +1,40 @@
+import("//opencamera.gni")
+
+group("media") {
+  deps = [
+    ":camera_info",
+    ":v4l2_video",
+  ]
+}
+
+oc_library("v4l2_video") {
+  sources = [
+    "./default_video_source_factory.h",
+    "./file_sink.h",
+    "./media_service.cc",
+    "./media_service.h",
+    "./v4l2_video_source_factory.cc",
+    "./v4l2_video_source_factory.h",
+    "./video_capturer.cc",
+    "./video_capturer.h",
+    "./video_sink.h",
+    "./video_source_factory.h",
+    "v4l2_video_source.cc",
+    "v4l2_video_source.h",
+  ]
+  deps = [
+    "//base:logging",
+    "//base:task_util",
+    "//common",
+  ]
+}
+
+oc_executable("camera_info") {
+  sources = [ "camera_info.cc" ]
+
+  deps = [
+    ":v4l2_video",
+    "//base:logging",
+    "//common",
+  ]
+}

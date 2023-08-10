@@ -1,0 +1,11 @@
+import("//opencamera.gni")
+
+oc_library("oc_api_video_unittests") {
+  testonly = true
+  sources = [ "nv12_buffer_unittest.cc" ]
+  deps = [
+    "..:video_frame",
+    "//test:frame_utils",
+    "//test:test_support",
+  ]
+}

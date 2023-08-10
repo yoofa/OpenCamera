@@ -1,4 +1,5 @@
 import("//build/config/ui.gni")
+import("//opencamera.gni")
 if (is_android) {
   import("//build/config/android/rules.gni")
 }
@@ -54,4 +55,14 @@ executable("gtest_demo") {
   sources = [ "gtest_demo.cpp" ]
 
   deps = [ ":test_support" ]
+}
+
+oc_library("frame_utils") {
+  visibility = [ "*" ]
+  testonly = true
+  sources = [
+    "frame_utils.cc",
+    "frame_utils.h",
+  ]
+  deps = [ "../api/video:video_frame" ]
 }

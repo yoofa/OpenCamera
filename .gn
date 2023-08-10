@@ -23,4 +23,10 @@ exec_script_whitelist = build_dotfile_settings.exec_script_whitelist +
 default_args = {
   is_component_build = true
   clang_use_chrome_plugins = false
+
+  # open camera not use abls now, remove absl dependency in libyuv
+  libyuv_use_absl_flags = false
+
+  # temporary disable jpeg in libyuv
+  libyuv_disable_jpeg = true
 }

@@ -1,0 +1,6 @@
+import("//opencamera.gni")
+
+group("api") {
+  visibility = [ "*" ]
+  deps = []
+}

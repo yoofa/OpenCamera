@@ -12,6 +12,7 @@ group("default") {
   #  deps += [ "examples" ]
   if (avp_include_test) {
     deps += [
+      ":oc_unittests",
       "base:base_unittests",
       "test",
     ]
@@ -69,6 +70,14 @@ config("common_config") {
   defines = []
 }
 
+oc_test("oc_unittests") {
+  testonly = true
+  deps = [
+    "api/video/test:oc_api_video_unittests",
+    "test:test_main",
+  ]
+}
+
 oc_library("opencamera") {
   testonly = true
   sources = []
@@ -77,6 +86,7 @@ oc_library("opencamera") {
   deps = []
 
   deps += [
+    "//api",
     "//app:oc",
     "//base",
     "//common",
@@ -84,6 +94,7 @@ oc_library("opencamera") {
     "//onvif",
     "//rtsp",
     "//third_party/inih",
+    "//third_party/libyuv",
     "//third_party/onvif_srvd:onvif_srv",
     "//third_party/openssl:libssl_static",
     "//third_party/rtsp_server",

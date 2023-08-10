@@ -13,7 +13,7 @@ vars = {
 deps = {
   # avp
   'src/base':
-    'git@github.com:vsyf/base.git@14df8cc0c31352a7afc213fd505ffff03bf2d658',
+    'git@github.com:vsyf/base.git@47ac6d509459c04a377f9ec3de477420c9c48572',
   'src/common':
     'git@github.com:vsyf/media_common.git@e1a69753e1abe3fc02a2ff569484fbb9a61d839c',
 
@@ -67,6 +67,9 @@ deps = {
     'https://chromium.googlesource.com/chromium/tools/depot_tools.git@dc7b108da629de39f923d510fc76ea2f58efa521',
   'src/third_party/googletest/src':
      'https://chromium.googlesource.com/external/github.com/google/googletest.git@4fe018038f87675c083d0cfb6a6b57c274fb1753',
+  'src/third_party/libyuv':
+    'https://chromium.googlesource.com/libyuv/libyuv.git@49ebc996aa8c4bdf89c1b5ea461eb677234c61cc',
+
   'src/tools/clang/dsymutil': {
     'packages': [
       {

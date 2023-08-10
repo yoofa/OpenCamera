@@ -9,7 +9,9 @@ oc_library("rtspserver") {
     "rtsp_server.cc",
     "rtsp_server.h",
   ]
+  configs += [ "//build/config/compiler:rtti" ]
   deps = [ "//common" ]
+
   public_deps = [ "//third_party/rtsp_server" ]
 }
 

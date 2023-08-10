@@ -36,7 +36,8 @@ if (is_clang) {
   oc_remove_configs += [ "//build/config/clang:find_bad_constructs" ]
 }
 oc_add_configs = oc_common_configs
-oc_add_configs += [ "//build/config/compiler:rtti" ]
+
+#oc_add_configs += [ "//build/config/compiler:rtti" ]
 
 oc_prod_configs = [ oc_root + ":oc_prod_config" ]
 
@@ -76,9 +77,10 @@ set_defaults("oc_shared_library") {
 
 oc_default_visibility = [ oc_root + "/*" ]
 
-# TODO(youfa) fix test template not found
+import("testing/test.gni")
+
 template("oc_test") {
-  executable(target_name) {
+  test(target_name) {
     forward_variables_from(invoker,
                            "*",
                            [

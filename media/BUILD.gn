@@ -22,10 +22,12 @@ oc_library("v4l2_video") {
     "v4l2_video_source.cc",
     "v4l2_video_source.h",
   ]
+  configs += [ "//build/config/compiler:rtti" ]
   deps = [
     "//base:logging",
     "//base:task_util",
     "//common",
+    "//third_party/inih",
   ]
 }
 

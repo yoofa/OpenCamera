@@ -9,7 +9,10 @@ oc_library("rtspserver") {
     "rtsp_server.cc",
     "rtsp_server.h",
   ]
+
+  # shared_ptr<MediaSource> dynamic_pointer_cat needs RTTI
   configs += [ "//build/config/compiler:rtti" ]
+
   deps = [ "//common" ]
 
   public_deps = [ "//third_party/rtsp_server" ]
@@ -21,4 +24,7 @@ oc_library("h264_file_source") {
     "h264_file_source.h",
   ]
   deps = [ "//common" ]
+
+  # shared_ptr<MediaSource> dynamic_pointer_cat needs RTTI
+  configs += [ "//build/config/compiler:rtti" ]
 }

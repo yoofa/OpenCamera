@@ -16,11 +16,10 @@ oc_library("oc") {
   deps = [
     "//base:logging",
     "//common:foundation",
-    "//media:v4l2_video",
+    "//media:media_video",
     "//onvif:onvifserver",
     "//rtsp:h264_file_source",
   ]
-
   public_deps = [
     "//rtsp:rtspserver",
     "//third_party/inih",

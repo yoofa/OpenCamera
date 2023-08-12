@@ -12,13 +12,27 @@ oc_library("video_frame") {
     "video_frame.h",
     "video_frame_buffer.cc",
     "video_frame_buffer.h",
+    "video_processor_interface.h",
     "video_sink_interface.h",
     "video_source_interface.h",
+    "yuyv_buffer.cc",
+    "yuyv_buffer.h",
   ]
   deps = [
     "//base/memory:aligned_malloc",
     "//third_party/libyuv",
   ]
+  configs += [ "//build/config/compiler:rtti" ]
+}
+
+oc_library("encoded_image") {
+  visibility = [ "*" ]
+  sources = [
+    "encoded_image.cc",
+    "encoded_image.h",
+  ]
+
+  deps = [ ":video_frame" ]
 }
 
 if (avp_include_test) {

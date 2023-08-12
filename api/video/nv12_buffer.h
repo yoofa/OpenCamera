@@ -29,8 +29,17 @@ class NV12Buffer : public NV12BufferInterface {
                                             size_t height,
                                             size_t stride_y,
                                             size_t stride_uv);
+  // copy data from i420_buffer
   static std::shared_ptr<NV12Buffer> Copy(
       const I420BufferInterface& i420_buffer);
+
+  // copy data from external memory
+  static std::shared_ptr<NV12Buffer> Copy(const uint8_t* data_y,
+                                          size_t stride_y,
+                                          const uint8_t* data_uv,
+                                          size_t stride_uv,
+                                          size_t width,
+                                          size_t height);
 
   NV12Buffer(size_t width,
              size_t height,

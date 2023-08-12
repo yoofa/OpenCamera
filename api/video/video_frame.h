@@ -37,7 +37,7 @@ class VideoFrame {
     bool operator!=(const Rect& other) const { return !(*this == other); }
   };
 
-  VideoFrame(uint32_t id,
+  VideoFrame(uint64_t id,
              std::shared_ptr<VideoFrameBuffer> video_frame_buffer,
              int64_t timestamp_us,
              std::optional<Rect> rect);
@@ -55,8 +55,8 @@ class VideoFrame {
   size_t size() const;
 
   // id, frame sequance from the origin video source.
-  uint32_t id() const { return id_; }
-  void set_id(uint32_t id) { id_ = id; }
+  uint64_t id() const { return id_; }
+  void set_id(uint64_t id) { id_ = id; }
 
   // video frame buffer
   std::shared_ptr<VideoFrameBuffer> video_frame_buffer() const;
@@ -81,7 +81,7 @@ class VideoFrame {
   }
 
  private:
-  uint32_t id_;
+  uint64_t id_;
   std::shared_ptr<VideoFrameBuffer> video_frame_buffer_;
   int64_t timestamp_us_;
   std::optional<Rect> rect_;

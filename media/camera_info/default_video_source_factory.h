@@ -8,7 +8,7 @@
 #ifndef DEFAULT_VIDEO_SOURCE_FACTORY_H
 #define DEFAULT_VIDEO_SOURCE_FACTORY_H
 
-#include "media/video_source_factory.h"
+#include "media/camera_info/video_source_factory.h"
 
 namespace avp {
 

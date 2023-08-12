@@ -11,6 +11,7 @@
 
 #include "api/video/i420_buffer.h"
 #include "api/video/nv12_buffer.h"
+#include "api/video/yuyv_buffer.h"
 
 namespace avp {
 
@@ -85,6 +86,27 @@ std::shared_ptr<VideoFrameBuffer> NV12BufferInterface::CropAndScale(
     size_t scaled_width,
     size_t scaled_height) {
   auto result = NV12Buffer::Create(scaled_width, scaled_height);
+  result->CropAndScaleFrom(*this, offset_x, offset_y, crop_width, crop_height);
+  return result;
+}
+
+/** YUYVBufferInterface **/
+VideoFrameBuffer::Type YUYVBufferInterface::type() const {
+  return Type::kNormal;
+}
+
+VideoFrameBuffer::PixelFormat YUYVBufferInterface::pixel_format() const {
+  return PixelFormat::kYUY2;
+}
+
+std::shared_ptr<VideoFrameBuffer> YUYVBufferInterface::CropAndScale(
+    size_t offset_x,
+    size_t offset_y,
+    size_t crop_width,
+    size_t crop_height,
+    size_t scaled_width,
+    size_t scaled_height) {
+  auto result = YUYVBuffer::Create(scaled_width, scaled_height);
   result->CropAndScaleFrom(*this, offset_x, offset_y, crop_width, crop_height);
   return result;
 }

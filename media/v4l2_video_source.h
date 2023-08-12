@@ -9,30 +9,42 @@
 #define V4L2_VIDEO_SOURCE_H
 #include <linux/videodev2.h>
 
-#include "common/media_source.h"
-#include "media/video_source_factory.h"
+#include "api/video/video_frame.h"
+#include "base/task_util/repeating_task.h"
+#include "base/task_util/task_runner.h"
+#include "base/task_util/task_runner_factory.h"
+#include "common/message.h"
+#include "common/meta_data.h"
+#include "media/video_source_base.h"
 
 namespace avp {
-class V4L2VideoSource : public MediaSource {
+class V4L2VideoSource : public VideoSourceBase<std::shared_ptr<VideoFrame>> {
+ protected:
+  // for private construct
+  struct protect_parameter {
+    explicit protect_parameter() {}
+  };
+
  public:
-  V4L2VideoSource() = delete;
-  explicit V4L2VideoSource(const char* device);
-  virtual ~V4L2VideoSource();
+  static std::shared_ptr<V4L2VideoSource> Create(std::shared_ptr<Message> info);
 
-  status_t start(MetaData* params = nullptr) override;
+  explicit V4L2VideoSource(const char* device,
+                           protect_parameter = protect_parameter());
+  virtual ~V4L2VideoSource() override;
 
-  status_t stop() override;
+  // VideoSourceBase implementation.
+  void AddOrUpdateSink(VideoSinkInterface<std::shared_ptr<VideoFrame>>* sink,
+                       const VideoSinkWants& wants) override;
+  void RemoveSink(
+      VideoSinkInterface<std::shared_ptr<VideoFrame>>* sink) override;
 
-  std::shared_ptr<MetaData> getFormat() override;
+  status_t start(MetaData* params = nullptr);
 
-  status_t read(std::shared_ptr<Buffer>& buffer,
-                const ReadOptions* options = nullptr) override;
+  status_t stop();
 
-  status_t pause() override;
+  status_t read(std::shared_ptr<VideoFrame>& buffer);
 
-  status_t setBuffers(const std::vector<Buffer*>&) override;
-
-  status_t setStopTimeUs(int64_t) override;
+  status_t pause();
 
  private:
   struct V4L2Buffer {
@@ -44,6 +56,10 @@ class V4L2VideoSource : public MediaSource {
   bool startStream();
   bool stopStream();
 
+  std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
+  std::unique_ptr<base::TaskRunner> task_runner_;
+  RepeatingTaskHandle repeating_task_handler_;
+
   int mFd;
   v4l2_capability mV4L2Capability;
   std::vector<v4l2_fmtdesc> mV4L2Formats;
@@ -52,9 +68,10 @@ class V4L2VideoSource : public MediaSource {
   int32_t mHeight;
   int32_t mColorFormat;
   std::vector<V4L2Buffer> mBuffers;
+  uint64_t frame_count_;
 };
 
-std::unique_ptr<VideoSourceFactory> CreateV4l2VideoSourceFactory();
+// std::unique_ptr<VideoSourceFactory> CreateV4l2VideoSourceFactory();
 
 }  // namespace avp
 

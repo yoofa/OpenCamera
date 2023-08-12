@@ -15,7 +15,7 @@ class VideoSinkInterface {
  public:
   virtual ~VideoSinkInterface() = default;
 
-  virtual void OnFrame(VideoFrameT& frame) = 0;
+  virtual void OnFrame(const VideoFrameT& frame) = 0;
 };
 
 }  // namespace avp

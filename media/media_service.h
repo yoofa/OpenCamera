@@ -17,9 +17,7 @@
 #include "common/looper.h"
 #include "common/message.h"
 #include "media/file_sink.h"
-#include "media/motion_detector.h"
 #include "media/video_capturer.h"
-#include "media/video_sink.h"
 
 namespace avp {
 
@@ -47,10 +45,13 @@ class MediaService : public Handler {
   std::shared_ptr<Message> notify_;
   std::shared_ptr<Looper> looper_;
   std::shared_ptr<Message> media_info_;
-  std::shared_ptr<VideoCapturer> video_capturer_;
-  std::shared_ptr<MotionDetector> motion_detector_;
 
-  std::shared_ptr<FileSink> file_sink_;
+  std::shared_ptr<VideoSourceInterface<std::shared_ptr<VideoFrame>>>
+      video_source_;
+
+  std::shared_ptr<VideoCapturer> video_capturer_;
+
+  std::shared_ptr<FileSink> row_file_sink_;
 
   AVP_DISALLOW_COPY_AND_ASSIGN(MediaService);
 };

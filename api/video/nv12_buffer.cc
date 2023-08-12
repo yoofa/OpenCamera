@@ -13,6 +13,7 @@
 #include "api/video/video_frame_buffer.h"
 #include "base/checks.h"
 #include "third_party/libyuv/include/libyuv.h"
+#include "third_party/libyuv/include/libyuv/planar_functions.h"
 
 namespace avp {
 
@@ -73,6 +74,20 @@ std::shared_ptr<NV12Buffer> NV12Buffer::Copy(
       i420_buffer.StrideU(), i420_buffer.DataV(), i420_buffer.StrideV(),
       buffer->MutableDataY(), buffer->StrideY(), buffer->MutableDataUV(),
       buffer->StrideUV(), buffer->width(), buffer->height());
+  return buffer;
+}
+
+// static
+std::shared_ptr<NV12Buffer> NV12Buffer::Copy(const uint8_t* data_y,
+                                             size_t stride_y,
+                                             const uint8_t* data_uv,
+                                             size_t stride_uv,
+                                             size_t width,
+                                             size_t height) {
+  std::shared_ptr<NV12Buffer> buffer = NV12Buffer::Create(width, height);
+  libyuv::NV12Copy(data_y, stride_y, data_uv, stride_uv, buffer->MutableDataY(),
+                   buffer->StrideY(), buffer->MutableDataUV(),
+                   buffer->StrideUV(), width, height);
   return buffer;
 }
 

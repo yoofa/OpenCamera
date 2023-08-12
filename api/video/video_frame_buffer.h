@@ -27,7 +27,7 @@ class VideoFrameBuffer {
   };
 
   // pixel format
-  enum class PixelFormat {
+  enum class PixelFormat : int32_t {
     kUnknown = -1,
     kI420,
     kI420A,
@@ -163,6 +163,31 @@ class NV12BufferInterface : public BiplanarYuv8Buffer {
 
  protected:
   ~NV12BufferInterface() override {}
+};
+
+class Packed8Buffer : public VideoFrameBuffer {
+ public:
+  virtual const uint8_t* Data() const = 0;
+  virtual size_t Stride() const = 0;
+
+ protected:
+  ~Packed8Buffer() override {}
+};
+
+class YUYVBufferInterface : public Packed8Buffer {
+ public:
+  Type type() const override;
+  PixelFormat pixel_format() const final override;
+
+  std::shared_ptr<VideoFrameBuffer> CropAndScale(size_t offset_x,
+                                                 size_t offset_y,
+                                                 size_t crop_width,
+                                                 size_t crop_height,
+                                                 size_t scaled_width,
+                                                 size_t scaled_height) override;
+
+ protected:
+  ~YUYVBufferInterface() override {}
 };
 
 }  // namespace avp

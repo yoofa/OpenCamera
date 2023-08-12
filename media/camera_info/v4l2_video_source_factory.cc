@@ -5,8 +5,8 @@
  * Distributed under terms of the GPLv2 license.
  */
 
-#include "media/default_video_source_factory.h"
-#include "media/v4l2_video_source.h"
+#include "media/camera_info/default_video_source_factory.h"
+#include "media/camera_info/v4l2_video_source.h"
 
 namespace avp {
 

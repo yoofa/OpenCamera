@@ -12,76 +12,70 @@
 #include <memory>
 #include <mutex>
 
+#include "api/video/video_frame.h"
+#include "api/video/video_processor_interface.h"
+#include "api/video/video_sink_interface.h"
+#include "api/video/video_source_interface.h"
 #include "base/task_util/repeating_task.h"
 #include "base/task_util/task_runner.h"
 #include "base/task_util/task_runner_factory.h"
 #include "base/types.h"
-#include "common/handler.h"
-#include "common/looper.h"
-#include "common/media_source.h"
-#include "media/video_processor.h"
-#include "media/video_sink.h"
-#include "media/video_source_factory.h"
+#include "common/message.h"
+#include "media/video_source_base.h"
 
 namespace avp {
-class VideoCapturer;
 
-class VideoCapturer : public Handler, VideoSink {
-  //                      std::enable_shared_from_this<VideoSink> {
+class VideoCapturer : public VideoSinkInterface<std::shared_ptr<VideoFrame>>,
+                      public VideoProcessorSink<std::shared_ptr<VideoFrame>>,
+                      public VideoSourceInterface<std::shared_ptr<VideoFrame>> {
+  using VideoSource = VideoSourceInterface<std::shared_ptr<VideoFrame>>;
+  using VideoSink = VideoSinkInterface<std::shared_ptr<VideoFrame>>;
+  using VideoProcessor = VideoProcessorInterface<std::shared_ptr<VideoFrame>>;
+
  public:
-  explicit VideoCapturer(std::shared_ptr<Looper> looper,
-                         std::shared_ptr<Message> capture_info);
+  explicit VideoCapturer(std::shared_ptr<Message> capture_info);
   virtual ~VideoCapturer();
 
-  status_t Init();
-  status_t Start();
-  status_t Stop();
+  // VideoSourceInterface implementation
+  void AddOrUpdateSink(VideoSink* sink, const VideoSinkWants& wants) override;
+  void RemoveSink(VideoSink* sink) override;
 
-  status_t AddVideoSink(std::shared_ptr<VideoSink> sink);
+  // VideoSinkInterface implementation
+  void OnFrame(const std::shared_ptr<VideoFrame>& frame) override;
+
+  // VideoProcessorSink implementation
+  void OnProcessedFrame(std::shared_ptr<VideoFrame>& frame) override;
+
+  void SetVideoSource(VideoSource* video_source, const VideoSinkWants& wants);
 
   // support only one processor, if need multiple processor, combine into one
   // processor
-  status_t SetProcessor(std::shared_ptr<VideoProcessor> processor);
+  status_t SetProcessor(std::shared_ptr<VideoProcessor>& processor);
 
-  // when frame captured, notify all sinks or processor
-  void OnFrameCaptured(std::shared_ptr<Buffer> buffer);
-
-  // capture one frame, return capture interval
-  uint64_t CaptureOneFrame();
-
-  // observer like motion detector will notify motion event which can control
-  // capturer framerate.
-  void OnSinkNotify(std::shared_ptr<Message> notify);
-
-  // video sink callback
-  void OnFrame(std::shared_ptr<Buffer> buffer) override;
-
-  enum {
-    kWhatSinkNotify = 'snfy',
-  };
+  uint64_t frame_received() const { return frame_received_; }
+  uint64_t frame_sent() const { return frame_sent_; }
 
  private:
-  void onMessageReceived(const std::shared_ptr<Message>& message) override;
+  // with lock
+  void AddOrUpdateSinkInternal(VideoSink* sink, const VideoSinkWants& wants);
 
   std::shared_ptr<Message> capture_info_;
-  std::unique_ptr<VideoSourceFactory> video_source_factory_;
-  std::unique_ptr<MediaSource> video_source_;
-
-  // message looper, used to handle sink notify message
-  std::shared_ptr<Looper> looper_;
 
   // capture runner, used to handle capture task
   std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
   std::unique_ptr<base::TaskRunner> task_runner_;
   RepeatingTaskHandle repeating_task_handler_;
 
-  // sinks
-  std::vector<std::shared_ptr<VideoSink>> video_sinks_;
+  VideoSource* video_source_;
 
+  // std::shared_ptr<VideoProcessor> video_processor_;
   std::shared_ptr<VideoProcessor> video_processor_;
 
-  std::mutex processor_lock_;
-  std::mutex sink_lock_;
+  // sinks broadcaster
+  VideoSourceBase<std::shared_ptr<VideoFrame>> sinks_broadcaster_;
+
+  uint64_t frame_received_;
+  uint64_t frame_sent_;
 };
 
 }  // namespace avp

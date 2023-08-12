@@ -1,0 +1,15 @@
+import("//opencamera.gni")
+
+if (avp_include_test) {
+  oc_library("oc_media_unittests") {
+    testonly = true
+    sources = [ "video_capturer_unittest.cc" ]
+    deps = [
+      "..:media_video",
+      "//api/video:video_frame",
+      "//base:logging",
+      "//test:frame_utils",
+      "//test:test_support",
+    ]
+  }
+}

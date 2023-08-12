@@ -18,7 +18,7 @@
 #include "common/handler.h"
 #include "common/message.h"
 #include "common/meta_data.h"
-#include "default_video_source_factory.h"
+#include "media/camera_info/default_video_source_factory.h"
 #include "v4l2_video_source.h"
 #include "video_source_factory.h"
 
@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < 100; i++) {
     std::shared_ptr<Buffer> buffer;
     ret = source->read(buffer);
-    LOG(LS_INFO) << "read ret:" << ret;
+    LOG(LS_INFO) << "read ret:" << ret << ", size:" << buffer->size();
     if (ret != OK) {
       continue;
     }

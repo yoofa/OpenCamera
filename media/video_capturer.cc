@@ -22,135 +22,98 @@
 #include "common/codec_constants.h"
 #include "common/looper.h"
 #include "common/message.h"
-#include "media/default_video_source_factory.h"
 
 namespace avp {
 
-VideoCapturer::VideoCapturer(std::shared_ptr<Looper> looper,
-                             std::shared_ptr<Message> capture_info)
+VideoCapturer::VideoCapturer(std::shared_ptr<Message> capture_info)
     : capture_info_(std::move(capture_info)),
-      video_source_factory_(CreateDefaultVideoSourceFactory()),
-      video_source_(video_source_factory_->CreateVideoSource(capture_info_)),
-      looper_(std::move(looper)),
       task_runner_factory_(base::CreateDefaultTaskRunnerFactory()),
       task_runner_(std::make_unique<base::TaskRunner>(
           task_runner_factory_->CreateTaskRunner(
               "VideoCapturer",
               base::TaskRunnerFactory::Priority::NORMAL))),
-      video_processor_(nullptr) {
+      video_source_(nullptr),
+      video_processor_(nullptr),
+      frame_received_(0),
+      frame_sent_(0) {
   // ctor
 }
 
 VideoCapturer::~VideoCapturer() {}
 
-status_t VideoCapturer::Init() {
-  task_runner_->PostTask([this]() {
-    looper_->registerHandler(
-        std::enable_shared_from_this<Handler>::shared_from_this());
-    repeating_task_handler_ = RepeatingTaskHandle::DelayedStart(
-        task_runner_->Get(), 1 * 1000 * 1000, [this]() {
-          CaptureOneFrame();
-          //  16ms, about 60fps
-          return (uint64_t)(16 * 1000);
-        });
-  });
-
-  return OK;
+void VideoCapturer::AddOrUpdateSinkInternal(VideoSink* sink,
+                                            const VideoSinkWants& wants) {
+  sinks_broadcaster_.AddOrUpdateSink(sink, wants);
 }
 
-status_t VideoCapturer::Start() {
-  task_runner_->PostTask([this]() {
-    MetaData metaData;
-    metaData.setInt32(kKeyWidth, 1920);
-    metaData.setInt32(kKeyHeight, 1080);
-    metaData.setInt32(kKeyColorFormat, COLOR_FormatYUV420Planar);
-    int ret = video_source_->start(&metaData);
-    LOG(LS_INFO) << "start ret: " << ret;
-  });
-  return OK;
+void VideoCapturer::AddOrUpdateSink(VideoSink* sink,
+                                    const VideoSinkWants& wants) {
+  task_runner_->PostTask(
+      [this, sink, wants]() { AddOrUpdateSinkInternal(sink, wants); });
 }
 
-status_t VideoCapturer::Stop() {
-  task_runner_->PostTask([this]() { video_source_->stop(); });
-  return OK;
+void VideoCapturer::RemoveSink(VideoSink* sink) {
+  task_runner_->PostTask(
+      [this, sink]() { sinks_broadcaster_.RemoveSink(sink); });
 }
 
-status_t VideoCapturer::AddVideoSink(std::shared_ptr<VideoSink> sink) {
-  task_runner_->PostTask([this, sink]() {
-    for (auto& s : video_sinks_) {
-      if (s == sink) {
+void VideoCapturer::OnFrame(const std::shared_ptr<VideoFrame>& frame) {
+  task_runner_->PostTask([this, frame]() {
+    frame_received_++;
+    // TODO(youfa) frame rate control
+    // if (drop) {
+    //   return;
+    // }
+
+    if (video_processor_ != nullptr) {
+      // after process, processor will call OnProcessedFrame
+      video_processor_->OnFrame(frame);
+    } else {
+      if (sinks_broadcaster_.sink_pairs().empty()) {
         return;
       }
+      frame_sent_++;
+      for (auto& sink : sinks_broadcaster_.sink_pairs()) {
+        sink.sink->OnFrame(frame);
+      }
     }
-
-    video_sinks_.push_back(std::move(sink));
-    return;
   });
-  return OK;
+}
+
+void VideoCapturer::OnProcessedFrame(std::shared_ptr<VideoFrame>& frame) {
+  task_runner_->PostTask([this, frame]() {
+    frame_sent_++;
+    for (auto& sink : sinks_broadcaster_.sink_pairs()) {
+      sink.sink->OnFrame(frame);
+    }
+  });
+}
+
+void VideoCapturer::SetVideoSource(VideoSource* video_source,
+                                   const VideoSinkWants& wants) {
+  task_runner_->PostTask([this, video_source, wants]() {
+    if (video_source_ != nullptr) {
+      video_source_->RemoveSink(this);
+    }
+    video_source_ = video_source;
+    if (video_source_ != nullptr) {
+      video_source_->AddOrUpdateSink(this, wants);
+    }
+  });
 }
 
 status_t VideoCapturer::SetProcessor(
-    std::shared_ptr<VideoProcessor> processor) {
+    std::shared_ptr<VideoProcessor>& processor) {
   task_runner_->PostTask([this, processor]() {
-    if (processor != nullptr) {
-      processor->SetVideoSink(nullptr);
+    if (video_processor_ != nullptr) {
+      video_processor_->RemoveSink(this);
     }
-    if (processor != nullptr) {
-      // video capturer lifecycle must longer than video processor
-      video_processor_->SetVideoSink(this);
+    video_processor_ = processor;
+    if (video_processor_ != nullptr) {
+      video_processor_->AddOrUpdateSink(this, VideoSinkWants{});
     }
   });
   return OK;
-}
-
-void VideoCapturer::OnFrameCaptured(std::shared_ptr<Buffer> buffer) {
-  task_runner_->PostTask([this, buffer]() {
-    if (video_processor_ != nullptr) {
-      video_processor_->OnProcess(buffer);
-    } else {
-      for (auto& sink : video_sinks_) {
-        sink->OnFrame(buffer);
-      }
-    }
-  });
-}
-
-uint64_t VideoCapturer::CaptureOneFrame() {
-  std::shared_ptr<Buffer> buffer;
-  status_t ret;
-
-  ret = video_source_->read(buffer);
-  if (buffer != nullptr && ret == OK) {
-    OnFrameCaptured(buffer);
-  }
-
-  // 16ms, about 60fps. capture faster than real fps
-  return 16 * 1000;
-}
-
-void VideoCapturer::OnSinkNotify(std::shared_ptr<Message> notify) {
-  // check fps in notify
-  int32_t fps;
-  DCHECK(notify->findInt32("fps", &fps));
-}
-
-void VideoCapturer::OnFrame(std::shared_ptr<Buffer> buffer) {
-  task_runner_->PostTask([this, &buffer]() {
-    for (auto& sink : video_sinks_) {
-      sink->OnFrame(buffer);
-    }
-  });
-}
-
-void VideoCapturer::onMessageReceived(const std::shared_ptr<Message>& message) {
-  switch (message->what()) {
-    case kWhatSinkNotify: {
-      OnSinkNotify(message);
-      break;
-    }
-    default:
-      break;
-  }
 }
 
 }  // namespace avp

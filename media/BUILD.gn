@@ -3,39 +3,68 @@ import("//opencamera.gni")
 group("media") {
   deps = [
     ":camera_info",
-    ":v4l2_video",
+    ":media_video",
   ]
 }
 
-oc_library("v4l2_video") {
+oc_library("media_video") {
   sources = [
-    "./default_video_source_factory.h",
-    "./file_sink.h",
     "./media_service.cc",
     "./media_service.h",
-    "./v4l2_video_source_factory.cc",
-    "./v4l2_video_source_factory.h",
     "./video_capturer.cc",
     "./video_capturer.h",
-    "./video_sink.h",
-    "./video_source_factory.h",
-    "v4l2_video_source.cc",
-    "v4l2_video_source.h",
   ]
-  configs += [ "//build/config/compiler:rtti" ]
+
   deps = [
+    ":file_sink",
+    ":v4l2_video_source",
+    "//api/video:video_frame",
     "//base:logging",
     "//base:task_util",
     "//common",
     "//third_party/inih",
   ]
 }
+oc_library("file_sink") {
+  sources = [
+    "file_sink.cc",
+    "file_sink.h",
+  ]
+  configs += [ "//build/config/compiler:rtti" ]
+}
 
-oc_executable("camera_info") {
-  sources = [ "camera_info.cc" ]
+oc_library("video_base") {
+  sources = [ "video_source_base.h" ]
+  deps = [ "//api/video:video_frame" ]
+}
+
+oc_library("v4l2_video_source") {
+  sources = [
+    "v4l2_video_source.cc",
+    "v4l2_video_source.h",
+  ]
 
   deps = [
-    ":v4l2_video",
+    ":video_base",
+    "//api/video:video_frame",
+    "//base:logging",
+    "//base:task_util",
+    "//common",
+  ]
+}
+
+oc_executable("camera_info") {
+  sources = [
+    "camera_info/camera_info.cc",
+    "camera_info/default_video_source_factory.h",
+    "camera_info/v4l2_video_source.cc",
+    "camera_info/v4l2_video_source.h",
+    "camera_info/v4l2_video_source_factory.cc",
+    "camera_info/video_source_factory.h",
+  ]
+
+  deps = [
+    ":media_video",
     "//base:logging",
     "//common",
   ]

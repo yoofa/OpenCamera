@@ -8,7 +8,7 @@
 #include "video_frame.h"
 
 namespace avp {
-VideoFrame::VideoFrame(uint32_t id,
+VideoFrame::VideoFrame(uint64_t id,
                        std::shared_ptr<VideoFrameBuffer> video_frame_buffer,
                        int64_t timestamp_us,
                        std::optional<Rect> rect)

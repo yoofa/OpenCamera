@@ -12,13 +12,22 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <memory>
+#include <optional>
 
+#include "api/video/i420_buffer.h"
+#include "api/video/nv12_buffer.h"
+#include "api/video/video_frame_buffer.h"
+#include "api/video/yuyv_buffer.h"
 #include "base/checks.h"
 #include "base/errors.h"
 #include "base/logging.h"
+#include "base/task_util/default_task_runner_factory.h"
+#include "base/types.h"
 #include "common/buffer.h"
 #include "common/codec_constants.h"
 #include "common/looper.h"
+#include "common/media_errors.h"
 #include "common/message.h"
 
 namespace avp {
@@ -44,14 +53,15 @@ constexpr int kTypicalFramerate = 25;
 // This list is ordered by precedence of use if no perfer color format
 struct {
   uint32_t fourcc;
-  int32_t pixel_format;
+  VideoFrameBuffer::PixelFormat pixel_format;
   size_t num_planes;
 } constexpr kSupportedFormatsAndPlanarity[] = {
-    {V4L2_PIX_FMT_YUV420, COLOR_FormatYUV420Planar, 1},
-    {V4L2_PIX_FMT_NV12, COLOR_FormatYUV420SemiPlanar, 1},
-    {V4L2_PIX_FMT_YUYV, COLOR_FormatYUV422PackedPlanar, 1},
-    {V4L2_PIX_FMT_RGB24, COLOR_Format24bitRGB888, 1},
-    {V4L2_PIX_FMT_Y16, COLOR_FormatL16, 1},
+    {V4L2_PIX_FMT_YUV420, VideoFrameBuffer::PixelFormat::kI420, 1},
+    {V4L2_PIX_FMT_NV12, VideoFrameBuffer::PixelFormat::kNV12, 1},
+    {V4L2_PIX_FMT_YUYV, VideoFrameBuffer::PixelFormat::kYUY2, 1},
+    {V4L2_PIX_FMT_RGB24, VideoFrameBuffer::PixelFormat::kRGB24, 1},
+    // error format
+    {V4L2_PIX_FMT_Y16, VideoFrameBuffer::PixelFormat::kMJPEG, 1},
 };
 
 static void V4L2MakeFourCCString(uint32_t x, char* s) {
@@ -66,7 +76,8 @@ std::vector<uint32_t> getListOfUsableFourCcs(int32_t perferColorFormat) {
   std::vector<uint32_t> supportedFormats;
   uint32_t perferFourCc = 0;
   for (const auto& format : kSupportedFormatsAndPlanarity) {
-    if (format.pixel_format == perferColorFormat) {
+    if (format.pixel_format ==
+        static_cast<VideoFrameBuffer::PixelFormat>(perferColorFormat)) {
       perferFourCc = format.fourcc;
       // insert later
       continue;
@@ -125,9 +136,84 @@ void fillV4L2Buffer(v4l2_buffer* buffer, int index) {
   buffer->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 }
 
+static void CreateVideoFrame(std::shared_ptr<VideoFrame>& frame_buffer,
+                             v4l2_format* format,
+                             uint8_t* data,
+                             size_t size) {
+  const int64_t now = Looper::getNowUs();
+  // char cc[5];
+  // V4L2MakeFourCCString(format->fmt.pix.pixelformat, cc);
+  // LOG(LS_INFO) << "CreateVideoFrame, format: " << cc
+  //              << ", width:" << format->fmt.pix.width
+  //              << ", timestamp:";
+  //              << ", height:" << format->fmt.pix.height << ", size:" << size
+
+  switch (format->fmt.pix.pixelformat) {
+    case V4L2_PIX_FMT_YUV420: {
+      auto video_frame_buffer =
+          I420Buffer::Create(format->fmt.pix.width, format->fmt.pix.height);
+      memcpy(video_frame_buffer->MutableDataY(), data,
+             video_frame_buffer->StrideY() * video_frame_buffer->height());
+      memcpy(
+          video_frame_buffer->MutableDataU(),
+          data + video_frame_buffer->StrideY() * video_frame_buffer->height(),
+          video_frame_buffer->StrideU() * video_frame_buffer->height() / 2);
+
+      memcpy(
+          video_frame_buffer->MutableDataV(),
+          data + video_frame_buffer->StrideY() * video_frame_buffer->height() +
+              video_frame_buffer->StrideU() * video_frame_buffer->height() / 2,
+          video_frame_buffer->StrideV() * video_frame_buffer->height() / 2);
+
+      frame_buffer = std::make_shared<VideoFrame>(0, video_frame_buffer, now,
+                                                  std::nullopt);
+      break;
+    }
+
+    case V4L2_PIX_FMT_NV12: {
+      auto video_frame_buffer = NV12Buffer::Copy(
+          data, format->fmt.pix.width,
+          data + format->fmt.pix.width * format->fmt.pix.height,
+          format->fmt.pix.width + format->fmt.pix.width % 2,
+          format->fmt.pix.width, format->fmt.pix.height);
+      frame_buffer = std::make_shared<VideoFrame>(0, video_frame_buffer, now,
+                                                  std::nullopt);
+      break;
+    }
+
+    case V4L2_PIX_FMT_YUYV: {
+      auto video_frame_buffer =
+          YUYVBuffer::Copy(data, format->fmt.pix.width * 2,
+                           format->fmt.pix.width, format->fmt.pix.height);
+      frame_buffer = std::make_shared<VideoFrame>(0, video_frame_buffer, now,
+                                                  std::nullopt);
+      break;
+    }
+
+    default: {
+      break;
+    }
+  }
+}
+
 }  // namespace
 
-V4L2VideoSource::V4L2VideoSource(const char* device) : mFd(-1) {
+std::shared_ptr<V4L2VideoSource> V4L2VideoSource::Create(
+    std::shared_ptr<Message> info) {
+  std::string v4l2_dev;
+  DCHECK(info->findString("v4l2-dev", v4l2_dev));
+  return std::make_shared<V4L2VideoSource>(v4l2_dev.c_str());
+}
+
+V4L2VideoSource::V4L2VideoSource(const char* device, protect_parameter)
+    : task_runner_factory_(base::CreateDefaultTaskRunnerFactory()),
+      task_runner_(std::make_unique<base::TaskRunner>(
+          task_runner_factory_->CreateTaskRunner(
+              "V4L2VideoSource",
+              base::TaskRunnerFactory::Priority::NORMAL))),
+      mFd(-1),
+      frame_count_(0) {
+  LOG(LS_INFO) << "V4L2VideoSource::V4L2VideoSource";
   mFd = ::open(device, O_RDWR);
   if (mFd < 0) {
     LOG(LS_ERROR) << "open " << device << " fail, maybe no permission";
@@ -151,11 +237,32 @@ V4L2VideoSource::V4L2VideoSource(const char* device) : mFd(-1) {
   for (; doIoctl(VIDIOC_ENUM_FMT, &fmtdesc) == 0; ++fmtdesc.index) {
     char cc[5];
     V4L2MakeFourCCString(fmtdesc.pixelformat, cc);
-    LOG(LS_DEBUG) << "support format: " << cc
-                  << ", desc: " << fmtdesc.description;
+    char description[32];
+    for (int i = 0; i < 31; i++) {
+      description[i] = fmtdesc.description[i];
+    }
+    LOG(LS_DEBUG) << "support format: " << cc << ", desc: " << description;
     mV4L2Formats.push_back(fmtdesc);
   }
-  //
+  MetaData metaData;
+  metaData.setInt32(kKeyWidth, 1920);
+  metaData.setInt32(kKeyHeight, 1080);
+  metaData.setInt32(kKeyColorFormat,
+                    static_cast<int32_t>(VideoFrameBuffer::PixelFormat::kI420));
+  start(&metaData);
+
+  repeating_task_handler_ = RepeatingTaskHandle::DelayedStart(
+      task_runner_->Get(), 1 * 1000 * 1000, [this]() {
+        std::shared_ptr<VideoFrame> frame;
+        read(frame);
+        if (frame) {
+          for (auto& sink : sink_pairs()) {
+            sink.sink->OnFrame(frame);
+          }
+        }
+        //   50ms, about 20fps
+        return (uint64_t)(50 * 1000);
+      });
 }
 
 V4L2VideoSource::~V4L2VideoSource() {
@@ -163,6 +270,22 @@ V4L2VideoSource::~V4L2VideoSource() {
     ::close(mFd);
     mFd = -1;
   }
+}
+
+void V4L2VideoSource::AddOrUpdateSink(
+    VideoSinkInterface<std::shared_ptr<VideoFrame>>* sink,
+    const VideoSinkWants& wants) {
+  task_runner_->PostTask([this, sink, wants]() {
+    VideoSourceBase<std::shared_ptr<VideoFrame>>::AddOrUpdateSink(sink, wants);
+  });
+}
+
+void V4L2VideoSource::RemoveSink(
+    VideoSinkInterface<std::shared_ptr<VideoFrame>>* sink) {
+  task_runner_->PostTask([this, sink]() {
+    LOG(LS_INFO) << "RemoveSink";
+    VideoSourceBase::RemoveSink(sink);
+  });
 }
 
 status_t V4L2VideoSource::start(MetaData* params) {
@@ -197,11 +320,12 @@ status_t V4L2VideoSource::start(MetaData* params) {
     return ERROR_UNSUPPORTED;
   }
   V4L2MakeFourCCString(mVideoFmt.fmt.pix.pixelformat, cc);
-  LOG(LS_INFO) << "set format: " << cc << ", width: " << mVideoFmt.fmt.pix.width
-               << ", height: " << mVideoFmt.fmt.pix.height;
 
   mWidth = mVideoFmt.fmt.pix.width;
   mHeight = mVideoFmt.fmt.pix.height;
+
+  LOG(LS_INFO) << "set format: " << cc << ", res: [" << width << "x" << height
+               << "] -> [" << mWidth << "x" << mHeight << "]";
 
   int32_t framerate = 0;
   params->findInt32(kKeyFrameRate, &framerate);
@@ -310,12 +434,7 @@ bool V4L2VideoSource::stopStream() {
   return true;
 }
 
-std::shared_ptr<MetaData> V4L2VideoSource::getFormat() {
-  return nullptr;
-}
-
-status_t V4L2VideoSource::read(std::shared_ptr<Buffer>& buffer,
-                               const ReadOptions* options) {
+status_t V4L2VideoSource::read(std::shared_ptr<VideoFrame>& buffer) {
   pollfd pfd = {};
   pfd.fd = mFd;
   pfd.events = POLLIN;
@@ -340,13 +459,20 @@ status_t V4L2VideoSource::read(std::shared_ptr<Buffer>& buffer,
       return UNKNOWN_ERROR;
     }
 
-    // TODO(youfa) change get now us to //base
-    const int64_t now = Looper::getNowUs();
-    buffer = std::make_shared<Buffer>(v4lBuffer.bytesused);
-    memcpy(buffer->data(), mBuffers[v4lBuffer.index].data, v4lBuffer.bytesused);
-    buffer->meta()->setInt64("timeUs", now);
-    buffer->meta()->setInt32("width", mWidth);
-    buffer->meta()->setInt32("height", mHeight);
+    CreateVideoFrame(buffer, &mVideoFmt, mBuffers[v4lBuffer.index].data,
+                     v4lBuffer.bytesused);
+
+    if (buffer != nullptr) {
+      // TODO(youfa) use now us or v4l2 timestamp
+      // const int64_t now = Looper::getNowUs();
+      // LOG(LS_INFO) << "now:" << now
+      //             << ", v4lBuffer.timestamp:" << v4lBuffer.timestamp.tv_sec
+      //             << "," << v4lBuffer.timestamp.tv_usec << ", ts:"
+      //             << v4lBuffer.timestamp.tv_sec * 1000000 +
+      //                    v4lBuffer.timestamp.tv_usec;
+      // buffer->set_timestamp_us(now);
+      buffer->set_id(frame_count_++);
+    }
 
     if (doIoctl(VIDIOC_QBUF, &v4lBuffer) < 0) {
       LOG(LS_ERROR) << "failed to enqueue capture buffer";
@@ -362,37 +488,8 @@ status_t V4L2VideoSource::pause() {
   return ERROR_RETRY;
 }
 
-status_t V4L2VideoSource::setBuffers(const std::vector<Buffer*>&) {
-  return OK;
-}
-
-status_t V4L2VideoSource::setStopTimeUs(int64_t) {
-  return OK;
-}
-
 int V4L2VideoSource::doIoctl(int request, void* argp) {
   return ::ioctl(mFd, request, argp);
-}
-class V4l2VideoSourceFactory : public VideoSourceFactory {
- public:
-  V4l2VideoSourceFactory() = default;
-  virtual ~V4l2VideoSourceFactory() = default;
-
-  std::unique_ptr<MediaSource> CreateVideoSource(
-      std::shared_ptr<Message> info) {
-    // TODO
-    std::string v4l2_dev;
-    DCHECK(info->findString("v4l2-dev", v4l2_dev));
-    return std::make_unique<V4L2VideoSource>(v4l2_dev.c_str());
-  }
-
- private:
-  /* data */
-};
-
-std::unique_ptr<VideoSourceFactory> CreateV4l2VideoSourceFactory() {
-  // TODO
-  return std::make_unique<V4l2VideoSourceFactory>();
 }
 
 }  // namespace avp

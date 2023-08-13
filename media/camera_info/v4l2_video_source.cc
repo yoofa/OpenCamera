@@ -174,12 +174,12 @@ status_t V4L2VideoSourceForCameraInfo::start(MetaData* params) {
 
   // read params
   int32_t width = 0;
-  DCHECK(params->findInt32(kKeyWidth, &width));
+  CHECK(params->findInt32(kKeyWidth, &width));
   int32_t height = 0;
-  DCHECK(params->findInt32(kKeyHeight, &height));
+  CHECK(params->findInt32(kKeyHeight, &height));
 
   int32_t preferColorFormat = -1;
-  DCHECK(params->findInt32(kKeyColorFormat, &preferColorFormat));
+  CHECK(params->findInt32(kKeyColorFormat, &preferColorFormat));
 
   // 1. prefer format, 2. support formats by device, support formats in code;
   uint32_t colorFormat = PreferFormatFourCc(mV4L2Formats, preferColorFormat);
@@ -384,7 +384,7 @@ class V4l2VideoSourceFactory : public VideoSourceFactory {
       std::shared_ptr<Message> info) {
     // TODO
     std::string v4l2_dev;
-    DCHECK(info->findString("v4l2-dev", v4l2_dev));
+    CHECK(info->findString("v4l2-dev", v4l2_dev));
     return std::make_unique<V4L2VideoSourceForCameraInfo>(v4l2_dev.c_str());
   }
 

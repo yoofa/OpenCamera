@@ -92,9 +92,9 @@ void RtspServer::OnClientConnected(const std::shared_ptr<Message>& msg) {
   int32_t sessionId = 0;
   std::string ip{};
   int32_t port = 0;
-  DCHECK(msg->findInt32("sessionId", &sessionId));
-  DCHECK(msg->findString("ip", ip));
-  DCHECK(msg->findInt32("port", &port));
+  CHECK(msg->findInt32("sessionId", &sessionId));
+  CHECK(msg->findString("ip", ip));
+  CHECK(msg->findInt32("port", &port));
   LOG(LS_INFO) << "client connect, sessionId: " << sessionId << ", ip: " << ip
                << ", port: " << port;
 }
@@ -103,16 +103,16 @@ void RtspServer::OnClientDisconnected(const std::shared_ptr<Message>& msg) {
   int32_t sessionId = 0;
   std::string ip{};
   int32_t port = 0;
-  DCHECK(msg->findInt32("sessionId", &sessionId));
-  DCHECK(msg->findString("ip", ip));
-  DCHECK(msg->findInt32("port", &port));
+  CHECK(msg->findInt32("sessionId", &sessionId));
+  CHECK(msg->findString("ip", ip));
+  CHECK(msg->findInt32("port", &port));
   LOG(LS_INFO) << "client disconnect, sessionId: " << sessionId
                << ", ip: " << ip << ", port: " << port;
 }
 
 void RtspServer::OnAddMediaSource(const std::shared_ptr<Message>& msg) {
   std::shared_ptr<MessageObject> obj;
-  DCHECK(msg->findObject("mediaSource", obj));
+  CHECK(msg->findObject("mediaSource", obj));
   std::shared_ptr<MediaSource> source =
       std::dynamic_pointer_cast<MediaSource>(obj);
 
@@ -123,7 +123,7 @@ void RtspServer::OnAddMediaSource(const std::shared_ptr<Message>& msg) {
   }
 
   std::string mime;
-  DCHECK(format->findString("mime", mime));
+  CHECK(format->findString("mime", mime));
   bool isAudio = !strncasecmp("audio/", mime.c_str(), 6);
   if (isAudio && has_audio_) {
     LOG(LS_WARNING)
@@ -165,7 +165,7 @@ void RtspServer::OnPullAudioSource() {
     frame.type = xop::AUDIO_FRAME;
     frame.size = buffer->size();
     int64_t pts = 0;
-    DCHECK(buffer->meta()->findInt64("timeUs", &pts));
+    CHECK(buffer->meta()->findInt64("timeUs", &pts));
     frame.timestamp = pts;
 
     frame.buffer.reset(new uint8_t[frame.size]);
@@ -194,7 +194,7 @@ void RtspServer::OnPullVideoSource() {
     frame.type = 0;
     frame.size = buffer->size();
     int64_t pts = 0;
-    DCHECK(buffer->meta()->findInt64("timeUs", &pts));
+    CHECK(buffer->meta()->findInt64("timeUs", &pts));
     frame.timestamp = pts / 1000 * 90;
 
     frame.buffer.reset(new uint8_t[frame.size]);

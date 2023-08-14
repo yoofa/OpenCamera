@@ -13,9 +13,9 @@ vars = {
 deps = {
   # avp
   'src/base':
-    'git@github.com:vsyf/base.git@47ac6d509459c04a377f9ec3de477420c9c48572',
+    'git@github.com:vsyf/base.git@c692416800d24840bb5d78304b8ce0d710780d0b',
   'src/common':
-    'git@github.com:vsyf/media_common.git@e1a69753e1abe3fc02a2ff569484fbb9a61d839c',
+    'git@github.com:vsyf/media_common.git@b097ade71196b5157c71de9632f0c0beb07d1cc8',
 
   # chromium 
   'src/build':

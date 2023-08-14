@@ -27,7 +27,8 @@ namespace avp {
 
 class VideoCapturer : public VideoSinkInterface<std::shared_ptr<VideoFrame>>,
                       public VideoProcessorSink<std::shared_ptr<VideoFrame>>,
-                      public VideoSourceInterface<std::shared_ptr<VideoFrame>> {
+                      public VideoSourceInterface<std::shared_ptr<VideoFrame>>,
+                      public MessageObject {
   using VideoSource = VideoSourceInterface<std::shared_ptr<VideoFrame>>;
   using VideoSink = VideoSinkInterface<std::shared_ptr<VideoFrame>>;
   using VideoProcessor = VideoProcessorInterface<std::shared_ptr<VideoFrame>>;

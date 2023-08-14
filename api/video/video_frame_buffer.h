@@ -26,6 +26,21 @@ class VideoFrameBuffer {
     kPrivate,
   };
 
+  static std::string TypeToString(Type type) {
+    switch (type) {
+      case Type::kNormal:
+        return "Normal";
+      case Type::kTexture:
+        return "Texture";
+      case Type::kHardware:
+        return "Hardware";
+      case Type::kPrivate:
+        return "Private";
+      default:
+        return "Unknown";
+    }
+  }
+
   // pixel format
   enum class PixelFormat : int32_t {
     kUnknown = -1,

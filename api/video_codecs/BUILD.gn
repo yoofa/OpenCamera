@@ -1,0 +1,24 @@
+import("//opencamera.gni")
+
+oc_library("video_encoder_api") {
+  visibility = [ "*" ]
+  sources = [
+    "video_encoder.cc",
+    "video_encoder.h",
+    "video_encoder_config.cc",
+    "video_encoder_config.h",
+    "video_encoder_factory.h",
+  ]
+  deps = [ "//common:foundation" ]
+}
+
+oc_library("fake_video_encoder") {
+  sources = [
+    "fake_video_encoder_factory.cc",
+    "fake_video_encoder_factory.h",
+  ]
+  deps = [
+    ":video_encoder_api",
+    "//api/video:encoded_image",
+  ]
+}

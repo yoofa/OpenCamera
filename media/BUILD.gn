@@ -7,34 +7,90 @@ group("media") {
   ]
 }
 
+oc_library("media_service") {
+  sources = [
+    "media_service.cc",
+    "media_service.h",
+  ]
+  deps = [
+    ":media_video",
+    ":media_worker",
+    "//base:logging",
+    "//third_party/inih",
+  ]
+
+  deps += [ "//api/video_codecs:fake_video_encoder" ]
+  configs += [ "//build/config/compiler:rtti" ]
+}
+
+oc_library("media_worker") {
+  sources = [
+    "hybird_worker.cc",
+    "hybird_worker.h",
+    "media_transport.cc",
+    "media_worker.h",
+    "mediatransport.h",
+  ]
+
+  deps = [
+    ":media_video",
+    "//base:logging",
+    "//base:task_util",
+    "//common:foundation",
+  ]
+}
+
+# video_capturer need rtti support, separate to a library
+oc_library("video_capturer") {
+  sources = [
+    "video_capturer.cc",
+    "video_capturer.h",
+  ]
+  configs += [ "//build/config/compiler:rtti" ]
+}
+
 oc_library("media_video") {
   sources = [
-    "./media_service.cc",
-    "./media_service.h",
-    "./video_capturer.cc",
-    "./video_capturer.h",
+    "media_stream.h",
+    "video_send_stream.cc",
+    "video_send_stream.h",
+    "video_stream_encoder.cc",
+    "video_stream_encoder.h",
+    "video_stream_sender.cc",
+    "video_stream_sender.h",
   ]
+
+  sources += [ "media_worker.h" ]
+
+  #  configs += [ "//build/config/compiler:rtti" ]
 
   deps = [
     ":file_sink",
     ":v4l2_video_source",
+    ":video_capturer",
+    "../base:sequence_checker",
     "//api/video:video_frame",
+    "//api/video_codecs:video_encoder_api",
     "//base:logging",
     "//base:task_util",
     "//common:foundation",
-    "//third_party/inih",
   ]
 }
+
 oc_library("file_sink") {
   sources = [
-    "file_sink.cc",
+    # "file_sink.cc",
     "file_sink.h",
   ]
   configs += [ "//build/config/compiler:rtti" ]
 }
 
 oc_library("video_base") {
-  sources = [ "video_source_base.h" ]
+  sources = [
+    "video_broadcaster.h",
+    "video_source_base.h",
+  ]
+
   deps = [ "//api/video:video_frame" ]
 }
 

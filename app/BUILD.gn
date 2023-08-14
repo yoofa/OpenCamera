@@ -16,7 +16,7 @@ oc_library("oc") {
   deps = [
     "//base:logging",
     "//common:foundation",
-    "//media:media_video",
+    "//media:media_service",
     "//onvif:onvifserver",
     "//rtsp:h264_file_source",
   ]

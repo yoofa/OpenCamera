@@ -20,8 +20,8 @@ class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
   VideoSourceBase() = default;
   ~VideoSourceBase() override = default;
 
-  void AddOrUpdateSink(VideoSinkInterface<VideoFrameT>* sink,
-                       const VideoSinkWants& wants) override {
+  virtual void AddOrUpdateSink(VideoSinkInterface<VideoFrameT>* sink,
+                               const VideoSinkWants& wants) override {
     DCHECK(sink != nullptr);
     SinkPair* sink_pair = FindSinkPair(sink);
     if (sink_pair) {
@@ -31,7 +31,7 @@ class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
     sinks_.push_back(SinkPair(sink, wants));
   }
 
-  void RemoveSink(VideoSinkInterface<VideoFrameT>* sink) override {
+  virtual void RemoveSink(VideoSinkInterface<VideoFrameT>* sink) override {
     DCHECK(FindSinkPair(sink));
     sinks_.erase(std::remove_if(sinks_.begin(), sinks_.end(),
                                 [sink](const SinkPair& sink_pair) {
@@ -46,6 +46,7 @@ class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
     VideoSinkInterface<VideoFrameT>* sink;
     VideoSinkWants wants;
   };
+
   SinkPair* FindSinkPair(const VideoSinkInterface<VideoFrameT>* sink) {
     DCHECK(sink != nullptr);
 

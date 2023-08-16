@@ -19,9 +19,9 @@ VideoStreamConfig::VideoStreamConfig()
     : width(0),
       height(0),
       max_framerate(-1),
-      min_bitrate_bps(-1),
-      target_bitrate_bps(-1),
-      max_bitrate_bps(-1),
+      min_bitrate_kbps(-1),
+      target_bitrate_kbps(-1),
+      max_bitrate_kbps(-1),
       scale_resolution_down_by(-1.),
       max_qp(-1),
       num_temporal_layers(std::nullopt),
@@ -31,14 +31,13 @@ VideoStreamConfig::VideoStreamConfig(const VideoStreamConfig& other) = default;
 VideoStreamConfig::~VideoStreamConfig() = default;
 
 std::string VideoStreamConfig::ToString() const {
-  char buf[1024];
-  std::stringstream ss(buf);
+  std::stringstream ss;
   ss << "{width: " << width;
   ss << ", height: " << height;
   ss << ", max_framerate: " << max_framerate;
-  ss << ", min_bitrate_bps:" << min_bitrate_bps;
-  ss << ", target_bitrate_bps:" << target_bitrate_bps;
-  ss << ", max_bitrate_bps:" << max_bitrate_bps;
+  ss << ", min_bitrate_kbps:" << min_bitrate_kbps;
+  ss << ", target_bitrate_kbps:" << target_bitrate_kbps;
+  ss << ", max_bitrate_kbps:" << max_bitrate_kbps;
   ss << ", max_qp: " << max_qp;
   ss << ", num_temporal_layers: " << num_temporal_layers.value_or(1);
   ss << ", bitrate_priority: " << bitrate_priority.value_or(0);
@@ -49,15 +48,14 @@ std::string VideoStreamConfig::ToString() const {
 }
 
 VideoEncoderConfig::VideoEncoderConfig()
-    :  // codec_type(kVideoCodecGeneric),
-       //     video_format("Unset"),
-       //     content_type(ContentType::kRealtimeVideo),
-       //     encoder_specific_settings(nullptr),
-      min_transmit_bitrate_bps(0),
-      max_bitrate_bps(0),
+    : codec_id(CodecId::AV_CODEC_ID_NONE),
+      //     video_format("Unset"),
+      //     content_type(ContentType::kRealtimeVideo),
+      //     encoder_specific_settings(nullptr),
+      min_bitrate_kbps(0),
+      max_bitrate_kbps(0),
       bitrate_priority(1.0),
       number_of_streams(0),
-      legacy_conference_mode(false),
       is_quality_scaling_allowed(false) {}
 
 VideoEncoderConfig::VideoEncoderConfig(VideoEncoderConfig&&) = default;
@@ -65,23 +63,23 @@ VideoEncoderConfig::VideoEncoderConfig(VideoEncoderConfig&&) = default;
 VideoEncoderConfig::~VideoEncoderConfig() = default;
 
 std::string VideoEncoderConfig::ToString() const {
-  char buf[1024];
-  std::stringstream ss(buf);
-  ss << "{codec_type: ";
-  // ss << CodecTypeToPayloadString(codec_type);
-  ss << ", content_type: ";
-  //  switch (content_type) {
-  //    case ContentType::kRealtimeVideo:
-  //      ss << "kRealtimeVideo";
-  //      break;
-  //    case ContentType::kScreen:
-  //      ss << "kScreenshare";
-  //      break;
-  //  }
-  ss << ", encoder_specific_settings: ";
+  std::stringstream ss;
+  ss << "{codec_id: ";
+  ss << CodecName(codec_id);
+  // ss << ", content_type: ";
+  //   switch (content_type) {
+  //     case ContentType::kRealtimeVideo:
+  //       ss << "kRealtimeVideo";
+  //       break;
+  //     case ContentType::kScreen:
+  //       ss << "kScreenshare";
+  //       break;
+  //   }
+  // ss << ", encoder_specific_settings: ";
   //  ss << (encoder_specific_settings != NULL ? "(ptr)" : "NULL");
 
-  ss << ", min_transmit_bitrate_bps: " << min_transmit_bitrate_bps;
+  ss << ", min_bitrate_bps: " << min_bitrate_kbps;
+  ss << ", max_bitrate_bps: " << max_bitrate_kbps;
   ss << '}';
   return ss.str();
 }
@@ -90,11 +88,11 @@ VideoEncoderConfig::VideoEncoderConfig(const VideoEncoderConfig&) = default;
 
 void VideoEncoderConfig::EncoderSpecificSettings::FillEncoderSpecificSettings(
     VideoCodecProperty* codec) const {
-  if (codec->codec_type == CodecId::AV_CODEC_ID_H264) {
+  if (codec->codec_id == CodecId::AV_CODEC_ID_H264) {
     FillVideoCodecH264(codec->H264());
-  } else if (codec->codec_type == CodecId::AV_CODEC_ID_VP8) {
+  } else if (codec->codec_id == CodecId::AV_CODEC_ID_VP8) {
     FillVideoCodecVp8(codec->VP8());
-  } else if (codec->codec_type == CodecId::AV_CODEC_ID_VP9) {
+  } else if (codec->codec_id == CodecId::AV_CODEC_ID_VP9) {
     FillVideoCodecVp9(codec->VP9());
   } else {
     AVP_NOTREACHED() << "Encoder specifics set/used for unknown codec type.";

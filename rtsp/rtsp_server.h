@@ -10,6 +10,10 @@
 
 #include <memory>
 
+#include "api/video/encoded_image.h"
+#include "api/video/video_sink_interface.h"
+#include "base/logging.h"
+#include "common/codec_id.h"
 #include "common/handler.h"
 #include "common/looper.h"
 #include "common/media_source.h"
@@ -19,13 +23,23 @@
 namespace avp {
 class RtspServer : public Handler {
  public:
+  class VideoQueue : public VideoSinkInterface<EncodedImage>,
+                     public MessageObject {
+   public:
+    void OnFrame(const EncodedImage& frame) override { queue_.push(frame); }
+    std::queue<EncodedImage>& queue() { return queue_; }
+
+   private:
+    std::queue<EncodedImage> queue_;
+  };
+
   RtspServer(std::shared_ptr<Message> notify);
   virtual ~RtspServer();
   status_t Init();
   status_t Start();
   status_t Stop();
 
-  status_t AddMediaSource(std::shared_ptr<MediaSource> mediaSource);
+  void RequestVideoSink(int32_t stream_id, CodecId codec_id);
 
   enum {
 
@@ -35,15 +49,23 @@ class RtspServer : public Handler {
     kWhatClientConnected = 'cnet',
     kWhatClientDisonnected = 'dcnt',
 
-    kWhatAddMediaSource = 'adms',
+    kWhatRequestVideoSink = 'rvid',
+
     kWhatPullAudio = 'pula',
     kWhatPullVideo = 'pulv',
+
+    // notify
+    kWhatClientConnectedNotify = 'ccnt',
+    kWhatClientDisconnectedNotify = 'dcnt',
+    kWhatVideoSinkAdded = 'vsin',
   };
 
  private:
   void OnClientConnected(const std::shared_ptr<Message>& msg);
   void OnClientDisconnected(const std::shared_ptr<Message>& msg);
   void OnAddMediaSource(const std::shared_ptr<Message>& msg);
+
+  void OnRequestVideoSink(const std::shared_ptr<Message>& msg);
   void OnPullAudioSource();
   void OnPullVideoSource();
 
@@ -58,12 +80,14 @@ class RtspServer : public Handler {
   std::shared_ptr<xop::EventLoop> event_loop_;
   std::shared_ptr<xop::RtspServer> server_;
   xop::MediaSessionId session_id_;
+  xop::MediaSession* media_session_;
+
+  std::shared_ptr<VideoQueue> video_queue_;
 
   bool has_audio_;
   bool has_video_;
   bool started_;
-  std::shared_ptr<MediaSource> audio_source_;
-  std::shared_ptr<MediaSource> video_source_;
+
   std::mutex mutex_;
 };
 }  // namespace avp

@@ -24,6 +24,7 @@ oc_library("oc") {
     "//rtsp:rtspserver",
     "//third_party/inih",
   ]
+  configs += [ "//build/config/compiler:rtti" ]
 }
 
 executable("somnus") {

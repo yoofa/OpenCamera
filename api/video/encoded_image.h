@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 
+#include "api/video/video_frame_type.h"
 #include "base/checks.h"
 #include "base/types.h"
 
@@ -65,7 +66,8 @@ class EncodedImage {
 
   ~EncodedImage();
 
-  void SetTimestamp(uint32_t timestamp) { timestamp_us_ = timestamp; }
+  void SetTimestamp(uint64_t timestamp) { timestamp_us_ = timestamp; }
+  uint64_t Timestamp() { return timestamp_us_; }
 
   void SetEncodeTime(int64_t encode_start_ms, int64_t encode_finish_ms);
 
@@ -87,7 +89,7 @@ class EncodedImage {
     size_ = 0;
   }
 
-  std::shared_ptr<EncodedImageBufferInterface> GetEncodedData() const {
+  std::shared_ptr<EncodedImageBuffer> GetEncodedData() const {
     return encoded_data_;
   }
 
@@ -97,15 +99,16 @@ class EncodedImage {
 
   uint32_t encoded_width_ = 0;
   uint32_t encoded_height_ = 0;
-  int64_t capture_time_ms_ = 0;
+  uint64_t capture_time_ms_ = 0;
   int qp_ = -1;  // Quantizer value.
+  VideoFrameType frame_type_ = VideoFrameType::kVideoFrameDelta;
 
  private:
   size_t Capacity() const { return encoded_data_ ? encoded_data_->Size() : 0; }
 
-  std::shared_ptr<EncodedImageBufferInterface> encoded_data_;
+  std::shared_ptr<EncodedImageBuffer> encoded_data_;
   size_t size_ = 0;  // Size of encoded frame data.
-  uint32_t timestamp_us_ = 0;
+  uint64_t timestamp_us_ = 0;
 };
 
 }  // namespace avp

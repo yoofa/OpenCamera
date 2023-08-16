@@ -19,8 +19,6 @@ class VideoEncoderFactory {
   virtual ~VideoEncoderFactory() = default;
 
   virtual std::unique_ptr<VideoEncoder> CreateVideoEncoder() = 0;
-
- private:
 };
 
 }  // namespace avp

@@ -25,20 +25,23 @@ namespace avp {
 class HybirdWorker : public MediaWorker {
   using VideoSource =
       std::shared_ptr<VideoSourceInterface<std::shared_ptr<VideoFrame>>>;
-  using EncodedVideoSink =
-      std::shared_ptr<VideoSinkInterface<std::shared_ptr<EncodedImage>>>;
+  using EncodedVideoSink = std::shared_ptr<VideoSinkInterface<EncodedImage>>;
 
  public:
   explicit HybirdWorker(VideoEncoderFactory* video_encoder_factory);
   virtual ~HybirdWorker();
 
-  void AddVideoSource(VideoSource& video_source, int32_t stream_id) override;
+  void AddVideoSource(VideoSource& video_source,
+                      int32_t stream_id,
+                      VideoEncoderConfig& encoder_config) override;
   void RemoveVideoSource(VideoSource& video_source, int32_t stream_id) override;
 
   void AddEncodedVideoSink(EncodedVideoSink& encoded_image_sink,
                            int32_t stream_id) override;
   void RemoveEncodedVideoSink(EncodedVideoSink& encoded_image_sink,
                               int32_t stream_id) override;
+
+  void RequestKeyFrame() override;
 
   struct VideoSourceInfo {
     VideoSource video_source;

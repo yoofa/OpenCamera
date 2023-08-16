@@ -27,24 +27,20 @@ class VideoStreamSender : public VideoStreamSenderInterface {
   bool frame_wanted() const;
 
   void AddVideoSink(
-      const std::shared_ptr<VideoSinkInterface<std::shared_ptr<EncodedImage>>>&
-          sink);
+      const std::shared_ptr<VideoSinkInterface<EncodedImage>>& sink);
   void RemoveVideoSink(
-      const std::shared_ptr<VideoSinkInterface<std::shared_ptr<EncodedImage>>>&
-          sink);
+      const std::shared_ptr<VideoSinkInterface<EncodedImage>>& sink);
 
   // VideoStreamSenderInterface implementation.
-  Result OnEncodedImage(
-      const std::shared_ptr<EncodedImage>& encoded_image) override;
+  Result OnEncodedImage(const EncodedImage& encoded_image) override;
 
  private:
   base::TaskRunner* transport_runner_;
   mutable Mutex sink_lock_;
-  std::vector<
-      std::shared_ptr<VideoSinkInterface<std::shared_ptr<EncodedImage>>>>
-      sinks_ GUARDED_BY(sink_lock_);
+  std::vector<std::shared_ptr<VideoSinkInterface<EncodedImage>>> sinks_
+      GUARDED_BY(sink_lock_);
 
-  VideoBroadcaster<std::shared_ptr<EncodedImage>> broadcaster_;
+  VideoBroadcaster<EncodedImage> broadcaster_;
 };
 
 }  // namespace avp

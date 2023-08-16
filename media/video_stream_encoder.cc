@@ -12,6 +12,7 @@
 #include "base/sequence_checker.h"
 #include "base/task_util/task_runner_base.h"
 #include "common/video_codec_property.h"
+#include "media/video_stream_helper.h"
 
 namespace avp {
 
@@ -22,6 +23,7 @@ VideoStreamEncoder::VideoStreamEncoder(
     : task_runner_factory_(task_runner_factory),
       encoder_factory_(encoder_factory),
       sink_(sink),
+      encoder_initialized_(false),
       pending_encoder_reconfiguration_(false),
       pending_encoder_creation_(false),
       max_data_payload_length_(0),
@@ -44,7 +46,15 @@ void VideoStreamEncoder::SetSink(EncoderSink* sink) {}
 
 void VideoStreamEncoder::SetStartBitrate(int start_bitrate_bps) {}
 
-void VideoStreamEncoder::SendKeyFrame() {}
+void VideoStreamEncoder::SendKeyFrame() {
+  encoder_runner_.PostTask([this]() {
+    AVP_DCHECK_RUN_ON(&encoder_runner_);
+    LOG(LS_INFO) << "key request";
+    if (encoder_) {
+      encoder_->RequestKeyFrame();
+    }
+  });
+}
 
 void VideoStreamEncoder::ConfigureEncoder(VideoEncoderConfig config,
                                           size_t max_data_payload_length) {
@@ -60,10 +70,9 @@ void VideoStreamEncoder::ConfigureEncoder(VideoEncoderConfig config,
         pending_encoder_reconfiguration_ = true;
 
         if (last_frame_info_) {
-          // ReconfigureEncoder();
+          ReConfigureEncoder();
         } else {
           // TODO(youfa) check encoder if has internal source,
-          ReConfigureEncoder();
         }
       });
 }
@@ -115,24 +124,53 @@ void VideoStreamEncoder::EncodeVideoFrame(
 void VideoStreamEncoder::ReConfigureEncoder() {
   DCHECK(pending_encoder_reconfiguration_);
 
+  bool encoder_reset_required = false;
   if (pending_encoder_creation_) {
+    encoder_reset_required = true;
     encoder_.reset();
-
     LOG(LS_INFO) << "create encoder";
     encoder_ = encoder_factory_->CreateVideoEncoder();
-    LOG(LS_INFO) << "encoder created " << encoder_.get();
     CHECK(encoder_);
 
     pending_encoder_creation_ = false;
     pending_encoder_reconfiguration_ = false;
+    LOG(LS_INFO) << "encoder_config:" << encoder_config_.ToString();
+  }
 
-    encoder_->InitEncoder(VideoCodecProperty(),
-                          Settings(Capabilities(false), 0, 10));
+  std::vector<VideoStreamConfig> stream_configs = CreateVideoStreamConfig(
+      last_frame_info_->width, last_frame_info_->height, encoder_config_);
 
-    encoder_->RegisterEncodedImageCallback(sink_);
+  VideoCodecProperty codec_property;
 
+  if (!SetupVideoCodecProperity(encoder_config_, stream_configs,
+                                &codec_property)) {
+    LOG(LS_ERROR) << "SetVideoCodecProperity failed";
     return;
   }
+
+  if (encoder_reset_required) {
+    if (encoder_->InitEncoder(
+            codec_property, VideoEncoder::Settings(
+                                VideoEncoder::Capabilities(false), 0, 10000)) !=
+        OK) {
+      ReleaseEncoder();
+    } else {
+      encoder_initialized_ = true;
+      encoder_->RegisterEncoderCompleteCallback(sink_);
+    }
+  }
+
+  return;
+}
+
+void VideoStreamEncoder::ReleaseEncoder() {
+  LOG(LS_INFO) << "release encoder";
+
+  if (!encoder_ || !encoder_initialized_) {
+    return;
+  }
+  encoder_->Release();
+  encoder_initialized_ = false;
 }
 
 void VideoStreamEncoder::Stop() {}

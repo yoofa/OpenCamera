@@ -11,6 +11,8 @@ oc_library("media_service") {
   sources = [
     "media_service.cc",
     "media_service.h",
+    "video_sink_wrapper.cc",
+    "video_sink_wrapper.h",
   ]
   deps = [
     ":media_video",
@@ -19,7 +21,10 @@ oc_library("media_service") {
     "//third_party/inih",
   ]
 
-  deps += [ "//api/video_codecs:fake_video_encoder" ]
+  deps += [
+    "//api/video_codecs:builtin_video_encoder",
+    "//api/video_codecs:fake_video_encoder",
+  ]
   configs += [ "//build/config/compiler:rtti" ]
 }
 
@@ -56,6 +61,8 @@ oc_library("media_video") {
     "video_send_stream.h",
     "video_stream_encoder.cc",
     "video_stream_encoder.h",
+    "video_stream_helper.cc",
+    "video_stream_helper.h",
     "video_stream_sender.cc",
     "video_stream_sender.h",
   ]

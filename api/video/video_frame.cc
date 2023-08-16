@@ -10,7 +10,7 @@
 namespace avp {
 VideoFrame::VideoFrame(uint64_t id,
                        std::shared_ptr<VideoFrameBuffer> video_frame_buffer,
-                       int64_t timestamp_us,
+                       uint64_t timestamp_us,
                        std::optional<Rect> rect)
     : id_(id),
       video_frame_buffer_(video_frame_buffer),

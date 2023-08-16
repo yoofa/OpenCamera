@@ -30,19 +30,21 @@ class VideoSendStream : public MediaStream,
       base::TaskRunner* task_runner,
       VideoEncoderFactory* video_encoder_factory,
       VideoSourceInterface<std::shared_ptr<VideoFrame>>* video_source,
-      VideoStreamSender* video_stream_sender);
+      VideoStreamSender* video_stream_sender,
+      VideoEncoderConfig encoder_config);
 
   ~VideoSendStream();
 
   void Start();
   void Stop();
 
+  void RequestKeyFrame();
+
   // VideoStreamEncoderInterface::EncoderSink implementation.
-  Result OnEncodedImage(
-      const std::shared_ptr<EncodedImage>& encoded_image) override;
+  Result OnEncodedImage(const EncodedImage& encoded_image) override;
 
  private:
-  void ReConfigureEncoder();
+  void ReConfigureEncoder(VideoEncoderConfig config);
 
   base::TaskRunnerFactory* task_runner_factory_;
   base::TaskRunner* task_runner_;

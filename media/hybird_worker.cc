@@ -28,8 +28,10 @@ HybirdWorker::HybirdWorker(VideoEncoderFactory* video_encoder_factory)
 HybirdWorker::~HybirdWorker() {}
 
 void HybirdWorker::AddVideoSource(VideoSource& video_source,
-                                  int32_t stream_id) {
-  worker_task_runner_.PostTask([this, video_source, stream_id]() {
+                                  int32_t stream_id,
+                                  VideoEncoderConfig& encoder_config) {
+  worker_task_runner_.PostTask([this, video_source, stream_id,
+                                config = encoder_config.Copy()]() mutable {
     AVP_DCHECK_RUN_ON(&worker_task_runner_);
     // warning if sources already exist in video_sources_
     auto it = std::find_if(video_sources_.begin(), video_sources_.end(),
@@ -51,7 +53,8 @@ void HybirdWorker::AddVideoSource(VideoSource& video_source,
     video_send_streams_.push_back(
         {std::make_unique<VideoSendStream>(
              task_runner_factory_.get(), &worker_task_runner_,
-             video_encoder_factory(), video_source.get(), stream_sender),
+             video_encoder_factory(), video_source.get(), stream_sender,
+             std::move(config)),
          stream_id});
 
     // start video send stream if media transport wants frame
@@ -133,6 +136,16 @@ void HybirdWorker::RemoveEncodedVideoSink(EncodedVideoSink& encoded_image_sink,
       if (it_send_stream != video_send_streams_.end()) {
         it_send_stream->video_send_stream->Stop();
       }
+    }
+  });
+}
+
+void HybirdWorker::RequestKeyFrame() {
+  worker_task_runner_.PostTask([this]() {
+    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    for (auto it = video_send_streams_.begin(); it != video_send_streams_.end();
+         ++it) {
+      it->video_send_stream->RequestKeyFrame();
     }
   });
 }

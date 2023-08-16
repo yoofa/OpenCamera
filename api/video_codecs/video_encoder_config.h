@@ -34,16 +34,16 @@ struct VideoStreamConfig {
   int max_framerate;
 
   // Bitrate, in bps, for the stream.
-  int min_bitrate_bps;
-  int target_bitrate_bps;
-  int max_bitrate_bps;
+  uint32_t min_bitrate_kbps;
+  uint32_t target_bitrate_kbps;
+  uint32_t max_bitrate_kbps;
 
   // Scaling factor applied to the stream size.
   // `width` and `height` values are already scaled down.
   double scale_resolution_down_by;
 
   // Maximum Quantization Parameter to use when encoding the stream.
-  int max_qp;
+  uint16_t max_qp;
 
   // Determines the number of temporal layers that the stream should be
   // encoded with. This value should be greater than zero.
@@ -143,9 +143,7 @@ class VideoEncoderConfig {
   ~VideoEncoderConfig();
   std::string ToString() const;
 
-  // TODO(nisse): Consolidate on one of these.
-  CodecId codec_type;
-  // SdpVideoFormat video_format;
+  CodecId codec_id;
 
   // std::shared_ptr<VideoStreamConfigFactoryInterface> video_stream_factory;
   // std::vector<SpatialLayer> spatial_layers;
@@ -156,8 +154,8 @@ class VideoEncoderConfig {
   // by the encoder. Padding above what's actually produced by the encoder helps
   // maintaining a higher bitrate estimate. Padding will however not be sent
   // unless the estimated bandwidth indicates that the link can handle it.
-  int min_transmit_bitrate_bps;
-  int max_bitrate_bps;
+  int min_bitrate_kbps;
+  int max_bitrate_kbps;
   // The bitrate priority used for all VideoStreamConfigs.
   double bitrate_priority;
 
@@ -170,9 +168,6 @@ class VideoEncoderConfig {
 
   // Max number of encoded VideoStreamConfigs to produce.
   size_t number_of_streams;
-
-  // Legacy Google conference mode flag for simulcast screenshare
-  bool legacy_conference_mode;
 
   // Indicates whether quality scaling can be used or not.
   bool is_quality_scaling_allowed;

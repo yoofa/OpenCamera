@@ -32,6 +32,20 @@ class MediaService : public Handler {
   status_t Start();
   status_t Stop();
 
+  void AddVideoSource(
+      std::shared_ptr<VideoSourceInterface<std::shared_ptr<VideoFrame>>>&
+          video_source,
+      int32_t stream_id,
+      CodecId codec_id,
+      int32_t min_bitrate,
+      int32_t max_bitrate);
+
+  void AddVideoSink(
+      const std::shared_ptr<VideoSinkInterface<EncodedImage>>& video_sink,
+      int32_t stream_id);
+
+  void RequesteKeyFrame();
+
   enum {
     kWhatStart = 'strt',
     kWhatStop = 'stop',
@@ -43,9 +57,16 @@ class MediaService : public Handler {
     kWhatAddEncodedVideoSink = 'senc',
     kWhatRemoveEncodedVideoSink = 'renc',
 
+    kWhatRequestKeyFrame = 'rkey',
+
   };
 
  private:
+  struct VideoCapturerPair {
+    std::shared_ptr<VideoCapturer> capturer;
+    int32_t id;
+  };
+
   uint32_t GenerateStreamId();
   void onMessageReceived(const std::shared_ptr<Message>& message) override;
 
@@ -63,7 +84,10 @@ class MediaService : public Handler {
   std::shared_ptr<VideoCapturer> video_capturer_;
   std::vector<std::unique_ptr<MediaWorker>> media_workers_;
 
-  std::shared_ptr<FileSink<std::shared_ptr<EncodedImage>>> row_file_sink_;
+  std::vector<VideoCapturerPair> video_capturers_;
+
+  std::shared_ptr<FileSink<EncodedImage>> file_sink_;
+  std::shared_ptr<FileSink<EncodedImage>> file_sink2_;
 
   AVP_DISALLOW_COPY_AND_ASSIGN(MediaService);
 };

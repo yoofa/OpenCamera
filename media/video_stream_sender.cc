@@ -26,7 +26,7 @@ bool VideoStreamSender::frame_wanted() const {
 }
 
 EncodedImageCallback::Result VideoStreamSender::OnEncodedImage(
-    const std::shared_ptr<EncodedImage>& encoded_image) {
+    const EncodedImage& encoded_image) {
   lock_guard guard(sink_lock_);
 
   broadcaster_.OnFrame(encoded_image);
@@ -34,8 +34,7 @@ EncodedImageCallback::Result VideoStreamSender::OnEncodedImage(
 }
 
 void VideoStreamSender::AddVideoSink(
-    const std::shared_ptr<VideoSinkInterface<std::shared_ptr<EncodedImage>>>&
-        sink) {
+    const std::shared_ptr<VideoSinkInterface<EncodedImage>>& sink) {
   lock_guard guard(sink_lock_);
   // add reference to sinks_
   sinks_.push_back(sink);
@@ -43,8 +42,7 @@ void VideoStreamSender::AddVideoSink(
 }
 
 void VideoStreamSender::RemoveVideoSink(
-    const std::shared_ptr<VideoSinkInterface<std::shared_ptr<EncodedImage>>>&
-        sink) {
+    const std::shared_ptr<VideoSinkInterface<EncodedImage>>& sink) {
   lock_guard guard(sink_lock_);
   // remove reference from sinks_
   broadcaster_.RemoveSink(sink.get());

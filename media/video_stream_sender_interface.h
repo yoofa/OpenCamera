@@ -14,8 +14,7 @@ namespace avp {
 
 class VideoStreamSenderInterface : public EncodedImageCallback {
  public:
-  virtual Result OnEncodedImage(
-      const std::shared_ptr<EncodedImage>& encoded_image) = 0;
+  virtual Result OnEncodedImage(const EncodedImage& encoded_image) = 0;
 };
 
 }  // namespace avp

@@ -18,8 +18,7 @@
 
 namespace avp {
 class MediaTransport {
-  using EncodedVideoSink =
-      std::shared_ptr<VideoSinkInterface<std::shared_ptr<EncodedImage>>>;
+  using EncodedVideoSink = std::shared_ptr<VideoSinkInterface<EncodedImage>>;
 
  public:
   MediaTransport(base::TaskRunnerFactory* task_runner_factory);

@@ -12,6 +12,18 @@ oc_library("video_encoder_api") {
   deps = [ "//common:foundation" ]
 }
 
+oc_library("builtin_video_encoder") {
+  sources = [
+    "builtin_video_encoder_factory.cc",
+    "builtin_video_encoder_factory.h",
+  ]
+  deps = [
+    ":video_encoder_api",
+    "//api/video:encoded_image",
+    "//modules/video_coding:avp_openh264",
+  ]
+}
+
 oc_library("fake_video_encoder") {
   sources = [
     "fake_video_encoder_factory.cc",

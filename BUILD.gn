@@ -97,6 +97,7 @@ oc_library("opencamera") {
     "//third_party/inih",
     "//third_party/libyuv",
     "//third_party/onvif_srvd:onvif_srv",
+    "//third_party/openh264:encoder",
     "//third_party/openssl:libssl_static",
     "//third_party/rtsp_server",
   ]

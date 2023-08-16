@@ -39,7 +39,7 @@ class VideoFrame {
 
   VideoFrame(uint64_t id,
              std::shared_ptr<VideoFrameBuffer> video_frame_buffer,
-             int64_t timestamp_us,
+             uint64_t timestamp_us,
              std::optional<Rect> rect);
   VideoFrame(VideoFrame&&);
   VideoFrame(const VideoFrame&);
@@ -64,8 +64,8 @@ class VideoFrame {
       std::shared_ptr<VideoFrameBuffer> video_frame_buffer);
 
   // system monotonic clock timestamp in microseconds
-  int64_t timestamp_us() const { return timestamp_us_; }
-  void set_timestamp_us(int64_t timestamp_us) { timestamp_us_ = timestamp_us; }
+  uint64_t timestamp_us() const { return timestamp_us_; }
+  void set_timestamp_us(uint64_t timestamp_us) { timestamp_us_ = timestamp_us; }
 
   // crop rect
   const std::optional<Rect> rect() const {
@@ -83,7 +83,7 @@ class VideoFrame {
  private:
   uint64_t id_;
   std::shared_ptr<VideoFrameBuffer> video_frame_buffer_;
-  int64_t timestamp_us_;
+  uint64_t timestamp_us_;
   std::optional<Rect> rect_;
 };
 }  // namespace avp

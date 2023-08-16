@@ -15,7 +15,7 @@ deps = {
   'src/base':
     'git@github.com:vsyf/base.git@c692416800d24840bb5d78304b8ce0d710780d0b',
   'src/common':
-    'git@github.com:vsyf/media_common.git@b097ade71196b5157c71de9632f0c0beb07d1cc8',
+    'git@github.com:vsyf/media_common.git@35a4fdcd6e4bfc85cd7b7748906ab2da6024c271',
 
   # chromium 
   'src/build':
@@ -69,6 +69,12 @@ deps = {
      'https://chromium.googlesource.com/external/github.com/google/googletest.git@4fe018038f87675c083d0cfb6a6b57c274fb1753',
   'src/third_party/libyuv':
     'https://chromium.googlesource.com/libyuv/libyuv.git@49ebc996aa8c4bdf89c1b5ea461eb677234c61cc',
+
+  'src/third_party/nasm':
+    'https://chromium.googlesource.com/chromium/deps/nasm.git@e9be5fd6d723a435ca2da162f9e0ffcb688747c1',
+
+  'src/third_party/openh264/src':
+    'https://chromium.googlesource.com/external/github.com/cisco/openh264@3dd5b80bc4f172dd82925bb259cb7c82348409c5',
 
   'src/tools/clang/dsymutil': {
     'packages': [

@@ -6,6 +6,7 @@
  */
 #include "rtsp_server.h"
 
+#include <cstdlib>
 #include <memory>
 
 #include "base/checks.h"
@@ -23,6 +24,7 @@ RtspServer::RtspServer(std::shared_ptr<Message> notify)
       event_loop_(new xop::EventLoop()),
       server_(xop::RtspServer::Create(event_loop_.get())),
       session_id_(-1),
+      video_queue_(std::make_shared<VideoQueue>()),
       has_audio_(false),
       has_video_(false),
       started_(false) {
@@ -40,7 +42,7 @@ status_t RtspServer::Init() {
   looper_->registerHandler(shared_from_this());
 
   xop::MediaSession* session = xop::MediaSession::CreateNew("live");
-  session->AddSource(xop::channel_0, xop::H264Source::CreateNew());
+  // session->AddSource(xop::channel_0, xop::H264Source::CreateNew());
   session->AddSource(xop::channel_1, xop::AACSource::CreateNew(44100, 2));
 
   session->AddNotifyConnectedCallback(
@@ -65,6 +67,7 @@ status_t RtspServer::Init() {
     msg->post();
   });
 
+  media_session_ = session;
   session_id_ = server_->AddSession(session);
   return OK;
 }
@@ -81,11 +84,13 @@ status_t RtspServer::Stop() {
   return OK;
 }
 
-status_t RtspServer::AddMediaSource(std::shared_ptr<MediaSource> mediaSource) {
-  auto msg = std::make_shared<Message>(kWhatAddMediaSource, shared_from_this());
-  msg->setObject("mediaSource", std::move(mediaSource));
+void RtspServer::RequestVideoSink(int32_t stream_id, CodecId codec_id) {
+  auto msg =
+      std::make_shared<Message>(kWhatRequestVideoSink, shared_from_this());
+
+  msg->setInt32("stream_id", stream_id);
+  msg->setInt32("codec_format", static_cast<int32_t>(codec_id));
   msg->post();
-  return OK;
 }
 
 void RtspServer::OnClientConnected(const std::shared_ptr<Message>& msg) {
@@ -97,6 +102,10 @@ void RtspServer::OnClientConnected(const std::shared_ptr<Message>& msg) {
   CHECK(msg->findInt32("port", &port));
   LOG(LS_INFO) << "client connect, sessionId: " << sessionId << ", ip: " << ip
                << ", port: " << port;
+
+  auto notify = notify_->dup();
+  notify->setInt32("what", kWhatClientConnectedNotify);
+  notify->post();
 }
 
 void RtspServer::OnClientDisconnected(const std::shared_ptr<Message>& msg) {
@@ -108,72 +117,51 @@ void RtspServer::OnClientDisconnected(const std::shared_ptr<Message>& msg) {
   CHECK(msg->findInt32("port", &port));
   LOG(LS_INFO) << "client disconnect, sessionId: " << sessionId
                << ", ip: " << ip << ", port: " << port;
+
+  auto notify = notify_->dup();
+  notify->setInt32("what", kWhatClientDisconnectedNotify);
+  notify->post();
 }
 
-void RtspServer::OnAddMediaSource(const std::shared_ptr<Message>& msg) {
-  std::shared_ptr<MessageObject> obj;
-  CHECK(msg->findObject("mediaSource", obj));
-  std::shared_ptr<MediaSource> source =
-      std::dynamic_pointer_cast<MediaSource>(obj);
+void RtspServer::OnRequestVideoSink(const std::shared_ptr<Message>& msg) {
+  int32_t stream_id;
+  CHECK(msg->findInt32("stream_id", &stream_id));
+  int32_t codec_id;
+  CHECK(msg->findInt32("codec_format", &codec_id));
 
-  auto meta = source->getFormat();
-  auto format = std::make_shared<Message>();
-  if (convertMetaDataToMessage(meta, format) != OK) {
+  if (media_session_ == nullptr) {
     return;
   }
-
-  std::string mime;
-  CHECK(format->findString("mime", mime));
-  bool isAudio = !strncasecmp("audio/", mime.c_str(), 6);
-  if (isAudio && has_audio_) {
-    LOG(LS_WARNING)
-        << "add media source failed, only support on audio stream, return";
-    return;
-  }
-
-  if (!isAudio && has_video_) {
-    LOG(LS_WARNING)
-        << "add media source failed, only support on video stream, return";
-    return;
-  }
-  if (isAudio) {
-    audio_source_ = std::move(source);
-    std::lock_guard<std::mutex> l(mutex_);
-    if (started_) {
-      auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
-      m->post();
+  CodecId codec = static_cast<CodecId>(codec_id);
+  switch (codec) {
+    case CodecId::AV_CODEC_ID_H264: {
+      media_session_->AddSource(xop::channel_0, xop::H264Source::CreateNew());
+      break;
     }
-  } else {
-    video_source_ = std::move(source);
-    std::lock_guard<std::mutex> l(mutex_);
-    if (started_) {
-      auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
-      m->post();
+    case CodecId::AV_CODEC_ID_VP8: {
+      media_session_->AddSource(xop::channel_0, xop::VP8Source::CreateNew());
+      break;
+    }
+
+    default: {
+      break;
     }
   }
+
+  LOG(LS_INFO) << "add video sink, stream_id: " << stream_id
+               << ", codec_id: " << codec_id;
+
+  auto notify = notify_->dup();
+  notify->setInt32("what", kWhatVideoSinkAdded);
+  notify->setInt32("stream_id", stream_id);
+  notify->setObject("encoded_video_sink", video_queue_);
+  notify->post();
+
+  auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
+  m->post();
 }
 
 void RtspServer::OnPullAudioSource() {
-  if (audio_source_.get() == nullptr) {
-    return;
-  }
-
-  std::shared_ptr<Buffer> buffer;
-  status_t ret = audio_source_->read(buffer);
-  if (ret == OK) {
-    xop::AVFrame frame = {0};
-    frame.type = xop::AUDIO_FRAME;
-    frame.size = buffer->size();
-    int64_t pts = 0;
-    CHECK(buffer->meta()->findInt64("timeUs", &pts));
-    frame.timestamp = pts;
-
-    frame.buffer.reset(new uint8_t[frame.size]);
-    memcpy(frame.buffer.get(), buffer->data(), frame.size);
-
-    server_->PushFrame(session_id_, xop::channel_1, frame);
-  }
-
   std::lock_guard<std::mutex> l(mutex_);
   if (started_) {
     auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
@@ -183,22 +171,27 @@ void RtspServer::OnPullAudioSource() {
 }
 
 void RtspServer::OnPullVideoSource() {
-  if (video_source_.get() == nullptr) {
-    return;
-  }
-
-  std::shared_ptr<Buffer> buffer;
-  status_t ret = video_source_->read(buffer);
-  if (ret == OK) {
+  // get one from VideoQueue.queue
+  if (!video_queue_->queue().empty()) {
+    EncodedImage image = video_queue_->queue().front();
+    video_queue_->queue().pop();
     xop::AVFrame frame = {0};
     frame.type = 0;
-    frame.size = buffer->size();
-    int64_t pts = 0;
-    CHECK(buffer->meta()->findInt64("timeUs", &pts));
-    frame.timestamp = pts / 1000 * 90;
+    frame.size = image.Size();
+    // int64_t pts = image.Timestamp();
+    // CHECK(buffer->meta()->findInt64("timeUs", &pts));
+    frame.timestamp = image.Timestamp() / 1000 * 90;
+
+    if (image.frame_type_ == VideoFrameType::kVideoFrameKey) {
+      LOG(LS_INFO) << "OnPullVideoSource, queue.size:"
+                   << video_queue_->queue().size()
+                   << ", image size: " << image.Size()
+                   << ", timestamp_us: " << image.Timestamp()
+                   << ", frame_type:" << image.frame_type_;
+    }
 
     frame.buffer.reset(new uint8_t[frame.size]);
-    memcpy(frame.buffer.get(), buffer->data(), frame.size);
+    memcpy(frame.buffer.get(), image.Data(), frame.size);
 
     server_->PushFrame(session_id_, xop::channel_0, frame);
   }
@@ -210,19 +203,9 @@ void RtspServer::OnPullVideoSource() {
     m->post(40 * 1000);
   }
 }
+
 void RtspServer::OnStart(const std::shared_ptr<Message>& msg) {
   server_->Start("0.0.0.0", 8554);
-  auto source = audio_source_;
-  if (source.get() != nullptr) {
-    auto m = std::make_shared<Message>(kWhatPullAudio, shared_from_this());
-    m->post();
-  }
-  source = video_source_;
-
-  if (source.get() != nullptr) {
-    auto m = std::make_shared<Message>(kWhatPullVideo, shared_from_this());
-    m->post();
-  }
   LOG(LS_INFO) << "rtsp server run at 127.0.0.1:8554/live";
 
   started_ = true;
@@ -254,10 +237,11 @@ void RtspServer::onMessageReceived(const std::shared_ptr<Message>& msg) {
       break;
     }
 
-    case kWhatAddMediaSource: {
-      OnAddMediaSource(msg);
+    case kWhatRequestVideoSink: {
+      OnRequestVideoSink(msg);
       break;
     }
+
     case kWhatPullAudio: {
       OnPullAudioSource();
       break;

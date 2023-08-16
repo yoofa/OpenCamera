@@ -34,7 +34,14 @@ class Conductor : public Handler {
   status_t Stop();
   void WaitingFinished();
 
+  void AddCameraSource();
+
  private:
+  struct VideoCapturerPair {
+    std::shared_ptr<VideoCapturer> capturer;
+    int32_t id;
+  };
+  uint32_t GenerateStreamId();
   void SignalFinished();
   void OnRtspNotify(const std::shared_ptr<Message>& message);
   void OnOnvifNotify(const std::shared_ptr<Message>& message);
@@ -51,6 +58,10 @@ class Conductor : public Handler {
     kWhatRtspNotify = 'rtsp',
     kWhatOnvifNotify = 'onvf',
     kWhatMediaServiceNotify = 'meds',
+
+    kWhatAddVideoSource = 'avss',
+
+    kWhatAddVideoSink = 'avsk',
   };
 
   AppConfig config_;
@@ -59,7 +70,11 @@ class Conductor : public Handler {
   std::shared_ptr<OnvifServer> onvif_server_;
   std::shared_ptr<MediaService> media_service_;
 
+  uint32_t max_stream_id_;
+  std::shared_ptr<VideoSourceInterface<std::shared_ptr<VideoFrame>>>
+      camera_source_;
   std::shared_ptr<MediaSource> video_source_;
+  std::vector<VideoCapturerPair> video_capturers_;
 
   std::mutex mutex_;
   std::condition_variable condition_;

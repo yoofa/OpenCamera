@@ -20,7 +20,8 @@ VideoSendStream::VideoSendStream(
     base::TaskRunner* task_runner,
     VideoEncoderFactory* video_encoder_factory,
     VideoSourceInterface<std::shared_ptr<VideoFrame>>* video_source,
-    VideoStreamSender* video_stream_sender)
+    VideoStreamSender* video_stream_sender,
+    VideoEncoderConfig encoder_config)
     : task_runner_factory_(task_runner_factory),
       task_runner_(task_runner),
       video_encoder_factory_(video_encoder_factory),
@@ -33,7 +34,7 @@ VideoSendStream::VideoSendStream(
   video_stream_encoder_->SetSource(video_source_);
   video_stream_encoder_->SetSink(this);
 
-  ReConfigureEncoder();
+  ReConfigureEncoder(std::move(encoder_config));
 }
 
 VideoSendStream::~VideoSendStream() {}
@@ -46,14 +47,18 @@ void VideoSendStream::Stop() {
   task_runner_->PostTask([]() {});
 }
 
+void VideoSendStream::RequestKeyFrame() {
+  task_runner_->PostTask([this]() { video_stream_encoder_->SendKeyFrame(); });
+}
+
 EncodedImageCallback::Result VideoSendStream::OnEncodedImage(
-    const std::shared_ptr<EncodedImage>& encoded_image) {
+    const EncodedImage& encoded_image) {
   video_stream_sender_->OnEncodedImage(encoded_image);
   return Result(Result::OK);
 }
 
-void VideoSendStream::ReConfigureEncoder() {
-  video_stream_encoder_->ConfigureEncoder(VideoEncoderConfig(), 100);
+void VideoSendStream::ReConfigureEncoder(VideoEncoderConfig config) {
+  video_stream_encoder_->ConfigureEncoder(std::move(config), 10000);
 }
 
 }  // namespace avp

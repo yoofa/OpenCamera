@@ -12,6 +12,7 @@ oc_library("video_frame") {
     "video_frame.h",
     "video_frame_buffer.cc",
     "video_frame_buffer.h",
+    "video_frame_type.h",
     "video_processor_interface.h",
     "video_sink_interface.h",
     "video_source_interface.h",

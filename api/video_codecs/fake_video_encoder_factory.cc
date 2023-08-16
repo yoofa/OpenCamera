@@ -22,7 +22,7 @@ class FakeVideoEncoder : public VideoEncoder {
     return OK;
   }
 
-  status_t RegisterEncodedImageCallback(
+  status_t RegisterEncoderCompleteCallback(
       EncodedImageCallback* callback) override {
     callback_ = callback;
     return OK;
@@ -47,14 +47,18 @@ class FakeVideoEncoder : public VideoEncoder {
            i420_buffer->DataV(),
            i420_buffer->StrideV() * i420_buffer->height() / 2);
 
-    auto encoded_image = std::make_shared<EncodedImage>();
-    encoded_image->SetEncodedData(encoded_data);
-    encoded_image->encoded_width_ = frame->width();
-    encoded_image->encoded_height_ = frame->height();
-    encoded_image->SetTimestamp(frame->timestamp_us());
-    callback_->OnEncodedImage(std::move(encoded_image));
+    // auto encoded_image = std::make_shared<EncodedImage>();
+
+    auto encoded_image = EncodedImage();
+    encoded_image.SetEncodedData(encoded_data);
+    encoded_image.encoded_width_ = frame->width();
+    encoded_image.encoded_height_ = frame->height();
+    encoded_image.SetTimestamp(frame->timestamp_us());
+    callback_->OnEncodedImage(encoded_image);
     return OK;
   }
+
+  void RequestKeyFrame() override {}
 
  private:
   EncodedImageCallback* callback_;

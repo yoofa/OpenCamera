@@ -16,6 +16,7 @@
 #include "base/sequence_checker.h"
 #include "base/task_util/task_runner.h"
 #include "base/task_util/task_runner_factory.h"
+#include "base/thread_annotation.h"
 
 namespace avp {
 class VideoStreamEncoder : public VideoStreamEncoderInterface {
@@ -60,12 +61,15 @@ class VideoStreamEncoder : public VideoStreamEncoderInterface {
   // Create or reconfigure the encoder.
   void ReConfigureEncoder() AVP_RUN_ON(&encoder_runner_);
 
+  void ReleaseEncoder() AVP_RUN_ON(&encoder_runner_);
+
   base::TaskRunnerFactory* task_runner_factory_;
   VideoEncoderFactory* encoder_factory_;
-  EncodedImageCallback* sink_;
+  EncodedImageCallback* sink_ GUARDED_BY(&encoder_runner_);
 
   VideoEncoderConfig encoder_config_ GUARDED_BY(&encoder_runner_);
   std::unique_ptr<VideoEncoder> encoder_ GUARDED_BY(&encoder_runner_);
+  bool encoder_initialized_ GUARDED_BY(&encoder_runner_);
 
   // Set when ConfigureEncoder has been called in order to lazy reconfigure
   // the encoder on the next frame.

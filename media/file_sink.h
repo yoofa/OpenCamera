@@ -53,14 +53,14 @@ class FileSink : public VideoSinkInterface<T>, public MessageObject {
                   i420_buffer->StrideV() * i420_buffer->height() / 2);
     }
   }
-  void OnFrameInternal(const std::shared_ptr<EncodedImage>& frame) {
-    // LOG(LS_INFO) << "EncodedImage, size: " << frame->Size();
-    file_.write((char*)frame->Data(), frame->Size());
+  void OnFrameInternal(const EncodedImage& frame) {
+    // LOG(LS_INFO) << "EncodedImage, size: " << frame.Size();
+    file_.write((char*)frame.Data(), frame.Size());
   }
 
   void OnFrame(const T& frame) override {
     static_assert(std::is_same_v<T, std::shared_ptr<VideoFrame>> ||
-                      std::is_same_v<T, std::shared_ptr<EncodedImage>>,
+                      std::is_same_v<T, EncodedImage>,
                   "Unsupported frame type.");
 
     if (!file_.is_open()) {
@@ -70,7 +70,7 @@ class FileSink : public VideoSinkInterface<T>, public MessageObject {
 
     if constexpr (std::is_same_v<T, std::shared_ptr<VideoFrame>>) {
       OnFrameInternal(frame);
-    } else if constexpr (std::is_same_v<T, std::shared_ptr<EncodedImage>>) {
+    } else if constexpr (std::is_same_v<T, EncodedImage>) {
       OnFrameInternal(frame);
     }
   }

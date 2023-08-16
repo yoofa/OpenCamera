@@ -1,0 +1,16 @@
+import("//opencamera.gni")
+
+oc_library("avp_openh264") {
+  visibility = [ "*" ]
+  sources = [
+    "codecs/h264/h264.cc",
+    "codecs/h264/h264.h",
+    "codecs/h264/openh264_encoder.cc",
+    "codecs/h264/openh264_encoder.h",
+  ]
+  deps = [
+    "//api/video:encoded_image",
+    "//api/video_codecs:video_encoder_api",
+    "//third_party/openh264:encoder",
+  ]
+}

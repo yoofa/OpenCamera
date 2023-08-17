@@ -81,13 +81,9 @@ class MediaService : public Handler {
 
   std::unique_ptr<VideoEncoderFactory> tmp_factory_;
   VideoEncoderFactory* video_encoder_factory_;
-  std::shared_ptr<VideoCapturer> video_capturer_;
   std::vector<std::unique_ptr<MediaWorker>> media_workers_;
 
   std::vector<VideoCapturerPair> video_capturers_;
-
-  std::shared_ptr<FileSink<EncodedImage>> file_sink_;
-  std::shared_ptr<FileSink<EncodedImage>> file_sink2_;
 
   AVP_DISALLOW_COPY_AND_ASSIGN(MediaService);
 };

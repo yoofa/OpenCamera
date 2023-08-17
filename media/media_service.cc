@@ -37,10 +37,7 @@ MediaService::MediaService(AppConfig appConfig, std::shared_ptr<Message> notify)
       video_source_(nullptr),
       // tmp_factory_(std::make_unique<FakeVideoEncoderFactory>()),
       tmp_factory_(CreateBuiltinVideoEncoderFactory()),
-      video_encoder_factory_(nullptr),
-      video_capturer_(nullptr),
-      file_sink_(std::make_shared<FileSink<EncodedImage>>("file1.frame")),
-      file_sink2_(std::make_shared<FileSink<EncodedImage>>("file2.frame")) {
+      video_encoder_factory_(nullptr) {
   looper_->setName("MediaService");
 }
 
@@ -56,35 +53,6 @@ status_t MediaService::Init() {
     media_workers_.push_back(
         std::make_unique<HybirdWorker>(video_encoder_factory_));
   }
-
-  // media_info_->setString("v4l2-dev", app_config_.v4l2_device);
-  // video_capturer_ = std::make_shared<VideoCapturer>(media_info_);
-  // video_source_ = V4L2VideoSource::Create(media_info_);
-
-  // video_capturer_->SetVideoSource(video_source_.get(), VideoSinkWants());
-
-  // video_capturer_->AddOrUpdateSink(row_file_sink_.get(), VideoSinkWants());
-
-  // TODO(Youfa) for test
-  // int32_t id = GenerateStreamId();
-  // auto msg = std::make_shared<Message>(kWhatAddVideoSource,
-  // shared_from_this()); msg->setObject("video_source", video_capturer_);
-  // msg->setInt32("stream_id", id);
-  // msg->setInt32("codec_format",
-  //              static_cast<int32_t>(CodecId::AV_CODEC_ID_H264));
-  // msg->setInt32("min_kbps", 300);
-  // msg->setInt32("max_kbps", 1000);
-  // msg->post();
-
-  // msg = std::make_shared<Message>(kWhatAddEncodedVideoSink,
-  // shared_from_this()); msg->setObject("encoded_video_sink", file_sink_);
-  // msg->setInt32("stream_id", id);
-  // msg->post();
-
-  // msg = std::make_shared<Message>(kWhatAddEncodedVideoSink,
-  // shared_from_this()); msg->setObject("encoded_video_sink", file_sink2_);
-  // msg->setInt32("stream_id", id);
-  // msg->post();
 
   return OK;
 }
@@ -179,10 +147,6 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
         auto config = encoder_config.Copy();
         worker->AddVideoSource(video_source, id, config);
       }
-
-      AddVideoSink(std::dynamic_pointer_cast<VideoSinkInterface<EncodedImage>>(
-                       file_sink_),
-                   id);
 
       break;
     }

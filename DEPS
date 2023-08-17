@@ -76,6 +76,9 @@ deps = {
   'src/third_party/openh264/src':
     'https://chromium.googlesource.com/external/github.com/cisco/openh264@3dd5b80bc4f172dd82925bb259cb7c82348409c5',
 
+  'src/third_party/fdk-aac/src':
+    'https://github.com/mstorsjo/fdk-aac.git@3f864cce9736cc8e9312835465fae18428d76295',
+
   'src/tools/clang/dsymutil': {
     'packages': [
       {

@@ -94,6 +94,7 @@ oc_library("opencamera") {
     "//media",
     "//onvif",
     "//rtsp",
+    "//third_party/fdk-aac",
     "//third_party/inih",
     "//third_party/libyuv",
     "//third_party/onvif_srvd:onvif_srv",

@@ -1,0 +1,239 @@
+import("//opencamera.gni")
+
+group("fdk-aac") {
+  deps = [
+    ":aac_enc_cli",
+    ":lib_aac_enc",
+  ]
+}
+
+oc_library("lib_aac_enc") {
+  sources = [
+    "src/libAACenc/src/aacEnc_ram.cpp",
+    "src/libAACenc/src/aacEnc_rom.cpp",
+    "src/libAACenc/src/aacenc.cpp",
+    "src/libAACenc/src/aacenc_lib.cpp",
+    "src/libAACenc/src/aacenc_pns.cpp",
+    "src/libAACenc/src/aacenc_tns.cpp",
+    "src/libAACenc/src/adj_thr.cpp",
+    "src/libAACenc/src/band_nrg.cpp",
+    "src/libAACenc/src/bandwidth.cpp",
+    "src/libAACenc/src/bit_cnt.cpp",
+    "src/libAACenc/src/bitenc.cpp",
+    "src/libAACenc/src/block_switch.cpp",
+    "src/libAACenc/src/channel_map.cpp",
+    "src/libAACenc/src/chaosmeasure.cpp",
+    "src/libAACenc/src/dyn_bits.cpp",
+    "src/libAACenc/src/grp_data.cpp",
+    "src/libAACenc/src/intensity.cpp",
+    "src/libAACenc/src/line_pe.cpp",
+    "src/libAACenc/src/metadata_compressor.cpp",
+    "src/libAACenc/src/metadata_main.cpp",
+    "src/libAACenc/src/mps_main.cpp",
+    "src/libAACenc/src/ms_stereo.cpp",
+    "src/libAACenc/src/noisedet.cpp",
+    "src/libAACenc/src/pnsparam.cpp",
+    "src/libAACenc/src/pre_echo_control.cpp",
+    "src/libAACenc/src/psy_configuration.cpp",
+    "src/libAACenc/src/psy_main.cpp",
+    "src/libAACenc/src/qc_main.cpp",
+    "src/libAACenc/src/quantize.cpp",
+    "src/libAACenc/src/sf_estim.cpp",
+    "src/libAACenc/src/spreading.cpp",
+    "src/libAACenc/src/tonality.cpp",
+    "src/libAACenc/src/transform.cpp",
+  ]
+  deps = [
+    ":libFDK",
+    ":libmpeg_tp_enc",
+    ":libpcm_utils",
+    ":libsac_enc",
+    ":libsbr_enc",
+    ":libsys_src",
+  ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_source_set("libpcm_utils") {
+  sources = [
+    "src/libPCMutils/src/limiter.cpp",
+    "src/libPCMutils/src/pcm_utils.cpp",
+    "src/libPCMutils/src/pcmdmx_lib.cpp",
+  ]
+
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_source_set("libsbr_enc") {
+  sources = [
+    "src/libSBRenc/src/bit_sbr.cpp",
+    "src/libSBRenc/src/code_env.cpp",
+    "src/libSBRenc/src/env_bit.cpp",
+    "src/libSBRenc/src/env_est.cpp",
+    "src/libSBRenc/src/fram_gen.cpp",
+    "src/libSBRenc/src/invf_est.cpp",
+    "src/libSBRenc/src/mh_det.cpp",
+    "src/libSBRenc/src/nf_est.cpp",
+    "src/libSBRenc/src/ps_bitenc.cpp",
+    "src/libSBRenc/src/ps_encode.cpp",
+    "src/libSBRenc/src/ps_main.cpp",
+    "src/libSBRenc/src/resampler.cpp",
+    "src/libSBRenc/src/sbr_encoder.cpp",
+    "src/libSBRenc/src/sbr_misc.cpp",
+    "src/libSBRenc/src/sbrenc_freq_sca.cpp",
+    "src/libSBRenc/src/sbrenc_ram.cpp",
+    "src/libSBRenc/src/sbrenc_rom.cpp",
+    "src/libSBRenc/src/ton_corr.cpp",
+    "src/libSBRenc/src/tran_det.cpp",
+  ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_library("aac_dec_src") {
+  sources = [
+    "src/libAACdec/src/FDK_delay.cpp",
+    "src/libAACdec/src/aac_ram.cpp",
+    "src/libAACdec/src/aac_rom.cpp",
+    "src/libAACdec/src/aacdec_drc.cpp",
+    "src/libAACdec/src/aacdec_hcr.cpp",
+    "src/libAACdec/src/aacdec_hcr_bit.cpp",
+    "src/libAACdec/src/aacdec_hcrs.cpp",
+    "src/libAACdec/src/aacdec_pns.cpp",
+    "src/libAACdec/src/aacdec_tns.cpp",
+    "src/libAACdec/src/aacdecoder.cpp",
+    "src/libAACdec/src/aacdecoder_lib.cpp",
+    "src/libAACdec/src/block.cpp",
+    "src/libAACdec/src/channel.cpp",
+    "src/libAACdec/src/channelinfo.cpp",
+    "src/libAACdec/src/conceal.cpp",
+    "src/libAACdec/src/ldfiltbank.cpp",
+    "src/libAACdec/src/pulsedata.cpp",
+    "src/libAACdec/src/rvlc.cpp",
+    "src/libAACdec/src/rvlcbit.cpp",
+    "src/libAACdec/src/rvlcconceal.cpp",
+    "src/libAACdec/src/stereo.cpp",
+    "src/libAACdec/src/usacdec_ace_d4t64.cpp",
+    "src/libAACdec/src/usacdec_ace_ltp.cpp",
+    "src/libAACdec/src/usacdec_acelp.cpp",
+    "src/libAACdec/src/usacdec_fac.cpp",
+    "src/libAACdec/src/usacdec_lpc.cpp",
+    "src/libAACdec/src/usacdec_lpd.cpp",
+    "src/libAACdec/src/usacdec_rom.cpp",
+  ]
+  deps = [ ":libsys_src" ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_source_set("libFDK") {
+  sources = [
+    "src/libFDK/src/FDK_bitbuffer.cpp",
+    "src/libFDK/src/FDK_core.cpp",
+    "src/libFDK/src/FDK_crc.cpp",
+    "src/libFDK/src/FDK_decorrelate.cpp",
+    "src/libFDK/src/FDK_hybrid.cpp",
+    "src/libFDK/src/FDK_lpc.cpp",
+    "src/libFDK/src/FDK_matrixCalloc.cpp",
+    "src/libFDK/src/FDK_qmf_domain.cpp",
+    "src/libFDK/src/FDK_tools_rom.cpp",
+    "src/libFDK/src/FDK_trigFcts.cpp",
+    "src/libFDK/src/autocorr2nd.cpp",
+    "src/libFDK/src/dct.cpp",
+    "src/libFDK/src/fft.cpp",
+    "src/libFDK/src/fft_rad2.cpp",
+    "src/libFDK/src/fixpoint_math.cpp",
+    "src/libFDK/src/huff_nodes.cpp",
+    "src/libFDK/src/mdct.cpp",
+    "src/libFDK/src/nlc_dec.cpp",
+    "src/libFDK/src/qmf.cpp",
+    "src/libFDK/src/scale.cpp",
+  ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_source_set("libsac_enc") {
+  sources = [
+    "src/libSACenc/src/sacenc_bitstream.cpp",
+    "src/libSACenc/src/sacenc_delay.cpp",
+    "src/libSACenc/src/sacenc_dmx_tdom_enh.cpp",
+    "src/libSACenc/src/sacenc_filter.cpp",
+    "src/libSACenc/src/sacenc_framewindowing.cpp",
+    "src/libSACenc/src/sacenc_huff_tab.cpp",
+    "src/libSACenc/src/sacenc_lib.cpp",
+    "src/libSACenc/src/sacenc_nlc_enc.cpp",
+    "src/libSACenc/src/sacenc_onsetdetect.cpp",
+    "src/libSACenc/src/sacenc_paramextract.cpp",
+    "src/libSACenc/src/sacenc_staticgain.cpp",
+    "src/libSACenc/src/sacenc_tree.cpp",
+    "src/libSACenc/src/sacenc_vectorfunctions.cpp",
+  ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_source_set("libmpeg_tp_enc") {
+  sources = [
+    "src/libMpegTPEnc/src/tpenc_adif.cpp",
+    "src/libMpegTPEnc/src/tpenc_adts.cpp",
+    "src/libMpegTPEnc/src/tpenc_asc.cpp",
+    "src/libMpegTPEnc/src/tpenc_latm.cpp",
+    "src/libMpegTPEnc/src/tpenc_lib.cpp",
+  ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_source_set("libsys_src") {
+  sources = [
+    "src/libSYS/include/FDK_audio.h",
+    "src/libSYS/include/genericStds.h",
+    "src/libSYS/include/machine_type.h",
+    "src/libSYS/include/syslib_channelMapDescr.h",
+    "src/libSYS/src/genericStds.cpp",
+    "src/libSYS/src/syslib_channelMapDescr.cpp",
+  ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+oc_executable("aac_enc_cli") {
+  sources = [
+    "src/aac-enc.c",
+    "src/wavreader.c",
+    "src/wavreader.h",
+  ]
+  deps = [
+    ":lib_aac_enc",
+    #  ":sbr_enc",
+  ]
+  public_configs = [ ":fdk-aac_config" ]
+}
+
+config("fdk-aac_config") {
+  include_dirs = [
+    "src/libAACdec/include",
+    "src/libAACenc/include",
+    "src/libArithCoding/include",
+    "src/libDRCdec/include",
+    "src/libSACdec/include",
+    "src/libSACenc/include",
+    "src/libSBRdec/include",
+    "src/libSBRenc/include",
+    "src/libMpegTPDec/include",
+    "src/libMpegTPEnc/include",
+    "src/libSYS/include",
+    "src/libFDK/include",
+    "src/libPCMutils/include",
+  ]
+
+  defines = [ "SUPPRESS_BUILD_DATE_INFO" ]
+
+  cflags = [
+    "-Wno-extra-semi",
+    "-Wno-unreachable-code",
+    "-Wno-unused-variable",
+    "-Wno-unused-parameter",
+    "-Wno-unused-function",
+    "-Wno-tautological-constant-out-of-range-compare",
+    "-Wno-pessimizing-move",
+    "-Wno-missing-braces",
+    "-Wno-unused-lambda-capture",
+    "-Wno-exit-time-destructors",
+  ]
+}

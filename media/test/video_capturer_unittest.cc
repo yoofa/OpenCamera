@@ -13,7 +13,7 @@
 #include "api/video/video_frame.h"
 #include "api/video/video_sink_interface.h"
 #include "base/logging.h"
-#include "media/video_capturer.h"
+#include "media/video/video_capturer.h"
 #include "test/gtest.h"
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 

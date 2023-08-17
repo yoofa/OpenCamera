@@ -17,9 +17,9 @@
 #include "common/handler.h"
 #include "common/looper.h"
 #include "common/message.h"
-#include "media/file_sink.h"
 #include "media/media_worker.h"
-#include "media/video_capturer.h"
+#include "media/video/file_sink.h"
+#include "media/video/video_capturer.h"
 
 namespace avp {
 

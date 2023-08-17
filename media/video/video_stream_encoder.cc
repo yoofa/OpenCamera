@@ -12,7 +12,7 @@
 #include "base/sequence_checker.h"
 #include "base/task_util/task_runner_base.h"
 #include "common/video_codec_property.h"
-#include "media/video_stream_helper.h"
+#include "media/video/video_stream_helper.h"
 
 namespace avp {
 

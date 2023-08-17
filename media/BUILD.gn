@@ -11,8 +11,8 @@ oc_library("media_service") {
   sources = [
     "media_service.cc",
     "media_service.h",
-    "video_sink_wrapper.cc",
-    "video_sink_wrapper.h",
+    "video/video_sink_wrapper.cc",
+    "video/video_sink_wrapper.h",
   ]
   deps = [
     ":media_video",
@@ -48,28 +48,24 @@ oc_library("media_worker") {
 # video_capturer need rtti support, separate to a library
 oc_library("video_capturer") {
   sources = [
-    "video_capturer.cc",
-    "video_capturer.h",
+    "video/video_capturer.cc",
+    "video/video_capturer.h",
   ]
   configs += [ "//build/config/compiler:rtti" ]
 }
 
 oc_library("media_video") {
   sources = [
-    "media_stream.h",
-    "video_send_stream.cc",
-    "video_send_stream.h",
-    "video_stream_encoder.cc",
-    "video_stream_encoder.h",
-    "video_stream_helper.cc",
-    "video_stream_helper.h",
-    "video_stream_sender.cc",
-    "video_stream_sender.h",
+    "video/media_stream.h",
+    "video/video_send_stream.cc",
+    "video/video_send_stream.h",
+    "video/video_stream_encoder.cc",
+    "video/video_stream_encoder.h",
+    "video/video_stream_helper.cc",
+    "video/video_stream_helper.h",
+    "video/video_stream_sender.cc",
+    "video/video_stream_sender.h",
   ]
-
-  sources += [ "media_worker.h" ]
-
-  #  configs += [ "//build/config/compiler:rtti" ]
 
   deps = [
     ":file_sink",
@@ -87,15 +83,15 @@ oc_library("media_video") {
 oc_library("file_sink") {
   sources = [
     # "file_sink.cc",
-    "file_sink.h",
+    "video/file_sink.h",
   ]
   configs += [ "//build/config/compiler:rtti" ]
 }
 
 oc_library("video_base") {
   sources = [
-    "video_broadcaster.h",
-    "video_source_base.h",
+    "video/video_broadcaster.h",
+    "video/video_source_base.h",
   ]
 
   deps = [ "//api/video:video_frame" ]
@@ -103,8 +99,8 @@ oc_library("video_base") {
 
 oc_library("v4l2_video_source") {
   sources = [
-    "v4l2_video_source.cc",
-    "v4l2_video_source.h",
+    "video/v4l2_video_source.cc",
+    "video/v4l2_video_source.h",
   ]
 
   deps = [

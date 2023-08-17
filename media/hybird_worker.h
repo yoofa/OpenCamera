@@ -17,8 +17,8 @@
 #include "base/thread_annotation.h"
 #include "media/media_transport.h"
 #include "media/media_worker.h"
-#include "media/video_send_stream.h"
-#include "media/video_stream_sender.h"
+#include "media/video/video_send_stream.h"
+#include "media/video/video_stream_sender.h"
 
 namespace avp {
 

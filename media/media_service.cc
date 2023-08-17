@@ -21,10 +21,10 @@
 #include "base/logging.h"
 #include "common/looper.h"
 #include "common/message.h"
-#include "media/file_sink.h"
 #include "media/hybird_worker.h"
-#include "media/v4l2_video_source.h"
-#include "media/video_sink_wrapper.h"
+#include "media/video/file_sink.h"
+#include "media/video/v4l2_video_source.h"
+#include "media/video/video_sink_wrapper.h"
 
 namespace avp {
 

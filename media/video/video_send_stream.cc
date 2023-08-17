@@ -11,7 +11,7 @@
 
 #include "api/video/video_source_interface.h"
 #include "base/sequence_checker.h"
-#include "media/video_stream_encoder.h"
+#include "media/video/video_stream_encoder.h"
 
 namespace avp {
 

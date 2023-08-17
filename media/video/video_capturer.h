@@ -21,7 +21,7 @@
 #include "base/task_util/task_runner_factory.h"
 #include "base/types.h"
 #include "common/message.h"
-#include "media/video_source_base.h"
+#include "media/video/video_source_base.h"
 
 namespace avp {
 

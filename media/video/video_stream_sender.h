@@ -14,8 +14,8 @@
 #include "base/task_util/task.h"
 #include "base/task_util/task_runner.h"
 #include "base/thread_annotation.h"
-#include "media/video_broadcaster.h"
-#include "media/video_stream_sender_interface.h"
+#include "media/video/video_broadcaster.h"
+#include "media/video/video_stream_sender_interface.h"
 
 namespace avp {
 

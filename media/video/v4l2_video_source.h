@@ -15,7 +15,7 @@
 #include "base/task_util/task_runner_factory.h"
 #include "common/message.h"
 #include "common/meta_data.h"
-#include "media/video_source_base.h"
+#include "media/video/video_source_base.h"
 
 namespace avp {
 class V4L2VideoSource : public VideoSourceBase<std::shared_ptr<VideoFrame>> {

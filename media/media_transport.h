@@ -14,7 +14,7 @@
 #include "base/task_util/task_runner.h"
 #include "base/task_util/task_runner_factory.h"
 #include "base/thread_annotation.h"
-#include "media/video_stream_sender.h"
+#include "media/video/video_stream_sender.h"
 
 namespace avp {
 class MediaTransport {

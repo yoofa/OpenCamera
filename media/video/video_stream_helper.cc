@@ -5,7 +5,7 @@
  * Distributed under terms of the GPLv2 license.
  */
 
-#include "media/video_stream_helper.h"
+#include "video_stream_helper.h"
 
 #include "api/video_codecs/video_encoder.h"
 #include "base/checks.h"

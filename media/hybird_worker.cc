@@ -12,7 +12,7 @@
 #include "base/checks.h"
 #include "base/sequence_checker.h"
 #include "base/task_util/default_task_runner_factory.h"
-#include "media/video_stream_sender.h"
+#include "media/video/video_stream_sender.h"
 
 namespace avp {
 

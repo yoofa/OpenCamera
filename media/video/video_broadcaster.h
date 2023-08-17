@@ -11,7 +11,7 @@
 #include "api/video/video_sink_interface.h"
 #include "base/mutex.h"
 #include "base/thread_annotation.h"
-#include "media/video_source_base.h"
+#include "media/video/video_source_base.h"
 
 namespace avp {
 

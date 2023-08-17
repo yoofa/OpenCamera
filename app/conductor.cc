@@ -11,7 +11,7 @@
 #include "base/logging.h"
 #include "common/message.h"
 #include "media/media_service.h"
-#include "media/v4l2_video_source.h"
+#include "media/video/v4l2_video_source.h"
 #include "xop/rtsp.h"
 
 namespace avp {

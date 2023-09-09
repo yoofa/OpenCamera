@@ -39,6 +39,38 @@ config("common_inherited_config") {
   if (oc_enable_ffmpeg_decoder) {
     defines += [ "OC_FFMPEG_DECODER" ]
   }
+
+  if (is_posix || is_fuchsia) {
+    defines += [ "AVP_POSIX" ]
+  }
+  if (is_ios) {
+    defines += [
+      "AVP_MAC",
+      "AVP_IOS",
+    ]
+  }
+  if (is_linux || is_chromeos) {
+    defines += [ "AVP_LINUX" ]
+  }
+  if (is_mac) {
+    defines += [ "AVP_MAC" ]
+  }
+  if (is_fuchsia) {
+    defines += [ "AVP_FUCHSIA" ]
+  }
+  if (is_win) {
+    defines += [ "AVP_WIN" ]
+  }
+  if (is_android) {
+    defines += [
+      "AVP_LINUX",
+      "AVP_ANDROID",
+    ]
+  }
+
+  if (is_chromeos) {
+    defines += [ "CHROMEOS" ]
+  }
 }
 
 config("no_exit_time_destructors") {
@@ -92,6 +124,7 @@ oc_library("opencamera") {
     "//base",
     "//common",
     "//media",
+    "//modules/audio_device:audio_device",
     "//onvif",
     "//rtsp",
     "//third_party/fdk-aac",

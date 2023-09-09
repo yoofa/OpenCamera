@@ -10,6 +10,8 @@
 
 #include <memory>
 
+#include "api/audio/audio_device.h"
+#include "api/audio/audio_sink_interface.h"
 #include "api/video_codecs/video_encoder_factory.h"
 #include "app/app_config.h"
 #include "base/constructor_magic.h"
@@ -17,6 +19,7 @@
 #include "common/handler.h"
 #include "common/looper.h"
 #include "common/message.h"
+#include "media/audio/audio_sink_wrapper.h"
 #include "media/media_worker.h"
 #include "media/video/file_sink.h"
 #include "media/video/video_capturer.h"
@@ -46,6 +49,17 @@ class MediaService : public Handler {
 
   void RequesteKeyFrame();
 
+  void AddEncodedAudioSink(
+      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+          audio_sink,
+      int32_t stream_id,
+      CodecId codec_id);
+
+  void RemoveEncodedAudioSink(
+      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+          audio_sink,
+      CodecId codec_id);
+
   enum {
     kWhatStart = 'strt',
     kWhatStop = 'stop',
@@ -58,6 +72,9 @@ class MediaService : public Handler {
     kWhatRemoveEncodedVideoSink = 'renc',
 
     kWhatRequestKeyFrame = 'rkey',
+
+    kWhatAddAudioRenderSink = 'saud',
+    kWhatRemoveAudioRenderSink = 'raud',
 
   };
 
@@ -76,14 +93,19 @@ class MediaService : public Handler {
   std::shared_ptr<Message> media_info_;
 
   uint32_t max_stream_id_;
-  std::shared_ptr<VideoSourceInterface<std::shared_ptr<VideoFrame>>>
-      video_source_;
+
+  std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
+  std::unique_ptr<AudioDevice> audio_device_;
 
   std::unique_ptr<VideoEncoderFactory> tmp_factory_;
+
+  AudioEncoderFactory* audio_encoder_factory_;
   VideoEncoderFactory* video_encoder_factory_;
   std::vector<std::unique_ptr<MediaWorker>> media_workers_;
 
   std::vector<VideoCapturerPair> video_capturers_;
+
+  std::vector<std::shared_ptr<AudioSinkWrapper>> audio_sinks_;
 
   AVP_DISALLOW_COPY_AND_ASSIGN(MediaService);
 };

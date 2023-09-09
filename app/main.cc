@@ -37,7 +37,7 @@ static struct option long_options[] = {
     {0, 0, 0, 0}};
 
 int main(int argc, char** argv) {
-  avp::LogMessage::LogToDebug(avp::LogSeverity::LS_VERBOSE);
+  avp::LogMessage::LogToDebug(avp::LogSeverity::LS_DEBUG);
 
   std::string configFile(DEFAULT_CONFIG_PATH);
   int opt;

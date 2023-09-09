@@ -1,0 +1,32 @@
+import("//opencamera.gni")
+
+oc_library("audio_device") {
+  deps = [ ":audio_device_impl" ]
+}
+
+oc_library("audio_device_impl") {
+  visibility = [ "*" ]
+
+  sources = []
+
+  sources += [
+    "audio_device_buffer.cc",
+    "audio_device_buffer.h",
+    "audio_device_config.h",
+    "audio_device_defines.h",
+    "audio_device_generic.h",
+  ]
+
+  if (is_linux) {
+    sources += [
+      "linux/alsasymboltable_linux.cc",
+      "linux/alsasymboltable_linux.h",
+      "linux/audio_device_alsa_linux.cc",
+      "linux/audio_device_alsa_linux.h",
+      "linux/audio_mixer_manager_alsa_linux.cc",
+      "linux/audio_mixer_manager_alsa_linux.h",
+      "linux/latebindingsymboltable_linux.cc",
+      "linux/latebindingsymboltable_linux.h",
+    ]
+  }
+}

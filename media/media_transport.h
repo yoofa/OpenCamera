@@ -11,9 +11,12 @@
 #include <memory>
 #include <ostream>
 
+#include "api/audio/audio_frame.h"
+#include "api/audio/audio_sink_interface.h"
 #include "base/task_util/task_runner.h"
 #include "base/task_util/task_runner_factory.h"
 #include "base/thread_annotation.h"
+#include "media/audio/audio_stream_sender.h"
 #include "media/video/video_stream_sender.h"
 
 namespace avp {
@@ -31,8 +34,19 @@ class MediaTransport {
 
   void AddVideoSink(const EncodedVideoSink& sink, int32_t id);
   void RemoveVideoSink(const EncodedVideoSink& sink);
-
   bool frame_wanted(int32_t stream_id) const;
+
+  AudioStreamSender* GetAudioStreamSender(int32_t id, CodecId codec_id);
+  void RemoveAudioStreamSender(CodecId codec_id);
+
+  void AddAudioSenderSink(
+      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+          sink,
+      int32_t stream_id,
+      CodecId codec_id);
+  void RemoveAudioSenderSink(
+      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+          sink);
 
  private:
   struct VideoStreamSenderInfo {
@@ -40,8 +54,15 @@ class MediaTransport {
     int32_t id;
   };
 
+  struct AudioStreamSenderInfo {
+    std::unique_ptr<AudioStreamSender> audio_stream_sender;
+    int32_t stream_id;
+    CodecId codec_id;
+  };
+
   base::TaskRunner transport_runner_;
   std::vector<VideoStreamSenderInfo> video_stream_senders_;
+  std::vector<AudioStreamSenderInfo> audio_stream_senders_;
 };
 
 }  // namespace avp

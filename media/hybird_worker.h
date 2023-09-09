@@ -11,10 +11,14 @@
 #include <memory>
 #include <vector>
 
+#include "api/audio/audio_frame.h"
+#include "api/audio/audio_sink_interface.h"
 #include "api/video_codecs/video_encoder_factory.h"
 #include "base/task_util/task_runner.h"
 #include "base/task_util/task_runner_factory.h"
 #include "base/thread_annotation.h"
+#include "media/audio/audio_flinger.h"
+#include "media/audio/audio_send_stream.h"
 #include "media/media_transport.h"
 #include "media/media_worker.h"
 #include "media/video/video_send_stream.h"
@@ -28,7 +32,10 @@ class HybirdWorker : public MediaWorker {
   using EncodedVideoSink = std::shared_ptr<VideoSinkInterface<EncodedImage>>;
 
  public:
-  explicit HybirdWorker(VideoEncoderFactory* video_encoder_factory);
+  explicit HybirdWorker(base::TaskRunnerFactory* task_runner_factory,
+                        AudioEncoderFactory* audio_encoder_factory,
+                        VideoEncoderFactory* video_encoder_factory,
+                        AudioDevice* audio_device);
   virtual ~HybirdWorker();
 
   void AddVideoSource(VideoSource& video_source,
@@ -43,6 +50,20 @@ class HybirdWorker : public MediaWorker {
 
   void RequestKeyFrame() override;
 
+  void AddEncodedAudioSink(
+      std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+          audio_sink,
+      int32_t stream_id,
+      CodecId codec_id) override;
+  void RemoveEncodedAudioSink(
+      std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+          audio_sink,
+      CodecId codec_id) override;
+
+  void AddAudioStreamReceiver() override;
+  void RemoveAudioStreamReceiver() override;
+
+ private:
   struct VideoSourceInfo {
     VideoSource video_source;
     int32_t stream_id;
@@ -52,16 +73,26 @@ class HybirdWorker : public MediaWorker {
     int32_t stream_id;
   };
 
- private:
+  struct AudioSendStreamInfo {
+    std::unique_ptr<AudioSendStream> audio_send_stream;
+    int32_t stream_id;
+    CodecId codec_id;
+    int sink_count = 0;
+  };
+
   // capture runner, used to handle capture task
   std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
   base::TaskRunner worker_task_runner_;
 
+  AudioFlinger audio_flinger_;
   std::unique_ptr<MediaTransport> media_transport_
       GUARDED_BY(worker_task_runner_);
 
   std::vector<VideoSourceInfo> video_sources_ GUARDED_BY(worker_task_runner_);
   std::vector<VideoSendStreamInfo> video_send_streams_
+      GUARDED_BY(worker_task_runner_);
+
+  std::vector<AudioSendStreamInfo> audio_send_streams_
       GUARDED_BY(worker_task_runner_);
 };
 

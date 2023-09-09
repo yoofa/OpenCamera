@@ -9,21 +9,32 @@
 
 #include <memory>
 
+#include "api/audio/audio_frame.h"
+#include "api/audio/audio_sink_interface.h"
 #include "base/checks.h"
 #include "base/sequence_checker.h"
 #include "base/task_util/default_task_runner_factory.h"
+#include "media/audio/audio_flinger.h"
 #include "media/video/video_stream_sender.h"
 
 namespace avp {
 
-HybirdWorker::HybirdWorker(VideoEncoderFactory* video_encoder_factory)
-    : MediaWorker(video_encoder_factory),
-      task_runner_factory_(base::CreateDefaultTaskRunnerFactory()),
-      worker_task_runner_(task_runner_factory_->CreateTaskRunner(
+HybirdWorker::HybirdWorker(base::TaskRunnerFactory* task_factory,
+                           AudioEncoderFactory* audio_encoder_factory,
+                           VideoEncoderFactory* video_encoder_factory,
+                           AudioDevice* audio_device)
+    : MediaWorker(task_factory,
+                  audio_encoder_factory,
+                  video_encoder_factory,
+                  audio_device),
+      worker_task_runner_(task_runner_factory()->CreateTaskRunner(
           "HybirdWorkerRunner",
           base::TaskRunnerFactory::Priority::NORMAL)),
+      audio_flinger_(audio_device),
       media_transport_(
-          std::make_unique<MediaTransport>(task_runner_factory_.get())) {}
+          std::make_unique<MediaTransport>(task_runner_factory())) {
+  audio_flinger_.InitIfNeed();
+}
 
 HybirdWorker::~HybirdWorker() {}
 
@@ -52,7 +63,7 @@ void HybirdWorker::AddVideoSource(VideoSource& video_source,
     // create video send stream
     video_send_streams_.push_back(
         {std::make_unique<VideoSendStream>(
-             task_runner_factory_.get(), &worker_task_runner_,
+             task_runner_factory(), &worker_task_runner_,
              video_encoder_factory(), video_source.get(), stream_sender,
              std::move(config)),
          stream_id});
@@ -149,5 +160,63 @@ void HybirdWorker::RequestKeyFrame() {
     }
   });
 }
+
+void HybirdWorker::AddEncodedAudioSink(
+    std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+        audio_sink,
+    int32_t stream_id,
+    CodecId codec_id) {
+  worker_task_runner_.PostTask([this, audio_sink, stream_id, codec_id]() {
+    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+
+    auto send_stream_it =
+        std::find_if(audio_send_streams_.begin(), audio_send_streams_.end(),
+                     [codec_id](const AudioSendStreamInfo& stream) {
+                       return stream.codec_id == codec_id;
+                     });
+
+    if (send_stream_it == audio_send_streams_.end()) {
+      // audio send stream differs with codec id
+      // new codec, create audio send stream
+
+      AudioStreamSender* audio_stream_sender =
+          media_transport_->GetAudioStreamSender(stream_id, codec_id);
+      audio_send_streams_.push_back(
+          {std::make_unique<AudioSendStream>(task_runner_factory(),
+                                             audio_stream_sender, nullptr),
+           stream_id, codec_id, 1});
+    } else {
+      send_stream_it->sink_count++;
+    }
+    media_transport_->AddAudioSenderSink(audio_sink, stream_id, codec_id);
+  });
+}
+
+void HybirdWorker::RemoveEncodedAudioSink(
+    std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+        audio_sink,
+    CodecId codec_id) {
+  worker_task_runner_.PostTask([this, audio_sink, codec_id]() {
+    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    auto send_stream_it =
+        std::find_if(audio_send_streams_.begin(), audio_send_streams_.end(),
+                     [codec_id](const AudioSendStreamInfo& stream) {
+                       return stream.codec_id == codec_id;
+                     });
+    DCHECK(send_stream_it != audio_send_streams_.end());
+
+    send_stream_it->sink_count--;
+    media_transport_->RemoveAudioSenderSink(audio_sink);
+
+    if (send_stream_it->sink_count == 0) {
+      // no sink left, remove audio send stream
+      media_transport_->RemoveAudioStreamSender(codec_id);
+      audio_send_streams_.erase(send_stream_it);
+    }
+  });
+}
+
+void HybirdWorker::AddAudioStreamReceiver() {}
+void HybirdWorker::RemoveAudioStreamReceiver() {}
 
 }  // namespace avp

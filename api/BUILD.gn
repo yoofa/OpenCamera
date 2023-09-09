@@ -4,3 +4,17 @@ group("api") {
   visibility = [ "*" ]
   deps = []
 }
+
+oc_library("api_audio") {
+  sources = [
+    "audio/audio_device.h",
+    "audio/audio_frame.cc",
+    "audio/audio_frame.h",
+    "audio/default_audio_device.cc",
+    "audio/default_audio_device.h",
+  ]
+  deps = [
+    "//common:foundation",
+    "//modules/audio_device:audio_device_impl",
+  ]
+}

@@ -7,6 +7,7 @@
 
 #include "media_transport.h"
 #include "base/task_util/task_runner_factory.h"
+#include "media/audio/audio_stream_sender.h"
 
 namespace avp {
 
@@ -62,6 +63,55 @@ bool MediaTransport::frame_wanted(int32_t stream_id) const {
     }
   }
   return false;
+}
+
+AudioStreamSender* MediaTransport::GetAudioStreamSender(int32_t stream_id,
+                                                        CodecId codec_id) {
+  auto it =
+      std::find_if(audio_stream_senders_.begin(), audio_stream_senders_.end(),
+                   [codec_id](const AudioStreamSenderInfo& info) {
+                     return info.codec_id == codec_id;
+                   });
+  if (it != audio_stream_senders_.end()) {
+    return it->audio_stream_sender.get();
+  }
+  audio_stream_senders_.push_back(
+      {std::make_unique<AudioStreamSender>(&transport_runner_), stream_id,
+       codec_id});
+  return audio_stream_senders_.back().audio_stream_sender.get();
+}
+
+void MediaTransport::RemoveAudioStreamSender(CodecId codec_id) {
+  auto it =
+      std::find_if(audio_stream_senders_.begin(), audio_stream_senders_.end(),
+                   [codec_id](const AudioStreamSenderInfo& info) {
+                     return info.codec_id == codec_id;
+                   });
+  if (it == audio_stream_senders_.end()) {
+    LOG(LS_WARNING)
+        << "RemoveAudioStreamSender failed, audio_stream_sender not found";
+
+    return;
+  }
+  audio_stream_senders_.erase(it);
+}
+
+void MediaTransport::AddAudioSenderSink(
+    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+        sink,
+    int32_t stream_id,
+    CodecId codec_id) {
+  auto audio_stream_sender = GetAudioStreamSender(stream_id, codec_id);
+  audio_stream_sender->AddAudioSink(sink);
+}
+
+void MediaTransport::RemoveAudioSenderSink(
+    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+        sink) {
+  // TODO(youfa) not all stream sender has this sink
+  for (auto& audio_stream_sender : audio_stream_senders_) {
+    audio_stream_sender.audio_stream_sender->RemoveAudioSink(sink);
+  }
 }
 
 }  // namespace avp

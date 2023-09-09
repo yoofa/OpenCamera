@@ -17,6 +17,7 @@ oc_library("media_service") {
   deps = [
     ":media_video",
     ":media_worker",
+    "//api:api_audio",
     "//base:logging",
     "//third_party/inih",
   ]
@@ -38,7 +39,9 @@ oc_library("media_worker") {
   ]
 
   deps = [
+    ":media_audio",
     ":media_video",
+    "//api:api_audio",
     "//base:logging",
     "//base:task_util",
     "//common:foundation",
@@ -77,6 +80,24 @@ oc_library("media_video") {
     "//base:logging",
     "//base:task_util",
     "//common:foundation",
+  ]
+}
+
+oc_library("media_audio") {
+  sources = [
+    "./audio/audio_callback.h",
+    "./audio/audio_flinger.cc",
+    "./audio/audio_flinger.h",
+    "./audio/audio_send_stream.cc",
+    "./audio/audio_send_stream.h",
+    "./audio/audio_sink_wrapper.cc",
+    "./audio/audio_sink_wrapper.h",
+    "./audio/audio_stream_sender.cc",
+    "./audio/audio_stream_sender.h",
+  ]
+  deps = [
+    "//api:api_audio",
+    "//modules/audio_device:audio_device_impl",
   ]
 }
 

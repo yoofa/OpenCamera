@@ -124,7 +124,7 @@ oc_library("opencamera") {
     "//base",
     "//common",
     "//media",
-    "//modules/audio_device:audio_device",
+    "//modules/audio_device",
     "//onvif",
     "//rtsp",
     "//third_party/fdk-aac",

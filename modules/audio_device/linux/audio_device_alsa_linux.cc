@@ -573,7 +573,7 @@ int32_t AudioDeviceLinuxALSA::SetPlayoutDevice(uint16_t index) {
     return -1;
   }
 
-  uint32_t nDevices = GetDevicesInfo(0, true);
+  int32_t nDevices = GetDevicesInfo(0, true);
   LOG(LS_VERBOSE) << "number of available audio output devices is " << nDevices;
 
   if (index > (nDevices - 1)) {
@@ -635,7 +635,7 @@ int32_t AudioDeviceLinuxALSA::SetRecordingDevice(uint16_t index) {
     return -1;
   }
 
-  uint32_t nDevices = GetDevicesInfo(0, false);
+  int32_t nDevices = GetDevicesInfo(0, false);
   LOG(LS_VERBOSE) << "number of availiable audio input devices is " << nDevices;
 
   if (index > (nDevices - 1)) {

@@ -2,8 +2,8 @@ import("//opencamera.gni")
 
 group("app") {
   deps = [
+    ":DyrachYO",
     ":oc",
-    ":somnus",
   ]
 }
 
@@ -27,7 +27,7 @@ oc_library("oc") {
   configs += [ "//build/config/compiler:rtti" ]
 }
 
-executable("somnus") {
+executable("DyrachYO") {
   sources = [ "main.cc" ]
   deps = [
     ":oc",

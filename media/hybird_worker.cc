@@ -14,6 +14,7 @@
 #include "base/checks.h"
 #include "base/sequence_checker.h"
 #include "base/task_util/default_task_runner_factory.h"
+#include "common/audio_codec_property.h"
 #include "media/audio/audio_flinger.h"
 #include "media/video/video_stream_sender.h"
 
@@ -162,8 +163,7 @@ void HybirdWorker::RequestKeyFrame() {
 }
 
 void HybirdWorker::AddEncodedAudioSink(
-    std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-        audio_sink,
+    std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
     int32_t stream_id,
     CodecId codec_id) {
   worker_task_runner_.PostTask([this, audio_sink, stream_id, codec_id]() {
@@ -182,19 +182,32 @@ void HybirdWorker::AddEncodedAudioSink(
       AudioStreamSender* audio_stream_sender =
           media_transport_->GetAudioStreamSender(stream_id, codec_id);
       audio_send_streams_.push_back(
-          {std::make_unique<AudioSendStream>(task_runner_factory(),
-                                             audio_stream_sender, nullptr),
+          {std::make_shared<AudioSendStream>(task_runner_factory(),
+                                             audio_stream_sender,
+                                             audio_encoder_factory()),
            stream_id, codec_id, 1});
+
+      // TODO(youfa) hardcode now, refine later
+      AudioCodecProperty codec_property;
+      codec_property.codec_id = codec_id;
+      codec_property.channels = 2;
+      codec_property.samples_per_channel = 1024;
+      codec_property.sample_rate = 44100;
+      codec_property.bit_rate = 64000;
+
+      audio_send_streams_.back().audio_send_stream->ConfigureEncoder(
+          codec_property);
+
     } else {
       send_stream_it->sink_count++;
     }
     media_transport_->AddAudioSenderSink(audio_sink, stream_id, codec_id);
+    UpdateAudioFlingerWithSenders();
   });
 }
 
 void HybirdWorker::RemoveEncodedAudioSink(
-    std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-        audio_sink,
+    std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
     CodecId codec_id) {
   worker_task_runner_.PostTask([this, audio_sink, codec_id]() {
     AVP_DCHECK_RUN_ON(&worker_task_runner_);
@@ -213,10 +226,20 @@ void HybirdWorker::RemoveEncodedAudioSink(
       media_transport_->RemoveAudioStreamSender(codec_id);
       audio_send_streams_.erase(send_stream_it);
     }
+    UpdateAudioFlingerWithSenders();
   });
 }
 
 void HybirdWorker::AddAudioStreamReceiver() {}
 void HybirdWorker::RemoveAudioStreamReceiver() {}
+
+void HybirdWorker::UpdateAudioFlingerWithSenders() {
+  LOG(LS_INFO) << "UpdateAudioFlingerWithSenders";
+  std::vector<std::shared_ptr<AudioSendStream>> senders;
+  for (auto& sender : audio_send_streams_) {
+    senders.push_back(sender.audio_send_stream);
+  }
+  audio_flinger_.UpdateSender(senders);
+}
 
 }  // namespace avp

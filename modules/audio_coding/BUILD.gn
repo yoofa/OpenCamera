@@ -1,0 +1,15 @@
+import("//opencamera.gni")
+
+oc_library("avp_fdkaac") {
+  visibility = [ "*" ]
+  sources = [
+    "codecs/aac/fdkaac_encoder.cc",
+    "codecs/aac/fdkaac_encoder.h",
+  ]
+  deps = [
+    "//api/audio_codecs:audio_encoder_api",
+    "//base:logging",
+    "//third_party/fdk-aac:lib_aac_enc",
+  ]
+  public_configs = [ "//third_party/fdk-aac:fdk-aac_config" ]
+}

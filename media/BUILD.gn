@@ -23,6 +23,7 @@ oc_library("media_service") {
   ]
 
   deps += [
+    "//api/audio_codecs:builtin_audio_encoder",
     "//api/video_codecs:builtin_video_encoder",
     "//api/video_codecs:fake_video_encoder",
   ]
@@ -85,16 +86,18 @@ oc_library("media_video") {
 
 oc_library("media_audio") {
   sources = [
-    "./audio/audio_callback.h",
-    "./audio/audio_flinger.cc",
-    "./audio/audio_flinger.h",
-    "./audio/audio_send_stream.cc",
-    "./audio/audio_send_stream.h",
-    "./audio/audio_sink_wrapper.cc",
-    "./audio/audio_sink_wrapper.h",
-    "./audio/audio_stream_sender.cc",
-    "./audio/audio_stream_sender.h",
+    "audio/audio_callback.h",
+    "audio/audio_flinger.cc",
+    "audio/audio_flinger.h",
+    "audio/audio_send_stream.cc",
+    "audio/audio_send_stream.h",
+    "audio/audio_sink_wrapper.h",
+    "audio/audio_stream_sender.cc",
+    "audio/audio_stream_sender.h",
+    "audio/remix_resample.cc",
+    "audio/remix_resample.h",
   ]
+
   deps = [
     "//api:api_audio",
     "//modules/audio_device:audio_device_impl",

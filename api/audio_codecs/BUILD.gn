@@ -1,0 +1,21 @@
+import("//opencamera.gni")
+
+oc_library("audio_encoder_api") {
+  visibility = [ "*" ]
+  sources = [
+    "audio_encoder.h",
+    "audio_encoder_factory.h",
+  ]
+  deps = [ "//common:foundation" ]
+}
+
+oc_library("builtin_audio_encoder") {
+  sources = [
+    "builtin_audio_encoder_factory.cc",
+    "builtin_audio_encoder_factory.h",
+  ]
+  deps = [
+    ":audio_encoder_api",
+    "../../modules/audio_coding:avp_fdkaac",
+  ]
+}

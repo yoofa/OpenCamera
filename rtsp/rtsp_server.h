@@ -10,8 +10,10 @@
 
 #include <memory>
 
+#include "api/audio/audio_sink_interface.h"
 #include "api/video/encoded_image.h"
 #include "api/video/video_sink_interface.h"
+#include "base/buffer.h"
 #include "base/logging.h"
 #include "common/codec_id.h"
 #include "common/handler.h"
@@ -33,6 +35,23 @@ class RtspServer : public Handler {
     std::queue<EncodedImage> queue_;
   };
 
+  class AudioQueue : public AudioSinkInterface<std::shared_ptr<Buffer8>>,
+                     public MessageObject {
+   public:
+    void SetSampleRate(int sample_rate) { set_sample_rate(sample_rate); }
+    void SetChannelCount(int channel_count) {
+      set_channel_count(channel_count);
+    }
+
+    void OnFrame(const std::shared_ptr<Buffer8> frame) override {
+      queue_.push(frame);
+    }
+    std::queue<std::shared_ptr<Buffer8>>& queue() { return queue_; }
+
+   private:
+    std::queue<std::shared_ptr<Buffer8>> queue_;
+  };
+
   RtspServer(std::shared_ptr<Message> notify);
   virtual ~RtspServer();
   status_t Init();
@@ -40,6 +59,10 @@ class RtspServer : public Handler {
   status_t Stop();
 
   void RequestVideoSink(int32_t stream_id, CodecId codec_id);
+  void RequestAudioSink(int32_t stream_id,
+                        CodecId codec_id,
+                        int sample_rate,
+                        int channels);
 
   enum {
 
@@ -49,6 +72,7 @@ class RtspServer : public Handler {
     kWhatClientConnected = 'cnet',
     kWhatClientDisonnected = 'dcnt',
 
+    kWhatRequestAudioSink = 'raud',
     kWhatRequestVideoSink = 'rvid',
 
     kWhatPullAudio = 'pula',
@@ -57,6 +81,7 @@ class RtspServer : public Handler {
     // notify
     kWhatClientConnectedNotify = 'ccnt',
     kWhatClientDisconnectedNotify = 'dcnt',
+    kWhatAudioSinkAdded = 'asin',
     kWhatVideoSinkAdded = 'vsin',
   };
 
@@ -65,6 +90,7 @@ class RtspServer : public Handler {
   void OnClientDisconnected(const std::shared_ptr<Message>& msg);
   void OnAddMediaSource(const std::shared_ptr<Message>& msg);
 
+  void OnRequestAudioSink(const std::shared_ptr<Message>& msg);
   void OnRequestVideoSink(const std::shared_ptr<Message>& msg);
   void OnPullAudioSource();
   void OnPullVideoSource();
@@ -82,6 +108,7 @@ class RtspServer : public Handler {
   xop::MediaSessionId session_id_;
   xop::MediaSession* media_session_;
 
+  std::shared_ptr<AudioQueue> audio_queue_;
   std::shared_ptr<VideoQueue> video_queue_;
 
   bool has_audio_;

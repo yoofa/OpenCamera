@@ -28,6 +28,9 @@ namespace avp {
 
 class MediaService : public Handler {
  public:
+  using EncodedAudioSinkWrapper =
+      std::shared_ptr<AudioSinkWrapper<std::shared_ptr<Buffer8>>>;
+
   MediaService(AppConfig appConfig, std::shared_ptr<Message> notify);
   ~MediaService();
 
@@ -50,13 +53,13 @@ class MediaService : public Handler {
   void RequesteKeyFrame();
 
   void AddEncodedAudioSink(
-      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
           audio_sink,
       int32_t stream_id,
       CodecId codec_id);
 
   void RemoveEncodedAudioSink(
-      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
           audio_sink,
       CodecId codec_id);
 
@@ -97,7 +100,8 @@ class MediaService : public Handler {
   std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
   std::unique_ptr<AudioDevice> audio_device_;
 
-  std::unique_ptr<VideoEncoderFactory> tmp_factory_;
+  std::unique_ptr<VideoEncoderFactory> tmp_video_factory_;
+  std::unique_ptr<AudioEncoderFactory> tmp_audio_factory_;
 
   AudioEncoderFactory* audio_encoder_factory_;
   VideoEncoderFactory* video_encoder_factory_;
@@ -105,7 +109,7 @@ class MediaService : public Handler {
 
   std::vector<VideoCapturerPair> video_capturers_;
 
-  std::vector<std::shared_ptr<AudioSinkWrapper>> audio_sinks_;
+  std::vector<EncodedAudioSinkWrapper> audio_sinks_;
 
   AVP_DISALLOW_COPY_AND_ASSIGN(MediaService);
 };

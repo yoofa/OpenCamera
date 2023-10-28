@@ -1,7 +1,10 @@
 import("//opencamera.gni")
 
-oc_library("audio_device") {
-  deps = [ ":audio_device_impl" ]
+group("audio_device") {
+  deps = [
+    ":alsa_test",
+    ":audio_device_impl",
+  ]
 }
 
 oc_library("audio_device_impl") {
@@ -27,6 +30,19 @@ oc_library("audio_device_impl") {
       "linux/audio_mixer_manager_alsa_linux.h",
       "linux/latebindingsymboltable_linux.cc",
       "linux/latebindingsymboltable_linux.h",
+    ]
+  }
+}
+
+if (is_linux) {
+  oc_executable("alsa_test") {
+    sources = [ "linux/test/alsa.cc" ]
+
+    deps = [
+      ":audio_device_impl",
+      "//api:api_audio",
+      "//base:logging",
+      "//base:task_util",
     ]
   }
 }

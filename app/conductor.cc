@@ -12,11 +12,13 @@
 #include "common/message.h"
 #include "media/media_service.h"
 #include "media/video/v4l2_video_source.h"
+#include "rtsp/rtsp_server.h"
 #include "xop/rtsp.h"
 
 namespace avp {
 namespace oc {
 namespace {
+using EncodedAudioSink = AudioSinkInterface<std::shared_ptr<Buffer8>>;
 using VideoSource = VideoSourceInterface<std::shared_ptr<VideoFrame>>;
 using EncodedVideoSink = VideoSinkInterface<EncodedImage>;
 }  // namespace
@@ -112,6 +114,27 @@ void Conductor::OnRtspNotify(const std::shared_ptr<Message>& msg) {
   int32_t what;
   CHECK(msg->findInt32("what", &what));
   switch (what) {
+    case RtspServer::kWhatAudioSinkAdded: {
+      LOG(LS_INFO) << "kWhatAudioSink";
+      int32_t stream_id;
+      int32_t codec_id;
+      int32_t sample_rate;
+      int32_t channels;
+      std::shared_ptr<MessageObject> obj;
+
+      CHECK(msg->findInt32("stream_id", &stream_id));
+      CHECK(msg->findInt32("codec_id", &codec_id));
+      CHECK(msg->findObject("audio_sink", obj));
+      auto audio_sink = std::dynamic_pointer_cast<EncodedAudioSink>(obj);
+      CHECK(audio_sink != nullptr);
+
+      CodecId codec = static_cast<CodecId>(codec_id);
+
+      media_service_->AddEncodedAudioSink(audio_sink, stream_id, codec);
+
+      break;
+    }
+
     case RtspServer::kWhatVideoSinkAdded: {
       LOG(LS_INFO) << "kWhatVideoSinkAdded";
       int32_t stream_id;
@@ -124,8 +147,6 @@ void Conductor::OnRtspNotify(const std::shared_ptr<Message>& msg) {
       DCHECK(encoded_video_sink != nullptr);
 
       media_service_->AddVideoSink(encoded_video_sink, stream_id);
-
-      LOG(LS_INFO) << "kWhatVideoSinkAdded";
 
       break;
     }
@@ -150,6 +171,9 @@ void Conductor::OnStart(const std::shared_ptr<Message>& msg) {
   rtsp_server_->Start();
   onvif_server_->Start();
   media_service_->Start();
+
+  uint32_t stream_id = GenerateStreamId();
+  rtsp_server_->RequestAudioSink(stream_id, CodecId::AV_CODEC_ID_AAC, 44100, 2);
 
   AddCameraSource();
 }

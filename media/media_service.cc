@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "api/audio/default_audio_device.h"
+#include "api/audio_codecs/builtin_audio_encoder_factory.h"
 #include "api/video/encoded_image.h"
 #include "api/video/video_sink_interface.h"
 #include "api/video_codecs/builtin_video_encoder_factory.h"
@@ -32,7 +33,7 @@ namespace avp {
 namespace {
 using VideoSource = VideoSourceInterface<std::shared_ptr<VideoFrame>>;
 using EncodedVideoSink = VideoSinkInterface<EncodedImage>;
-using EncodedAudioSink = AudioSinkInterface<std::shared_ptr<AudioFrame>>;
+using EncodedAudioSink = AudioSinkInterface<std::shared_ptr<Buffer8>>;
 
 }  // namespace
 
@@ -46,9 +47,12 @@ MediaService::MediaService(AppConfig appConfig, std::shared_ptr<Message> notify)
       audio_device_(
           DefaultAudioDevice::Create(task_runner_factory_.get(),
                                      AudioDevice::AudioLayer::kLinuxAlsa)),
-      // tmp_factory_(std::make_unique<FakeVideoEncoderFactory>()),
-      tmp_factory_(CreateBuiltinVideoEncoderFactory()),
-      video_encoder_factory_(nullptr) {
+      // TODO(youfa) develop usage, audio_device/encoder_factory will be created
+      // by app
+      tmp_video_factory_(CreateBuiltinVideoEncoderFactory()),
+      tmp_audio_factory_(CreateBuiltinAudioEncoderFactory()),
+      audio_encoder_factory_(tmp_audio_factory_.get()),
+      video_encoder_factory_(tmp_video_factory_.get()) {
   looper_->setName("MediaService");
 }
 
@@ -58,13 +62,9 @@ status_t MediaService::Init() {
   looper_->start();
   looper_->registerHandler(shared_from_this());
 
-  // TODO(youfa), develop usage, remove later
-  video_encoder_factory_ = tmp_factory_.get();
-  if (video_encoder_factory_) {
-    media_workers_.push_back(std::make_unique<HybirdWorker>(
-        task_runner_factory_.get(), audio_encoder_factory_,
-        video_encoder_factory_, audio_device_.get()));
-  }
+  media_workers_.push_back(std::make_unique<HybirdWorker>(
+      task_runner_factory_.get(), audio_encoder_factory_,
+      video_encoder_factory_, audio_device_.get()));
 
   return OK;
 }
@@ -116,23 +116,23 @@ void MediaService::RequesteKeyFrame() {
 }
 
 void MediaService::AddEncodedAudioSink(
-    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
         audio_sink,
     int32_t stream_id,
     CodecId codec_id) {
   // find sink in audio_sinks_
-  auto it = std::find_if(
-      audio_sinks_.begin(), audio_sinks_.end(),
-      [&audio_sink](const std::shared_ptr<AudioSinkWrapper>& sink) {
-        return sink->sink() == audio_sink;
-      });
+  auto it = std::find_if(audio_sinks_.begin(), audio_sinks_.end(),
+                         [&audio_sink](const EncodedAudioSinkWrapper& sink) {
+                           return sink->sink() == audio_sink;
+                         });
   CHECK(it == audio_sinks_.end());
 
-  audio_sinks_.push_back(std::make_shared<AudioSinkWrapper>(audio_sink));
+  audio_sinks_.push_back(
+      AudioSinkWrapper<std::shared_ptr<Buffer8>>::Create(audio_sink));
 
   auto msg =
       std::make_shared<Message>(kWhatAddAudioRenderSink, shared_from_this());
-  msg->setObject("encoded_video_sink",
+  msg->setObject("encoded_audio_sink",
                  std::dynamic_pointer_cast<MessageObject>(audio_sinks_.back()));
   msg->setInt32("stream_id", stream_id);
   msg->setInt32("codec_id", static_cast<int32_t>(codec_id));
@@ -140,14 +140,13 @@ void MediaService::AddEncodedAudioSink(
 }
 
 void MediaService::RemoveEncodedAudioSink(
-    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
+    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
         audio_sink,
     CodecId codec_id) {
-  auto it = std::find_if(
-      audio_sinks_.begin(), audio_sinks_.end(),
-      [&audio_sink](const std::shared_ptr<AudioSinkWrapper>& sink) {
-        return sink->sink() == audio_sink;
-      });
+  auto it = std::find_if(audio_sinks_.begin(), audio_sinks_.end(),
+                         [&audio_sink](const EncodedAudioSinkWrapper& sink) {
+                           return sink->sink() == audio_sink;
+                         });
   CHECK(it != audio_sinks_.end());
 
   auto msg =
@@ -267,9 +266,10 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
     }
 
     case kWhatAddAudioRenderSink: {
+      LOG(LS_INFO) << "kWhatAddAudioRenderSink";
       std::shared_ptr<MessageObject> obj;
       CHECK(message->findObject("encoded_audio_sink", obj));
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>
+      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>
           encoded_video_sink = std::dynamic_pointer_cast<EncodedAudioSink>(obj);
       DCHECK(encoded_video_sink != nullptr);
 
@@ -290,7 +290,7 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
     case kWhatRemoveAudioRenderSink: {
       std::shared_ptr<MessageObject> obj;
       CHECK(message->findObject("encoded_audio_sink", obj));
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>
+      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>
           encoded_video_sink = std::dynamic_pointer_cast<EncodedAudioSink>(obj);
       DCHECK(encoded_video_sink != nullptr);
 

@@ -22,6 +22,9 @@
 namespace avp {
 class MediaTransport {
   using EncodedVideoSink = std::shared_ptr<VideoSinkInterface<EncodedImage>>;
+  using EncodedAudioBuffer = std::shared_ptr<Buffer8>;
+  using EncodedAudioSink =
+      std::shared_ptr<AudioSinkInterface<EncodedAudioBuffer>>;
 
  public:
   MediaTransport(base::TaskRunnerFactory* task_runner_factory);
@@ -39,14 +42,10 @@ class MediaTransport {
   AudioStreamSender* GetAudioStreamSender(int32_t id, CodecId codec_id);
   void RemoveAudioStreamSender(CodecId codec_id);
 
-  void AddAudioSenderSink(
-      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-          sink,
-      int32_t stream_id,
-      CodecId codec_id);
-  void RemoveAudioSenderSink(
-      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-          sink);
+  void AddAudioSenderSink(const EncodedAudioSink sink,
+                          int32_t stream_id,
+                          CodecId codec_id);
+  void RemoveAudioSenderSink(const EncodedAudioSink& sink);
 
  private:
   struct VideoStreamSenderInfo {

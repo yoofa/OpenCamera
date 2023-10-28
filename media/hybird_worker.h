@@ -51,19 +51,18 @@ class HybirdWorker : public MediaWorker {
   void RequestKeyFrame() override;
 
   void AddEncodedAudioSink(
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-          audio_sink,
+      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
       int32_t stream_id,
       CodecId codec_id) override;
   void RemoveEncodedAudioSink(
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-          audio_sink,
+      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
       CodecId codec_id) override;
 
   void AddAudioStreamReceiver() override;
   void RemoveAudioStreamReceiver() override;
 
  private:
+  void UpdateAudioFlingerWithSenders() REQUIRES(worker_task_runner_);
   struct VideoSourceInfo {
     VideoSource video_source;
     int32_t stream_id;
@@ -74,7 +73,7 @@ class HybirdWorker : public MediaWorker {
   };
 
   struct AudioSendStreamInfo {
-    std::unique_ptr<AudioSendStream> audio_send_stream;
+    std::shared_ptr<AudioSendStream> audio_send_stream;
     int32_t stream_id;
     CodecId codec_id;
     int sink_count = 0;
@@ -84,7 +83,7 @@ class HybirdWorker : public MediaWorker {
   std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
   base::TaskRunner worker_task_runner_;
 
-  AudioFlinger audio_flinger_;
+  AudioFlinger audio_flinger_ GUARDED_BY(worker_task_runner_);
   std::unique_ptr<MediaTransport> media_transport_
       GUARDED_BY(worker_task_runner_);
 

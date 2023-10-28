@@ -96,19 +96,16 @@ void MediaTransport::RemoveAudioStreamSender(CodecId codec_id) {
   audio_stream_senders_.erase(it);
 }
 
-void MediaTransport::AddAudioSenderSink(
-    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-        sink,
-    int32_t stream_id,
-    CodecId codec_id) {
+void MediaTransport::AddAudioSenderSink(const EncodedAudioSink sink,
+                                        int32_t stream_id,
+                                        CodecId codec_id) {
   auto audio_stream_sender = GetAudioStreamSender(stream_id, codec_id);
-  audio_stream_sender->AddAudioSink(sink);
+  audio_stream_sender->AddAudioSink(std::move(sink));
 }
 
-void MediaTransport::RemoveAudioSenderSink(
-    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<AudioFrame>>>&
-        sink) {
-  // TODO(youfa) not all stream sender has this sink
+void MediaTransport::RemoveAudioSenderSink(const EncodedAudioSink& sink) {
+  // FIXME(youfa) this sink is not the real sink in audio_stream_sender, so the
+  // code below is not correct, same as RemoveVideoSink
   for (auto& audio_stream_sender : audio_stream_senders_) {
     audio_stream_sender.audio_stream_sender->RemoveAudioSink(sink);
   }

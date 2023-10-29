@@ -13,20 +13,20 @@
 
 #include "api/audio/audio_frame.h"
 #include "api/audio/audio_sink_interface.h"
-#include "base/buffer.h"
 #include "base/task_util/task_runner.h"
 #include "base/thread_annotation.h"
+#include "common/media_packet.h"
 
 namespace avp {
-class AudioStreamSender : public AudioSinkInterface<std::shared_ptr<Buffer8>> {
+class AudioStreamSender : public AudioSinkInterface<MediaPacket> {
  public:
-  using AudioBufferT = std::shared_ptr<Buffer8>;
-  using AudioSinkT = AudioSinkInterface<AudioBufferT>;
+  using AudioBufferT = MediaPacket;
+  using AudioSinkT = AudioSinkInterface<MediaPacket>;
 
   AudioStreamSender(base::TaskRunner* transport_runner);
 
   ~AudioStreamSender();
-  void OnFrame(const AudioBufferT frame) override;
+  void OnFrame(const MediaPacket packet) override;
   // AudioSinkInterface implementation.
 
   void AddAudioSink(const std::shared_ptr<AudioSinkT> sink);

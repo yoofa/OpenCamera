@@ -18,7 +18,7 @@
 namespace avp {
 namespace oc {
 namespace {
-using EncodedAudioSink = AudioSinkInterface<std::shared_ptr<Buffer8>>;
+using EncodedAudioSink = AudioSinkInterface<MediaPacket>;
 using VideoSource = VideoSourceInterface<std::shared_ptr<VideoFrame>>;
 using EncodedVideoSink = VideoSinkInterface<EncodedImage>;
 }  // namespace

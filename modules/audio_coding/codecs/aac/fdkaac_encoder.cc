@@ -11,6 +11,7 @@
 #include "base/logging.h"
 #include "base/types.h"
 #include "common/media_errors.h"
+#include "common/media_packet.h"
 #include "third_party/fdk-aac/src/libAACenc/include/aacenc_lib.h"
 #include "third_party/fdk-aac/src/libAACenc/src/aacenc.h"
 #include "third_party/fdk-aac/src/libSYS/include/FDK_audio.h"
@@ -212,14 +213,31 @@ status_t FDKAACEncoder::Encode(const std::shared_ptr<AudioFrame>& frame) {
     return UNKNOWN_ERROR;
   }
 
-  // out_frame->timestamp_ = frame->timestamp_;
+  MediaPacket packet = MediaPacket::Create(out_bytes);
+  packet.SetMediaType(MediaType::AUDIO);
+  packet.SetData((uint8_t*)out_frame->data(), out_bytes);
+  auto packet_info = packet.audio_info();
+  DCHECK(packet_info != nullptr);
+  packet_info->timestamp_us = frame->timestamp_;
+  packet_info->codec_id = CodecId::AV_CODEC_ID_AAC;
+  packet_info->sample_rate_hz = frame->sample_rate_hz_;
+  packet_info->channels = frame->num_channels_;
+  packet_info->samples_per_channel = frame->samples_per_channel_;
+  packet_info->bits_per_sample = 16;
 
-  std::shared_ptr<Buffer8> buffer = std::make_shared<Buffer8>(out_bytes);
-  memcpy(buffer->data(), out_frame->data(), out_bytes);
+  LOG(LS_VERBOSE) << "packet.size:" << out_bytes
+                  << ", ts:" << packet_info->timestamp_us;
 
   if (callback_) {
-    callback_->OnEncoded(buffer);
+    callback_->OnEncoded(packet);
   }
+
+  // std::shared_ptr<Buffer8> buffer = std::make_shared<Buffer8>(out_bytes);
+  // memcpy(buffer->data(), out_frame->data(), out_bytes);
+
+  // if (callback_) {
+  //   callback_->OnEncoded(buffer);
+  // }
 
   return OK;
 }

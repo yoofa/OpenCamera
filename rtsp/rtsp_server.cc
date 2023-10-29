@@ -229,15 +229,16 @@ void RtspServer::OnRequestVideoSink(const std::shared_ptr<Message>& msg) {
 void RtspServer::OnPullAudioSource() {
   if (!audio_queue_->queue().empty()) {
     LOG(LS_VERBOSE) << "OnPullAudioSource";
-    auto buffer = audio_queue_->queue().front();
+    auto packet = audio_queue_->queue().front();
+    auto packet_info = packet.audio_info();
     audio_queue_->queue().pop();
     xop::AVFrame frame = {0};
     frame.type = 1;
-    frame.size = buffer->size();
-    // frame.timestamp = buffer->timestamp();
+    frame.size = packet.size();
+    frame.timestamp = packet_info->timestamp_us;
 
     frame.buffer.reset(new uint8_t[frame.size]);
-    memcpy(frame.buffer.get(), buffer->data(), frame.size);
+    memcpy(frame.buffer.get(), packet.data(), frame.size);
 
     LOG(LS_VERBOSE) << "push audio frame, size: " << frame.size
                     << ", timestamp: " << frame.timestamp;

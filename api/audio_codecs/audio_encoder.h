@@ -12,6 +12,7 @@
 #include "base/buffer.h"
 #include "base/types.h"
 #include "common/audio_codec_property.h"
+#include "common/media_packet.h"
 
 namespace avp {
 
@@ -20,7 +21,7 @@ class AudioEncoder {
   class EncodedCallback {
    public:
     virtual ~EncodedCallback() = default;
-    virtual void OnEncoded(const std::shared_ptr<Buffer8> frame) = 0;
+    virtual void OnEncoded(const MediaPacket packet) = 0;
   };
 
   AudioEncoder() = default;

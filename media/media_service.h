@@ -29,7 +29,7 @@ namespace avp {
 class MediaService : public Handler {
  public:
   using EncodedAudioSinkWrapper =
-      std::shared_ptr<AudioSinkWrapper<std::shared_ptr<Buffer8>>>;
+      std::shared_ptr<AudioSinkWrapper<MediaPacket>>;
 
   MediaService(AppConfig appConfig, std::shared_ptr<Message> notify);
   ~MediaService();
@@ -53,14 +53,12 @@ class MediaService : public Handler {
   void RequesteKeyFrame();
 
   void AddEncodedAudioSink(
-      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
-          audio_sink,
+      const std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
       int32_t stream_id,
       CodecId codec_id);
 
   void RemoveEncodedAudioSink(
-      const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
-          audio_sink,
+      const std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
       CodecId codec_id);
 
   enum {

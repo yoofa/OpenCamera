@@ -18,12 +18,12 @@ AudioStreamSender::AudioStreamSender(base::TaskRunner* transport_runner)
 
 AudioStreamSender::~AudioStreamSender() {}
 
-void AudioStreamSender::OnFrame(const std::shared_ptr<Buffer8> frame) {
-  transport_runner_->PostTask([this, frame = std::move(frame)]() {
+void AudioStreamSender::OnFrame(const MediaPacket packet) {
+  transport_runner_->PostTask([this, packet = std::move(packet)]() {
     AVP_DCHECK_RUN_ON(transport_runner_);
 
     for (auto& sink : sinks_) {
-      sink->OnFrame(frame);
+      sink->OnFrame(packet);
     }
   });
 }
@@ -49,7 +49,7 @@ void AudioStreamSender::AddAudioSink(const std::shared_ptr<AudioSinkT> sink) {
 }
 
 void AudioStreamSender::RemoveAudioSink(
-    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>> sink) {
+    const std::shared_ptr<AudioSinkT> sink) {
   transport_runner_->PostTask([this, sink = std::move(sink)]() {
     AVP_DCHECK_RUN_ON(transport_runner_);
 

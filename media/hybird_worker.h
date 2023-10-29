@@ -51,11 +51,11 @@ class HybirdWorker : public MediaWorker {
   void RequestKeyFrame() override;
 
   void AddEncodedAudioSink(
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
+      std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
       int32_t stream_id,
       CodecId codec_id) override;
   void RemoveEncodedAudioSink(
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
+      std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
       CodecId codec_id) override;
 
   void AddAudioStreamReceiver() override;

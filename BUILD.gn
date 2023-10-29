@@ -106,6 +106,7 @@ oc_test("oc_unittests") {
   testonly = true
   deps = [
     "api/video/test:oc_api_video_unittests",
+    "common:media_foundation_unittests",
     "media/test:oc_media_unittests",
     "test:test_main",
   ]

@@ -15,6 +15,7 @@
 #include "api/audio_codecs/audio_encoder_factory.h"
 #include "base/task_util/task_runner.h"
 #include "base/task_util/task_runner_factory.h"
+#include "common/media_packet.h"
 #include "media/audio/audio_stream_sender.h"
 
 namespace avp {
@@ -28,7 +29,7 @@ class AudioSendStream : public AudioEncoder::EncodedCallback {
 
   void SendAudioData(std::shared_ptr<AudioFrame> audio_frame);
 
-  void OnEncoded(std::shared_ptr<Buffer8> frame) override;
+  void OnEncoded(const MediaPacket packet) override;
 
   size_t samples_per_channel() const { return samples_per_channel_; }
   int sample_rate_hz() const { return sample_rate_hz_; }

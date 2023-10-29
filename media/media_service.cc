@@ -33,7 +33,7 @@ namespace avp {
 namespace {
 using VideoSource = VideoSourceInterface<std::shared_ptr<VideoFrame>>;
 using EncodedVideoSink = VideoSinkInterface<EncodedImage>;
-using EncodedAudioSink = AudioSinkInterface<std::shared_ptr<Buffer8>>;
+using EncodedAudioSink = AudioSinkInterface<MediaPacket>;
 
 }  // namespace
 
@@ -116,8 +116,7 @@ void MediaService::RequesteKeyFrame() {
 }
 
 void MediaService::AddEncodedAudioSink(
-    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
-        audio_sink,
+    const std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
     int32_t stream_id,
     CodecId codec_id) {
   // find sink in audio_sinks_
@@ -127,8 +126,7 @@ void MediaService::AddEncodedAudioSink(
                          });
   CHECK(it == audio_sinks_.end());
 
-  audio_sinks_.push_back(
-      AudioSinkWrapper<std::shared_ptr<Buffer8>>::Create(audio_sink));
+  audio_sinks_.push_back(AudioSinkWrapper<MediaPacket>::Create(audio_sink));
 
   auto msg =
       std::make_shared<Message>(kWhatAddAudioRenderSink, shared_from_this());
@@ -140,8 +138,7 @@ void MediaService::AddEncodedAudioSink(
 }
 
 void MediaService::RemoveEncodedAudioSink(
-    const std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>&
-        audio_sink,
+    const std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
     CodecId codec_id) {
   auto it = std::find_if(audio_sinks_.begin(), audio_sinks_.end(),
                          [&audio_sink](const EncodedAudioSinkWrapper& sink) {
@@ -269,8 +266,8 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
       LOG(LS_INFO) << "kWhatAddAudioRenderSink";
       std::shared_ptr<MessageObject> obj;
       CHECK(message->findObject("encoded_audio_sink", obj));
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>
-          encoded_video_sink = std::dynamic_pointer_cast<EncodedAudioSink>(obj);
+      std::shared_ptr<AudioSinkInterface<MediaPacket>> encoded_video_sink =
+          std::dynamic_pointer_cast<EncodedAudioSink>(obj);
       DCHECK(encoded_video_sink != nullptr);
 
       int32_t stream_id;
@@ -290,8 +287,8 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
     case kWhatRemoveAudioRenderSink: {
       std::shared_ptr<MessageObject> obj;
       CHECK(message->findObject("encoded_audio_sink", obj));
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>
-          encoded_video_sink = std::dynamic_pointer_cast<EncodedAudioSink>(obj);
+      std::shared_ptr<AudioSinkInterface<MediaPacket>> encoded_video_sink =
+          std::dynamic_pointer_cast<EncodedAudioSink>(obj);
       DCHECK(encoded_video_sink != nullptr);
 
       int32_t codec_id;

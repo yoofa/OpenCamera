@@ -163,7 +163,7 @@ void HybirdWorker::RequestKeyFrame() {
 }
 
 void HybirdWorker::AddEncodedAudioSink(
-    std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
+    std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
     int32_t stream_id,
     CodecId codec_id) {
   worker_task_runner_.PostTask([this, audio_sink, stream_id, codec_id]() {
@@ -207,7 +207,7 @@ void HybirdWorker::AddEncodedAudioSink(
 }
 
 void HybirdWorker::RemoveEncodedAudioSink(
-    std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
+    std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
     CodecId codec_id) {
   worker_task_runner_.PostTask([this, audio_sink, codec_id]() {
     AVP_DCHECK_RUN_ON(&worker_task_runner_);

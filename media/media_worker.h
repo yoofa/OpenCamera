@@ -52,11 +52,11 @@ class MediaWorker {
   virtual void RequestKeyFrame() {}
 
   virtual void AddEncodedAudioSink(
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
+      std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
       int32_t stream_id,
       CodecId codec_id) = 0;
   virtual void RemoveEncodedAudioSink(
-      std::shared_ptr<AudioSinkInterface<std::shared_ptr<Buffer8>>>& audio_sink,
+      std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
       CodecId codec_id) = 0;
 
   virtual void AddAudioStreamReceiver() = 0;

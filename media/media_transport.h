@@ -22,7 +22,7 @@
 namespace avp {
 class MediaTransport {
   using EncodedVideoSink = std::shared_ptr<VideoSinkInterface<EncodedImage>>;
-  using EncodedAudioBuffer = std::shared_ptr<Buffer8>;
+  using EncodedAudioBuffer = MediaPacket;
   using EncodedAudioSink =
       std::shared_ptr<AudioSinkInterface<EncodedAudioBuffer>>;
 

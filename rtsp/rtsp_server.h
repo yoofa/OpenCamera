@@ -18,6 +18,7 @@
 #include "common/codec_id.h"
 #include "common/handler.h"
 #include "common/looper.h"
+#include "common/media_packet.h"
 #include "common/media_source.h"
 #include "common/message.h"
 #include "third_party/rtsp_server/src/src/xop/RtspServer.h"
@@ -35,7 +36,7 @@ class RtspServer : public Handler {
     std::queue<EncodedImage> queue_;
   };
 
-  class AudioQueue : public AudioSinkInterface<std::shared_ptr<Buffer8>>,
+  class AudioQueue : public AudioSinkInterface<MediaPacket>,
                      public MessageObject {
    public:
     void SetSampleRate(int sample_rate) { set_sample_rate(sample_rate); }
@@ -43,13 +44,11 @@ class RtspServer : public Handler {
       set_channel_count(channel_count);
     }
 
-    void OnFrame(const std::shared_ptr<Buffer8> frame) override {
-      queue_.push(frame);
-    }
-    std::queue<std::shared_ptr<Buffer8>>& queue() { return queue_; }
+    void OnFrame(const MediaPacket frame) override { queue_.push(frame); }
+    std::queue<MediaPacket>& queue() { return queue_; }
 
    private:
-    std::queue<std::shared_ptr<Buffer8>> queue_;
+    std::queue<MediaPacket> queue_;
   };
 
   RtspServer(std::shared_ptr<Message> notify);

@@ -45,11 +45,11 @@ void AudioSendStream::SendAudioData(std::shared_ptr<AudioFrame> audio_frame) {
   });
 }
 
-void AudioSendStream::OnEncoded(std::shared_ptr<Buffer8> frame) {
+void AudioSendStream::OnEncoded(const MediaPacket packet) {
   LOG(LS_VERBOSE) << "OnEncoded";
-  task_runner_.PostTask([this, frame = std::move(frame)]() {
+  task_runner_.PostTask([this, packet = std::move(packet)]() {
     AVP_DCHECK_RUN_ON(&task_runner_);
-    audio_stream_sender_->OnFrame(std::move(frame));
+    audio_stream_sender_->OnFrame(std::move(packet));
   });
 }
 

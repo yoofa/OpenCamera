@@ -54,7 +54,7 @@ void VideoSendStream::RequestKeyFrame() {
 EncodedImageCallback::Result VideoSendStream::OnEncodedImage(
     const EncodedImage& encoded_image) {
   video_stream_sender_->OnEncodedImage(encoded_image);
-  return Result(Result::OK);
+  return Result(Result::ENCODED_OK);
 }
 
 void VideoSendStream::ReConfigureEncoder(VideoEncoderConfig config) {

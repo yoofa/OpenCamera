@@ -53,6 +53,8 @@ static_library("net") {
     "src/src/net/log.h",
   ]
 
+  cflags_cc = [ "-Wno-unreachable-code-return" ]
+
   public_configs = [ ":rtsp_server_config" ]
 }
 
@@ -90,6 +92,11 @@ static_library("xop") {
     "src/src/xop/rtsp.h",
   ]
 
+  cflags_cc = [
+    "-Wno-unqualified-std-cast-call",
+    "-Wno-unused-but-set-variable",
+  ]
+
   public_configs = [ ":rtsp_server_config" ]
 }
 
@@ -104,6 +111,8 @@ config("rtsp_server_config") {
     "-Wno-tautological-constant-out-of-range-compare",
     "-Wno-pessimizing-move",
     "-Wno-missing-braces",
+    "-Wno-null-pointer-subtraction",
+    "-Wno-shadow",
     "-Wno-unused-lambda-capture",
     "-Wno-exit-time-destructors",
   ]

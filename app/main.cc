@@ -47,7 +47,6 @@ int main(int argc, char** argv) {
       case LongOpts::help: {
         puts(help_str);
         exit(0);
-        break;
       }
       case LongOpts::config: {
         configFile = optarg;

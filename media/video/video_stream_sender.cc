@@ -30,7 +30,7 @@ EncodedImageCallback::Result VideoStreamSender::OnEncodedImage(
   lock_guard guard(sink_lock_);
 
   broadcaster_.OnFrame(encoded_image);
-  return Result(Result::OK);
+  return Result(Result::ENCODED_OK);
 }
 
 void VideoStreamSender::AddVideoSink(

@@ -22,7 +22,7 @@ class EncodedImageCallback {
 
   struct Result {
     enum Error {
-      OK,
+      ENCODED_OK,
 
       // Failed to send the packet.
       ERROR_SEND_FAILED,

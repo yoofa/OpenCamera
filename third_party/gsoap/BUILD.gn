@@ -53,6 +53,8 @@ config("gsoap_config") {
   cflags = [
     "-Wno-unreachable-code",
     "-Wno-implicit-function-declaration",
+    "-Wno-implicit-fallthrough",
+    "-Wno-shadow",
     "-Wno-format",
   ]
 

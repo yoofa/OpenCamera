@@ -235,5 +235,7 @@ config("fdk-aac_config") {
     "-Wno-missing-braces",
     "-Wno-unused-lambda-capture",
     "-Wno-exit-time-destructors",
+
+    "-Wno-unused-but-set-variable",
   ]
 }

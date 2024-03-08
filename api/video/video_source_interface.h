@@ -13,7 +13,7 @@
 
 #include "api/video/video_sink_interface.h"
 
-namespace avp {
+namespace ave {
 
 struct VideoSinkWants {
   struct FrameSize {
@@ -84,6 +84,6 @@ class VideoSourceInterface {
                                const VideoSinkWants& wants) = 0;
   virtual void RemoveSink(VideoSinkInterface<VideoFrameT>* sink) = 0;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_SOURCE_INTERFACE_H */

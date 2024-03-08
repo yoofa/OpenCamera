@@ -13,7 +13,7 @@
 #include "api/video/video_frame_buffer.h"
 #include "base/memory/aligned_memory.h"
 
-namespace avp {
+namespace ave {
 
 class YUYVBuffer : public YUYVBufferInterface {
  protected:
@@ -69,9 +69,9 @@ class YUYVBuffer : public YUYVBufferInterface {
   const size_t width_;
   const size_t height_;
   const size_t stride_yuyv_;
-  const std::unique_ptr<uint8_t, AlignedFreeDeleter> data_;
+  const std::unique_ptr<uint8_t, base::AlignedFreeDeleter> data_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !YUYV_BUFFER_H */

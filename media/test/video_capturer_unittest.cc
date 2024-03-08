@@ -17,7 +17,7 @@
 #include "test/gtest.h"
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
-namespace avp {
+namespace ave {
 using namespace std::chrono_literals;
 namespace {
 
@@ -170,4 +170,4 @@ TEST(VideoCapturerTest, VideoProcessorTest) {
   TestVideoProcessor processor;
 }
 
-}  // namespace avp
+}  // namespace ave

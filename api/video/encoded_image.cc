@@ -8,7 +8,7 @@
 #include "encoded_image.h"
 #include <cstdint>
 
-namespace avp {
+namespace ave {
 EncodedImageBuffer::EncodedImageBuffer(size_t size, protect_parameter p)
     : size_(size), buffer_(static_cast<uint8_t*>(malloc(size))) {}
 
@@ -54,4 +54,4 @@ EncodedImage& EncodedImage::operator=(EncodedImage&& rhs) = default;
 EncodedImage& EncodedImage::operator=(const EncodedImage& rhs) = default;
 EncodedImage::~EncodedImage() = default;
 
-}  // namespace avp
+}  // namespace ave

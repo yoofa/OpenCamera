@@ -15,7 +15,7 @@
 #include "third_party/libyuv/include/libyuv.h"
 #include "third_party/libyuv/include/libyuv/planar_functions.h"
 
-namespace avp {
+namespace ave {
 
 namespace {
 
@@ -40,12 +40,12 @@ NV12Buffer::NV12Buffer(size_t width,
       stride_y_(stride_y),
       stride_uv_(stride_uv),
       data_(static_cast<uint8_t*>(
-          AlignedMalloc(NV12DataSize(height_, stride_y_, stride_uv),
-                        kBufferAlignment))) {
-  DCHECK_GT(width, 0);
-  DCHECK_GT(height, 0);
-  DCHECK_GE(stride_y, width);
-  DCHECK_GE(stride_uv, (width + width % 2));
+          base::AlignedMalloc(NV12DataSize(height_, stride_y_, stride_uv),
+                              kBufferAlignment))) {
+  AVE_DCHECK_GT(width, 0);
+  AVE_DCHECK_GT(height, 0);
+  AVE_DCHECK_GE(stride_y, width);
+  AVE_DCHECK_GE(stride_uv, (width + width % 2));
 }
 
 NV12Buffer::~NV12Buffer() = default;
@@ -138,12 +138,12 @@ void NV12Buffer::CropAndScaleFrom(const NV12BufferInterface& src,
                                   size_t offset_y,
                                   size_t crop_width,
                                   size_t crop_height) {
-  CHECK_LE(crop_width, src.width());
-  CHECK_LE(crop_height, src.height());
-  CHECK_LE(crop_width + offset_x, src.width());
-  CHECK_LE(crop_height + offset_y, src.height());
-  CHECK_GE(offset_x, 0);
-  CHECK_GE(offset_y, 0);
+  AVE_CHECK_LE(crop_width, src.width());
+  AVE_CHECK_LE(crop_height, src.height());
+  AVE_CHECK_LE(crop_width + offset_x, src.width());
+  AVE_CHECK_LE(crop_height + offset_y, src.height());
+  AVE_CHECK_GE(offset_x, 0);
+  AVE_CHECK_GE(offset_y, 0);
 
   // Make sure offset is even so that u/v plane becomes aligned.
   const int uv_offset_x = offset_x / 2;
@@ -160,7 +160,7 @@ void NV12Buffer::CropAndScaleFrom(const NV12BufferInterface& src,
                               StrideY(), MutableDataUV(), StrideUV(), width(),
                               height(), libyuv::kFilterBox);
 
-  DCHECK_EQ(res, 0);
+  AVE_DCHECK_EQ(res, 0);
 }
 
-}  // namespace avp
+}  // namespace ave

@@ -10,10 +10,10 @@
 
 #include "media/camera_info/video_source_factory.h"
 
-namespace avp {
+namespace ave {
 
 std::unique_ptr<VideoSourceFactory> CreateDefaultVideoSourceFactory();
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !DEFAULT_VIDEO_SOURCE_FACTORY_H */

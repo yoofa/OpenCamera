@@ -18,7 +18,7 @@
 #include "base/task_util/task_runner_factory.h"
 #include "base/thread_annotation.h"
 
-namespace avp {
+namespace ave {
 class VideoStreamEncoder : public VideoStreamEncoderInterface {
  public:
   VideoStreamEncoder(base::TaskRunnerFactory* task_runner_factory,
@@ -59,9 +59,9 @@ class VideoStreamEncoder : public VideoStreamEncoderInterface {
   void EncodeVideoFrame(const std::shared_ptr<VideoFrame>& frame);
 
   // Create or reconfigure the encoder.
-  void ReConfigureEncoder() AVP_RUN_ON(&encoder_runner_);
+  void ReConfigureEncoder() AVE_RUN_ON(&encoder_runner_);
 
-  void ReleaseEncoder() AVP_RUN_ON(&encoder_runner_);
+  void ReleaseEncoder() AVE_RUN_ON(&encoder_runner_);
 
   base::TaskRunnerFactory* task_runner_factory_;
   VideoEncoderFactory* encoder_factory_;
@@ -84,9 +84,9 @@ class VideoStreamEncoder : public VideoStreamEncoderInterface {
 
   base::TaskRunner encoder_runner_;
 
-  AVP_DISALLOW_COPY_AND_ASSIGN(VideoStreamEncoder);
+  AVE_DISALLOW_COPY_AND_ASSIGN(VideoStreamEncoder);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_STREAM_ENCODER_H */

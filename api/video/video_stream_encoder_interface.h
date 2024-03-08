@@ -16,7 +16,7 @@
 #include "api/video_codecs/video_encoder.h"
 #include "api/video_codecs/video_encoder_config.h"
 
-namespace avp {
+namespace ave {
 class VideoStreamEncoderInterface
     : public VideoSinkInterface<std::shared_ptr<VideoFrame>> {
  public:
@@ -44,6 +44,6 @@ class VideoStreamEncoderInterface
   // guaranteed that no encoded frames will be delivered to the sink.
   virtual void Stop() = 0;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_STREAM_ENCODER_INTERFACE_H */

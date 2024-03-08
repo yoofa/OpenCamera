@@ -23,7 +23,7 @@
 #include "common/message.h"
 #include "third_party/rtsp_server/src/src/xop/RtspServer.h"
 
-namespace avp {
+namespace ave {
 class RtspServer : public Handler {
  public:
   class VideoQueue : public VideoSinkInterface<EncodedImage>,
@@ -116,6 +116,6 @@ class RtspServer : public Handler {
 
   std::mutex mutex_;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !RTSPSERVER_H */

@@ -12,7 +12,7 @@
 #include "common/media_source.h"
 #include "media/camera_info/video_source_factory.h"
 
-namespace avp {
+namespace ave {
 class V4L2VideoSourceForCameraInfo : public MediaSource {
  public:
   V4L2VideoSourceForCameraInfo() = delete;
@@ -56,6 +56,6 @@ class V4L2VideoSourceForCameraInfo : public MediaSource {
 
 std::unique_ptr<VideoSourceFactory> CreateV4l2VideoSourceFactory();
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !V4L2_VIDEO_SOURCE_H */

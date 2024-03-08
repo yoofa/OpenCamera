@@ -16,7 +16,7 @@
 #include "common/codec_id.h"
 #include "common/video_codec_property.h"
 
-namespace avp {
+namespace ave {
 // The `VideoStreamConfig` struct describes a simulcast layer, or "stream".
 struct VideoStreamConfig {
   VideoStreamConfig();
@@ -178,6 +178,6 @@ class VideoEncoderConfig {
   VideoEncoderConfig(const VideoEncoderConfig&);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_ENCODER_CONFIG_H */

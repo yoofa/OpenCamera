@@ -8,7 +8,7 @@
 #include "audio_frame.h"
 
 #include "base/checks.h"
-namespace avp {
+namespace ave {
 
 AudioFrame::AudioFrame() {
   // Visual Studio doesn't like this in the class definition.
@@ -42,12 +42,12 @@ void AudioFrame::UpdateFrame(uint32_t timestamp,
   num_channels_ = num_channels;
   channel_layout_ = GuessChannelLayout(num_channels);
   if (channel_layout_ != CHANNEL_LAYOUT_UNSUPPORTED) {
-    DCHECK_EQ(num_channels,
-              (size_t)ChannelLayoutToChannelCount(channel_layout_));
+    AVE_DCHECK_EQ(num_channels,
+                  (size_t)ChannelLayoutToChannelCount(channel_layout_));
   }
 
   const size_t length = samples_per_channel * num_channels;
-  CHECK_LE(length, kMaxDataSizeSamples);
+  AVE_CHECK_LE(length, kMaxDataSizeSamples);
   if (data != nullptr) {
     memcpy(data_, data, sizeof(int16_t) * length);
     muted_ = false;
@@ -71,7 +71,7 @@ void AudioFrame::CopyFrom(const AudioFrame& src) {
   absolute_capture_timestamp_ms_ = src.absolute_capture_timestamp_ms();
 
   const size_t length = samples_per_channel_ * num_channels_;
-  CHECK_LE(length, kMaxDataSizeSamples);
+  AVE_CHECK_LE(length, kMaxDataSizeSamples);
   if (!src.muted()) {
     memcpy(data_, src.data(), sizeof(int16_t) * length);
     muted_ = false;
@@ -104,4 +104,4 @@ const int16_t* AudioFrame::empty_data() {
   return &null_data[0];
 }
 
-}  // namespace avp
+}  // namespace ave

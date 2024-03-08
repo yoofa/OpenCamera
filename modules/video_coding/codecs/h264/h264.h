@@ -5,15 +5,15 @@
  * Distributed under terms of the GPLv2 license.
  */
 
-#ifndef AVP_VIDEO_CODECS_H264_H
-#define AVP_VIDEO_CODECS_H264_H
+#ifndef AVE_VIDEO_CODECS_H264_H
+#define AVE_VIDEO_CODECS_H264_H
 
 #include <memory>
 
 #include "api/video_codecs/video_encoder.h"
 #include "common/video_codec_property.h"
 
-namespace avp {
+namespace ave {
 
 class H264Encoder : public VideoEncoder {
  public:
@@ -23,6 +23,6 @@ class H264Encoder : public VideoEncoder {
   static std::unique_ptr<H264Encoder> Create();
 };
 
-}  // namespace avp
+}  // namespace ave
 
-#endif /* !AVP_VIDEO_CODECS_H264_H */
+#endif /* !AVE_VIDEO_CODECS_H264_H */

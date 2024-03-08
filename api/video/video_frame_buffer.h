@@ -12,7 +12,7 @@
 #include <memory>
 #include "base/types.h"
 
-namespace avp {
+namespace ave {
 
 class I420BufferInterface;
 
@@ -205,6 +205,6 @@ class YUYVBufferInterface : public Packed8Buffer {
   ~YUYVBufferInterface() override {}
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_FRAME_BUFFER_H */

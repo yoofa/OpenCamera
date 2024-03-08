@@ -23,7 +23,7 @@
 #include "common/looper.h"
 #include "common/message.h"
 
-namespace avp {
+namespace ave {
 
 VideoCapturer::VideoCapturer(std::shared_ptr<Message> capture_info)
     : capture_info_(std::move(capture_info)),
@@ -116,4 +116,4 @@ status_t VideoCapturer::SetProcessor(
   return OK;
 }
 
-}  // namespace avp
+}  // namespace ave

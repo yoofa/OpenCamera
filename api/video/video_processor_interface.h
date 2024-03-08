@@ -14,7 +14,7 @@
 #include "api/video/video_sink_interface.h"
 #include "api/video/video_source_interface.h"
 
-namespace avp {
+namespace ave {
 
 template <typename VideoFrameT>
 class VideoProcessorSink {
@@ -55,6 +55,6 @@ class VideoProcessorInterface : public VideoSourceInterface<VideoFrameT>,
   VideoSinkInterface<VideoFrameT>* video_sink_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_PROCESSOR_INTERFACE_H */

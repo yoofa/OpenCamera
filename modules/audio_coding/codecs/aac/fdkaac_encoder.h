@@ -11,7 +11,7 @@
 #include "api/audio_codecs/audio_encoder.h"
 #include "third_party/fdk-aac/src/libAACenc/include/aacenc_lib.h"
 
-namespace avp {
+namespace ave {
 
 class FDKAACEncoder : public AudioEncoder {
  public:
@@ -33,5 +33,5 @@ class FDKAACEncoder : public AudioEncoder {
   HANDLE_AACENCODER encoder_;
 };
 
-}  // namespace avp
+}  // namespace ave
 #endif /* !FDKAAC_ENCODER_H */

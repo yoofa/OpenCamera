@@ -16,7 +16,7 @@
 #include "base/checks.h"
 #include "base/types.h"
 
-namespace avp {
+namespace ave {
 
 class EncodedImageBufferInterface {
  public:
@@ -75,7 +75,7 @@ class EncodedImage {
 
   void SetSize(size_t new_size) {
     // Allow set_size(0) even if we have no buffer.
-    DCHECK_LE(new_size, new_size == 0 ? 0 : Capacity());
+    AVE_DCHECK_LE(new_size, new_size == 0 ? 0 : Capacity());
     size_ = new_size;
   }
 
@@ -111,6 +111,6 @@ class EncodedImage {
   uint64_t timestamp_us_ = 0;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !ENCODED_IMAGE_H */

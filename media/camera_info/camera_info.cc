@@ -22,7 +22,7 @@
 #include "v4l2_video_source.h"
 #include "video_source_factory.h"
 
-using namespace avp;
+using namespace ave;
 
 std::mutex mutex_;
 std::condition_variable condition_;
@@ -79,7 +79,7 @@ void ImageWriter::onMessageReceived(const std::shared_ptr<Message>& message) {
 }
 
 int main(int argc, char* argv[]) {
-  avp::LogMessage::LogToDebug(avp::LogSeverity::LS_VERBOSE);
+  ave::base::LogMessage::LogToDebug(LS_VERBOSE);
 
   auto writer = std::make_shared<ImageWriter>("frame.yuv");
   writer->init();
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
 
   int ret = source->start(&metaData);
 
-  LOG(LS_INFO) << "start ret: " << ret;
+  AVE_LOG(LS_INFO) << "start ret: " << ret;
 
   if (ret < 0) {
     return ret;
@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < 100; i++) {
     std::shared_ptr<Buffer> buffer;
     ret = source->read(buffer);
-    LOG(LS_INFO) << "read ret:" << ret << ", size:" << buffer->size();
+    AVE_LOG(LS_INFO) << "read ret:" << ret << ", size:" << buffer->size();
     if (ret != OK) {
       continue;
     }
@@ -118,12 +118,12 @@ int main(int argc, char* argv[]) {
   }
   source->stop();
 
-  LOG(LS_INFO) << "source stop";
+  AVE_LOG(LS_INFO) << "source stop";
 
   auto msg = std::make_shared<Message>(ImageWriter::kWhatStop, writer);
   msg->post();
 
   std::unique_lock<std::mutex> l_(mutex_);
   condition_.wait(l_);
-  LOG(LS_INFO) << "end";
+  AVE_LOG(LS_INFO) << "end";
 }

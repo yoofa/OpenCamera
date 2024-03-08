@@ -11,7 +11,7 @@
 #include "api/video/video_frame_buffer.h"
 #include "base/memory/aligned_memory.h"
 
-namespace avp {
+namespace ave {
 
 // NV12 is a biplanar encoding format, with full-resolution Y and
 // half-resolution interleved UV. More information can be found at
@@ -79,9 +79,9 @@ class NV12Buffer : public NV12BufferInterface {
   const size_t height_;
   const size_t stride_y_;
   const size_t stride_uv_;
-  const std::unique_ptr<uint8_t, AlignedFreeDeleter> data_;
+  const std::unique_ptr<uint8_t, base::AlignedFreeDeleter> data_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !NV12_BUFFER_H */

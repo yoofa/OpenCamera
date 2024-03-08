@@ -11,7 +11,7 @@
 #include "base/sequence_checker.h"
 #include "base/task_util/task_runner.h"
 
-namespace avp {
+namespace ave {
 
 AudioStreamSender::AudioStreamSender(base::TaskRunner* transport_runner)
     : transport_runner_(transport_runner) {}
@@ -20,7 +20,7 @@ AudioStreamSender::~AudioStreamSender() {}
 
 void AudioStreamSender::OnFrame(const MediaPacket packet) {
   transport_runner_->PostTask([this, packet = std::move(packet)]() {
-    AVP_DCHECK_RUN_ON(transport_runner_);
+    AVE_DCHECK_RUN_ON(transport_runner_);
 
     for (auto& sink : sinks_) {
       sink->OnFrame(packet);
@@ -30,7 +30,7 @@ void AudioStreamSender::OnFrame(const MediaPacket packet) {
 
 void AudioStreamSender::AddAudioSink(const std::shared_ptr<AudioSinkT> sink) {
   transport_runner_->PostTask([this, sink = std::move(sink)]() {
-    AVP_DCHECK_RUN_ON(transport_runner_);
+    AVE_DCHECK_RUN_ON(transport_runner_);
 
     auto it = std::find_if(sinks_.begin(), sinks_.end(),
                            [&sink](const std::shared_ptr<AudioSinkT>& s) {
@@ -38,20 +38,20 @@ void AudioStreamSender::AddAudioSink(const std::shared_ptr<AudioSinkT> sink) {
                            });
 
     if (it != sinks_.end()) {
-      LOG(LS_WARNING)
+      AVE_LOG(LS_WARNING)
           << "AudioStreamSender::AddAudioSink() sink already exists";
       return;
     }
 
     sinks_.push_back(sink);
-    LOG(LS_INFO) << "AudioStreamSender::AddAudioSink()";
+    AVE_LOG(LS_INFO) << "AudioStreamSender::AddAudioSink()";
   });
 }
 
 void AudioStreamSender::RemoveAudioSink(
     const std::shared_ptr<AudioSinkT> sink) {
   transport_runner_->PostTask([this, sink = std::move(sink)]() {
-    AVP_DCHECK_RUN_ON(transport_runner_);
+    AVE_DCHECK_RUN_ON(transport_runner_);
 
     auto it = std::find_if(sinks_.begin(), sinks_.end(),
                            [&sink](const std::shared_ptr<AudioSinkT>& s) {
@@ -59,14 +59,14 @@ void AudioStreamSender::RemoveAudioSink(
                            });
 
     if (it == sinks_.end()) {
-      LOG(LS_WARNING)
+      AVE_LOG(LS_WARNING)
           << "AudioStreamSender::RemoveAudioSink() sink does not exist";
       return;
     }
 
     sinks_.erase(it);
-    LOG(LS_INFO) << "AudioStreamSender::RemoveAudioSink()";
+    AVE_LOG(LS_INFO) << "AudioStreamSender::RemoveAudioSink()";
   });
 }
 
-}  // namespace avp
+}  // namespace ave

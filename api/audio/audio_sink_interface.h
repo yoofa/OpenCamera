@@ -9,7 +9,7 @@
 #define AUDIO_SINK_INTERFACE_H
 #include "base/types.h"
 
-namespace avp {
+namespace ave {
 
 template <typename AudioFrame>
 class AudioSinkInterface {
@@ -32,6 +32,6 @@ class AudioSinkInterface {
   uint32_t sample_rate_ = 0;
   uint16_t channel_count_ = 0;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_SINK_INTERFACE_H */

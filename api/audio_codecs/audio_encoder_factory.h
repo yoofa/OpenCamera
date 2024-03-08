@@ -13,7 +13,7 @@
 #include "api/audio_codecs/audio_encoder.h"
 #include "common/codec_id.h"
 
-namespace avp {
+namespace ave {
 class AudioEncoderFactory {
  public:
   virtual ~AudioEncoderFactory() = default;
@@ -21,6 +21,6 @@ class AudioEncoderFactory {
   virtual std::unique_ptr<AudioEncoder> CreateAudioEncoder(
       CodecId codec_id) = 0;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_ENCODER_FACTORY_H */

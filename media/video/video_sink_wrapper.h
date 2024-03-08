@@ -14,7 +14,7 @@
 #include "api/video/video_sink_interface.h"
 #include "common/message.h"
 
-namespace avp {
+namespace ave {
 class VideoSinkWrapper : public VideoSinkInterface<EncodedImage>,
                          public MessageObject {
  public:
@@ -30,6 +30,6 @@ class VideoSinkWrapper : public VideoSinkInterface<EncodedImage>,
   std::shared_ptr<VideoSinkInterface<EncodedImage>> sink_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_SINK_WRAPPER_H */

@@ -13,7 +13,7 @@
 #include "common/media_source.h"
 #include "common/message.h"
 
-namespace avp {
+namespace ave {
 class VideoSourceFactory {
  public:
   virtual ~VideoSourceFactory() = default;
@@ -25,6 +25,6 @@ class VideoSourceFactory {
       std::shared_ptr<Message> video_info) = 0;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_SOURCE_FACTORY_H */

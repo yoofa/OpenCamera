@@ -24,7 +24,7 @@
 #include "media/video/video_send_stream.h"
 #include "media/video/video_stream_sender.h"
 
-namespace avp {
+namespace ave {
 
 class HybirdWorker : public MediaWorker {
   using VideoSource =
@@ -95,6 +95,6 @@ class HybirdWorker : public MediaWorker {
       GUARDED_BY(worker_task_runner_);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !HYBIRD_WORKER_H */

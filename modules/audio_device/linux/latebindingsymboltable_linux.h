@@ -19,10 +19,10 @@
 // supports Linux and pure C symbols.
 // See talk/sound/pulseaudiosymboltable.(h|cc) for an example.
 
-namespace avp {
+namespace ave {
 namespace adm_linux {
 
-// #ifdef AVP_LINUX
+// #ifdef AVE_LINUX
 typedef void* DllHandle;
 
 const DllHandle kInvalidDllHandle = NULL;
@@ -56,7 +56,7 @@ class LateBindingSymbolTable {
 
   // We do not use this, but we offer it for theoretical convenience.
   static const char* GetSymbolName(int index) {
-    DCHECK_LT(index, NumSymbols());
+    AVE_DCHECK_LT(index, NumSymbols());
     return kSymbolNames[index];
   }
 
@@ -97,8 +97,8 @@ class LateBindingSymbolTable {
   // Retrieves the given symbol. NOTE: Recommended to use LATESYM_GET below
   // instead of this.
   void* GetSymbol(int index) const {
-    DCHECK(IsLoaded());
-    DCHECK_LT(index, NumSymbols());
+    AVE_DCHECK(IsLoaded());
+    AVE_DCHECK_LT(index, NumSymbols());
     return symbols_[index];
   }
 
@@ -107,7 +107,7 @@ class LateBindingSymbolTable {
   bool undefined_symbols_;
   void* symbols_[SYMBOL_TABLE_SIZE];
 
-  AVP_DISALLOW_COPY_AND_ASSIGN(LateBindingSymbolTable);
+  AVE_DISALLOW_COPY_AND_ASSIGN(LateBindingSymbolTable);
 };
 
 // This macro must be invoked in a header to declare a symbol table class.
@@ -130,7 +130,7 @@ class LateBindingSymbolTable {
   extern const char* const                                     \
       ClassName##_kSymbolNames[ClassName##_SYMBOL_TABLE_SIZE]; \
                                                                \
-  typedef ::avp::adm_linux::LateBindingSymbolTable<            \
+  typedef ::ave::adm_linux::LateBindingSymbolTable<            \
       ClassName##_SYMBOL_TABLE_SIZE, ClassName##_kDllName,     \
       ClassName##_kSymbolNames>                                \
       ClassName;
@@ -159,6 +159,6 @@ class LateBindingSymbolTable {
       (inst)->GetSymbol(LATESYM_INDEXOF(ClassName, sym))))
 
 }  // namespace adm_linux
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !LATEBINDINGSYMBOLTABLE_LINUX_H */

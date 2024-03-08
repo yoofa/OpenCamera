@@ -18,22 +18,22 @@
 #include "modules/audio_device/linux/audio_device_alsa_linux.h"
 
 namespace {
-#define CHECKinitialized_() \
-  {                         \
-    if (!initialized_) {    \
-      return -1;            \
-    }                       \
+#define AVE_CHECKinitialized_() \
+  {                             \
+    if (!initialized_) {        \
+      return -1;                \
+    }                           \
   }
 
-#define CHECKinitialized__BOOL() \
-  {                              \
-    if (!initialized_) {         \
-      return false;              \
-    }                            \
+#define AVE_CHECKinitialized__BOOL() \
+  {                                  \
+    if (!initialized_) {             \
+      return false;                  \
+    }                                \
   }
 }  // namespace
 
-namespace avp {
+namespace ave {
 
 std::unique_ptr<AudioDevice> DefaultAudioDevice::Create(
     base::TaskRunnerFactory* task_runner_factory,
@@ -73,7 +73,7 @@ DefaultAudioDevice::~DefaultAudioDevice() {}
 
 int32_t DefaultAudioDevice::CreatePlatformSpecificObjects() {
   if (audio_device_ != nullptr) {
-    LOG(LS_INFO) << "Reusing provided audio device";
+    AVE_LOG(LS_INFO) << "Reusing provided audio device";
     return 0;
   }
 
@@ -82,7 +82,7 @@ int32_t DefaultAudioDevice::CreatePlatformSpecificObjects() {
   }
 
   if (audio_device_ == nullptr) {
-    LOG(LS_ERROR) << "Failed to create platform specific audio device";
+    AVE_LOG(LS_ERROR) << "Failed to create platform specific audio device";
     return -1;
   }
   return 0;
@@ -110,7 +110,7 @@ status_t DefaultAudioDevice::Init() {
   if (initialized_) {
     return OK;
   }
-  DCHECK(audio_device_);
+  AVE_DCHECK(audio_device_);
   auto status = audio_device_->Init();
   if (status != OK) {
     return status;
@@ -136,19 +136,19 @@ bool DefaultAudioDevice::Initialized() const {
 
 // Device enumeration
 int16_t DefaultAudioDevice::PlayoutDevices() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return (int16_t)audio_device_->PlayoutDevices();
 }
 
 int16_t DefaultAudioDevice::RecordingDevices() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return (int16_t)audio_device_->RecordingDevices();
 }
 
 int32_t DefaultAudioDevice::PlayoutDeviceName(uint16_t index,
                                               char name[kAdmMaxDeviceNameSize],
                                               char guid[kAdmMaxGuidSize]) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   if (name == nullptr) {
     return -1;
   }
@@ -162,7 +162,7 @@ int32_t DefaultAudioDevice::RecordingDeviceName(
     uint16_t index,
     char name[kAdmMaxDeviceNameSize],
     char guid[kAdmMaxGuidSize]) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   if (name == nullptr) {
     return -1;
   }
@@ -174,22 +174,22 @@ int32_t DefaultAudioDevice::RecordingDeviceName(
 
 // Device selection
 int32_t DefaultAudioDevice::SetPlayoutDevice(uint16_t index) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetPlayoutDevice(index);
 }
 int32_t DefaultAudioDevice::SetRecordingDevice(uint16_t index) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetRecordingDevice(index);
 }
 
 // Audio transport initialization
 int32_t DefaultAudioDevice::PlayoutIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->PlayoutIsAvailable(available);
 }
 
 int32_t DefaultAudioDevice::InitPlayout() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   if (PlayoutIsInitialized()) {
     return 0;
   }
@@ -197,17 +197,17 @@ int32_t DefaultAudioDevice::InitPlayout() {
 }
 
 bool DefaultAudioDevice::PlayoutIsInitialized() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return audio_device_->PlayoutIsInitialized();
 }
 
 int32_t DefaultAudioDevice::RecordingIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->RecordingIsAvailable(available);
 }
 
 int32_t DefaultAudioDevice::InitRecording() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   if (RecordingIsInitialized()) {
     return 0;
   }
@@ -215,13 +215,13 @@ int32_t DefaultAudioDevice::InitRecording() {
 }
 
 bool DefaultAudioDevice::RecordingIsInitialized() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return audio_device_->RecordingIsInitialized();
 }
 
 // Audio transport control
 int32_t DefaultAudioDevice::StartPlayout() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   if (Playing()) {
     return 0;
   }
@@ -229,17 +229,17 @@ int32_t DefaultAudioDevice::StartPlayout() {
   return audio_device_->StartPlayout();
 }
 int32_t DefaultAudioDevice::StopPlayout() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   int32_t ret = audio_device_->StopPlayout();
   audio_device_buffer_->StopPlayout();
   return ret;
 }
 bool DefaultAudioDevice::Playing() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return audio_device_->Playing();
 }
 int32_t DefaultAudioDevice::StartRecording() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   if (Recording()) {
     return 0;
   }
@@ -247,170 +247,170 @@ int32_t DefaultAudioDevice::StartRecording() {
   return audio_device_->StartRecording();
 }
 int32_t DefaultAudioDevice::StopRecording() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   auto result = audio_device_->StopRecording();
   audio_device_buffer_->StopRecording();
   return result;
 }
 bool DefaultAudioDevice::Recording() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return audio_device_->Recording();
 }
 
 // Audio mixer initialization
 int32_t DefaultAudioDevice::InitSpeaker() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->InitSpeaker();
 }
 
 bool DefaultAudioDevice::SpeakerIsInitialized() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return audio_device_->SpeakerIsInitialized();
 }
 
 int32_t DefaultAudioDevice::InitMicrophone() {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->InitMicrophone();
 }
 
 bool DefaultAudioDevice::MicrophoneIsInitialized() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return audio_device_->MicrophoneIsInitialized();
 }
 
 // Speaker volume controls
 int32_t DefaultAudioDevice::SpeakerVolumeIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SpeakerVolumeIsAvailable(available);
 }
 int32_t DefaultAudioDevice::SetSpeakerVolume(uint32_t volume) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetSpeakerVolume(volume);
 }
 int32_t DefaultAudioDevice::SpeakerVolume(uint32_t& volume) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SpeakerVolume(volume);
 }
 int32_t DefaultAudioDevice::MaxSpeakerVolume(uint32_t& maxVolume) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MaxSpeakerVolume(maxVolume);
 }
 int32_t DefaultAudioDevice::MinSpeakerVolume(uint32_t& minVolume) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MinSpeakerVolume(minVolume);
 }
 
 // Microphone volume controls
 int32_t DefaultAudioDevice::MicrophoneVolumeIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MicrophoneVolumeIsAvailable(available);
 }
 int32_t DefaultAudioDevice::SetMicrophoneVolume(uint32_t volume) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetMicrophoneVolume(volume);
 }
 int32_t DefaultAudioDevice::MicrophoneVolume(uint32_t& volume) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MicrophoneVolume(volume);
 }
 int32_t DefaultAudioDevice::MaxMicrophoneVolume(uint32_t& maxVolume) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MaxMicrophoneVolume(maxVolume);
 }
 int32_t DefaultAudioDevice::MinMicrophoneVolume(uint32_t& minVolume) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MinMicrophoneVolume(minVolume);
 }
 
 // Speaker mute control
 int32_t DefaultAudioDevice::SpeakerMuteIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SpeakerMuteIsAvailable(available);
 }
 int32_t DefaultAudioDevice::SetSpeakerMute(bool enable) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetSpeakerMute(enable);
 }
 int32_t DefaultAudioDevice::SpeakerMute(bool& enabled) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SpeakerMute(enabled);
 }
 
 // Microphone mute control
 int32_t DefaultAudioDevice::MicrophoneMuteIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MicrophoneMuteIsAvailable(available);
 }
 int32_t DefaultAudioDevice::SetMicrophoneMute(bool enable) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetMicrophoneMute(enable);
 }
 int32_t DefaultAudioDevice::MicrophoneMute(bool& enabled) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->MicrophoneMute(enabled);
 }
 
 // Stereo support
 int32_t DefaultAudioDevice::StereoPlayoutIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->StereoPlayoutIsAvailable(available);
 }
 int32_t DefaultAudioDevice::SetStereoPlayout(bool enable) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetStereoPlayout(enable);
 }
 int32_t DefaultAudioDevice::StereoPlayout(bool& enabled) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->StereoPlayout(enabled);
 }
 int32_t DefaultAudioDevice::StereoRecordingIsAvailable(bool& available) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->StereoRecordingIsAvailable(available);
 }
 int32_t DefaultAudioDevice::SetStereoRecording(bool enable) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->SetStereoRecording(enable);
 }
 int32_t DefaultAudioDevice::StereoRecording(bool& enabled) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->StereoRecording(enabled);
   ;
 }
 
 // Delay information and control
 int32_t DefaultAudioDevice::PlayoutDelay(uint16_t& delayMS) const {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return audio_device_->PlayoutDelay(delayMS);
 }
 
 // Android only
 bool DefaultAudioDevice::BuiltInAECIsAvailable() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return false;
 }
 
 bool DefaultAudioDevice::BuiltInAGCIsAvailable() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return false;
 }
 
 bool DefaultAudioDevice::BuiltInNSIsAvailable() const {
-  CHECKinitialized__BOOL();
+  AVE_CHECKinitialized__BOOL();
   return false;
 }
 
 // 3A
 int32_t DefaultAudioDevice::EnableBuiltInAEC(bool enable) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return 0;
 }
 int32_t DefaultAudioDevice::EnableBuiltInAGC(bool enable) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return 0;
 }
 int32_t DefaultAudioDevice::EnableBuiltInNS(bool enable) {
-  CHECKinitialized_();
+  AVE_CHECKinitialized_();
   return 0;
 }
 
-}  // namespace avp
+}  // namespace ave

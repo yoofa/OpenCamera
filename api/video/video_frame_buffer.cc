@@ -13,7 +13,7 @@
 #include "api/video/nv12_buffer.h"
 #include "api/video/yuyv_buffer.h"
 
-namespace avp {
+namespace ave {
 
 /** VideoFrameBuffer **/
 
@@ -111,4 +111,4 @@ std::shared_ptr<VideoFrameBuffer> YUYVBufferInterface::CropAndScale(
   return result;
 }
 
-}  // namespace avp
+}  // namespace ave

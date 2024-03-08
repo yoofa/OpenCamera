@@ -1,6 +1,6 @@
 import("//opencamera.gni")
 
-oc_library("avp_fdkaac") {
+oc_library("ave_fdkaac") {
   visibility = [ "*" ]
   sources = [
     "codecs/aac/fdkaac_encoder.cc",

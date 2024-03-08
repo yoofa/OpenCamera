@@ -10,7 +10,7 @@
 
 #include "base/types.h"
 
-namespace avp {
+namespace ave {
 
 void RemixAndResample(const int16_t* src,
                       uint32_t src_channels,
@@ -20,6 +20,6 @@ void RemixAndResample(const int16_t* src,
                       uint32_t dst_channels,
                       uint32_t dst_sample_rate);
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !REMIX_RESAMPLE_H */

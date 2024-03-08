@@ -29,7 +29,7 @@
 #include "media/video/v4l2_video_source.h"
 #include "media/video/video_sink_wrapper.h"
 
-namespace avp {
+namespace ave {
 namespace {
 using VideoSource = VideoSourceInterface<std::shared_ptr<VideoFrame>>;
 using EncodedVideoSink = VideoSinkInterface<EncodedImage>;
@@ -124,7 +124,7 @@ void MediaService::AddEncodedAudioSink(
                          [&audio_sink](const EncodedAudioSinkWrapper& sink) {
                            return sink->sink() == audio_sink;
                          });
-  CHECK(it == audio_sinks_.end());
+  AVE_CHECK(it == audio_sinks_.end());
 
   audio_sinks_.push_back(AudioSinkWrapper<MediaPacket>::Create(audio_sink));
 
@@ -144,7 +144,7 @@ void MediaService::RemoveEncodedAudioSink(
                          [&audio_sink](const EncodedAudioSinkWrapper& sink) {
                            return sink->sink() == audio_sink;
                          });
-  CHECK(it != audio_sinks_.end());
+  AVE_CHECK(it != audio_sinks_.end());
 
   auto msg =
       std::make_shared<Message>(kWhatRemoveAudioRenderSink, shared_from_this());
@@ -170,26 +170,26 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
 
     case kWhatAddVideoSource: {
       std::shared_ptr<MessageObject> obj;
-      CHECK(message->findObject("video_source", obj));
+      AVE_CHECK(message->findObject("video_source", obj));
       std::shared_ptr<VideoSource> video_source =
           std::dynamic_pointer_cast<VideoSource>(obj);
-      DCHECK(video_source != nullptr);
+      AVE_DCHECK(video_source != nullptr);
 
       int32_t id;
-      CHECK(message->findInt32("stream_id", &id));
+      AVE_CHECK(message->findInt32("stream_id", &id));
 
       VideoEncoderConfig encoder_config;
 
       int32_t codec_id;
-      CHECK(message->findInt32("codec_format", &codec_id));
+      AVE_CHECK(message->findInt32("codec_format", &codec_id));
       encoder_config.codec_id = static_cast<CodecId>(codec_id);
 
       int32_t min_bitrate;
-      CHECK(message->findInt32("min_kbps", &min_bitrate));
+      AVE_CHECK(message->findInt32("min_kbps", &min_bitrate));
       encoder_config.min_bitrate_kbps = min_bitrate;
 
       int32_t max_bitrate;
-      CHECK(message->findInt32("max_kbps", &max_bitrate));
+      AVE_CHECK(message->findInt32("max_kbps", &max_bitrate));
       encoder_config.max_bitrate_kbps = max_bitrate;
 
       // add source to each media worker
@@ -203,13 +203,13 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
 
     case kWhatRemoveVideoSource: {
       std::shared_ptr<MessageObject> obj;
-      CHECK(message->findObject("video_source", obj));
+      AVE_CHECK(message->findObject("video_source", obj));
       std::shared_ptr<VideoSource> video_source =
           std::dynamic_pointer_cast<VideoSource>(obj);
-      DCHECK(video_source != nullptr);
+      AVE_DCHECK(video_source != nullptr);
 
       int32_t id;
-      CHECK(message->findInt32("stream_id", &id));
+      AVE_CHECK(message->findInt32("stream_id", &id));
 
       // add source to each media worker
       for (auto& worker : media_workers_) {
@@ -220,13 +220,13 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
 
     case kWhatAddEncodedVideoSink: {
       std::shared_ptr<MessageObject> obj;
-      CHECK(message->findObject("encoded_video_sink", obj));
+      AVE_CHECK(message->findObject("encoded_video_sink", obj));
       std::shared_ptr<EncodedVideoSink> encoded_video_sink =
           std::dynamic_pointer_cast<EncodedVideoSink>(obj);
-      DCHECK(encoded_video_sink != nullptr);
+      AVE_DCHECK(encoded_video_sink != nullptr);
 
       int32_t id;
-      CHECK(message->findInt32("stream_id", &id));
+      AVE_CHECK(message->findInt32("stream_id", &id));
 
       // add sink to each media worker
       for (auto& worker : media_workers_) {
@@ -236,13 +236,13 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
     }
     case kWhatRemoveEncodedVideoSink: {
       std::shared_ptr<MessageObject> obj;
-      CHECK(message->findObject("encoded_video_sink", obj));
+      AVE_CHECK(message->findObject("encoded_video_sink", obj));
       std::shared_ptr<EncodedVideoSink> encoded_video_sink =
           std::dynamic_pointer_cast<EncodedVideoSink>(obj);
-      DCHECK(encoded_video_sink != nullptr);
+      AVE_DCHECK(encoded_video_sink != nullptr);
 
       int32_t id;
-      CHECK(message->findInt32("stream_id", &id));
+      AVE_CHECK(message->findInt32("stream_id", &id));
 
       for (auto& worker : media_workers_) {
         worker->RemoveEncodedVideoSink(encoded_video_sink, id);
@@ -263,17 +263,17 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
     }
 
     case kWhatAddAudioRenderSink: {
-      LOG(LS_INFO) << "kWhatAddAudioRenderSink";
+      AVE_LOG(LS_INFO) << "kWhatAddAudioRenderSink";
       std::shared_ptr<MessageObject> obj;
-      CHECK(message->findObject("encoded_audio_sink", obj));
+      AVE_CHECK(message->findObject("encoded_audio_sink", obj));
       std::shared_ptr<AudioSinkInterface<MediaPacket>> encoded_video_sink =
           std::dynamic_pointer_cast<EncodedAudioSink>(obj);
-      DCHECK(encoded_video_sink != nullptr);
+      AVE_DCHECK(encoded_video_sink != nullptr);
 
       int32_t stream_id;
-      CHECK(message->findInt32("stream_id", &stream_id));
+      AVE_CHECK(message->findInt32("stream_id", &stream_id));
       int32_t codec_id;
-      CHECK(message->findInt32("codec_id", &codec_id));
+      AVE_CHECK(message->findInt32("codec_id", &codec_id));
 
       // FIXME(youfa): only hybird_worker need add sink ,webrtc worker has it's
       // own transport sink
@@ -286,13 +286,13 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
 
     case kWhatRemoveAudioRenderSink: {
       std::shared_ptr<MessageObject> obj;
-      CHECK(message->findObject("encoded_audio_sink", obj));
+      AVE_CHECK(message->findObject("encoded_audio_sink", obj));
       std::shared_ptr<AudioSinkInterface<MediaPacket>> encoded_video_sink =
           std::dynamic_pointer_cast<EncodedAudioSink>(obj);
-      DCHECK(encoded_video_sink != nullptr);
+      AVE_DCHECK(encoded_video_sink != nullptr);
 
       int32_t codec_id;
-      CHECK(message->findInt32("codec_id", &codec_id));
+      AVE_CHECK(message->findInt32("codec_id", &codec_id));
 
       for (auto& worker : media_workers_) {
         worker->RemoveEncodedAudioSink(encoded_video_sink,
@@ -307,4 +307,4 @@ void MediaService::onMessageReceived(const std::shared_ptr<Message>& message) {
   }
 }
 
-}  // namespace avp
+}  // namespace ave

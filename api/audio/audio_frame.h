@@ -13,7 +13,7 @@
 #include "base/types.h"
 #include "common/channel_layout.h"
 
-namespace avp {
+namespace ave {
 class AudioFrame {
  public:
   enum : size_t {
@@ -94,6 +94,6 @@ class AudioFrame {
   // This is only valid for audio frames captured on this machine.
   std::optional<int64_t> absolute_capture_timestamp_ms_;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_FRAME_H */

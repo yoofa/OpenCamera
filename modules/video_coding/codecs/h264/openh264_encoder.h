@@ -5,14 +5,14 @@
  * Distributed under terms of the GPLv2 license.
  */
 
-#ifndef AVP_VIDEO_CODECS_OPENH264_ENCODER_H
-#define AVP_VIDEO_CODECS_OPENH264_ENCODER_H
+#ifndef AVE_VIDEO_CODECS_OPENH264_ENCODER_H
+#define AVE_VIDEO_CODECS_OPENH264_ENCODER_H
 
 #include "common/video_codec_property.h"
 #include "modules/video_coding/codecs/h264/h264.h"
 #include "third_party/openh264/src/codec/api/svc/codec_api.h"
 
-namespace avp {
+namespace ave {
 
 class OpenH264Encoder : public H264Encoder {
  public:
@@ -64,6 +64,6 @@ class OpenH264Encoder : public H264Encoder {
   EncodedImageCallback* encoded_image_callback_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
-#endif /* !AVP_VIDEO_CODECS_OPENH264_ENCODER_H */
+#endif /* !AVE_VIDEO_CODECS_OPENH264_ENCODER_H */

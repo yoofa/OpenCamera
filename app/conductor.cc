@@ -15,7 +15,7 @@
 #include "rtsp/rtsp_server.h"
 #include "xop/rtsp.h"
 
-namespace avp {
+namespace ave {
 namespace oc {
 namespace {
 using EncodedAudioSink = AudioSinkInterface<MediaPacket>;
@@ -28,7 +28,7 @@ Conductor::Conductor(AppConfig appConfig)
       looper_(std::make_shared<Looper>()),
       max_stream_id_(0),
       video_source_(std::make_shared<H264FileSource>("data/h264.bin")) {
-  DCHECK(!config_.error);
+  AVE_DCHECK(!config_.error);
   looper_->setName("conductor");
 }
 
@@ -112,21 +112,21 @@ void Conductor::AddCameraSource() {
 
 void Conductor::OnRtspNotify(const std::shared_ptr<Message>& msg) {
   int32_t what;
-  CHECK(msg->findInt32("what", &what));
+  AVE_CHECK(msg->findInt32("what", &what));
   switch (what) {
     case RtspServer::kWhatAudioSinkAdded: {
-      LOG(LS_INFO) << "kWhatAudioSink";
+      AVE_LOG(LS_INFO) << "kWhatAudioSink";
       int32_t stream_id;
       int32_t codec_id;
       int32_t sample_rate;
       int32_t channels;
       std::shared_ptr<MessageObject> obj;
 
-      CHECK(msg->findInt32("stream_id", &stream_id));
-      CHECK(msg->findInt32("codec_id", &codec_id));
-      CHECK(msg->findObject("audio_sink", obj));
+      AVE_CHECK(msg->findInt32("stream_id", &stream_id));
+      AVE_CHECK(msg->findInt32("codec_id", &codec_id));
+      AVE_CHECK(msg->findObject("audio_sink", obj));
       auto audio_sink = std::dynamic_pointer_cast<EncodedAudioSink>(obj);
-      CHECK(audio_sink != nullptr);
+      AVE_CHECK(audio_sink != nullptr);
 
       CodecId codec = static_cast<CodecId>(codec_id);
 
@@ -136,15 +136,15 @@ void Conductor::OnRtspNotify(const std::shared_ptr<Message>& msg) {
     }
 
     case RtspServer::kWhatVideoSinkAdded: {
-      LOG(LS_INFO) << "kWhatVideoSinkAdded";
+      AVE_LOG(LS_INFO) << "kWhatVideoSinkAdded";
       int32_t stream_id;
-      DCHECK(msg->findInt32("stream_id", &stream_id));
+      AVE_DCHECK(msg->findInt32("stream_id", &stream_id));
 
       std::shared_ptr<MessageObject> obj;
-      CHECK(msg->findObject("encoded_video_sink", obj));
+      AVE_CHECK(msg->findObject("encoded_video_sink", obj));
       std::shared_ptr<EncodedVideoSink> encoded_video_sink =
           std::dynamic_pointer_cast<EncodedVideoSink>(obj);
-      DCHECK(encoded_video_sink != nullptr);
+      AVE_DCHECK(encoded_video_sink != nullptr);
 
       media_service_->AddVideoSink(encoded_video_sink, stream_id);
 
@@ -162,7 +162,7 @@ void Conductor::OnRtspNotify(const std::shared_ptr<Message>& msg) {
 
 void Conductor::OnOnvifNotify(const std::shared_ptr<Message>& msg) {
   int32_t what;
-  CHECK(msg->findInt32("what", &what));
+  AVE_CHECK(msg->findInt32("what", &what));
   switch (what) {
     // TODO
   }
@@ -202,19 +202,19 @@ void Conductor::onMessageReceived(const std::shared_ptr<Message>& msg) {
     }
     case kWhatAddVideoSource: {
       int32_t id;
-      CHECK(msg->findInt32("stream_id", &id));
+      AVE_CHECK(msg->findInt32("stream_id", &id));
       int32_t codec_id;
-      CHECK(msg->findInt32("codec_format", &codec_id));
+      AVE_CHECK(msg->findInt32("codec_format", &codec_id));
       int32_t min_bitrate;
-      CHECK(msg->findInt32("min_kbps", &min_bitrate));
+      AVE_CHECK(msg->findInt32("min_kbps", &min_bitrate));
       int32_t max_bitrate;
-      CHECK(msg->findInt32("max_kbps", &max_bitrate));
+      AVE_CHECK(msg->findInt32("max_kbps", &max_bitrate));
 
       std::shared_ptr<MessageObject> obj;
-      CHECK(msg->findObject("video_source", obj));
+      AVE_CHECK(msg->findObject("video_source", obj));
       std::shared_ptr<VideoSource> video_source =
           std::dynamic_pointer_cast<VideoSource>(obj);
-      DCHECK(video_source != nullptr);
+      AVE_DCHECK(video_source != nullptr);
 
       media_service_->AddVideoSource(video_source, id,
                                      static_cast<CodecId>(codec_id),
@@ -231,4 +231,4 @@ void Conductor::onMessageReceived(const std::shared_ptr<Message>& msg) {
 }
 
 }  // namespace oc
-}  // namespace avp
+}  // namespace ave

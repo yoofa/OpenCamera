@@ -9,10 +9,10 @@
 
 #include "modules/video_coding/codecs/h264/openh264_encoder.h"
 
-namespace avp {
+namespace ave {
 
 std::unique_ptr<H264Encoder> H264Encoder::Create() {
   return std::make_unique<OpenH264Encoder>();
 }
 
-}  // namespace avp
+}  // namespace ave

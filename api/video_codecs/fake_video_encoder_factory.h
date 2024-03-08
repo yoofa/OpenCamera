@@ -9,13 +9,13 @@
 #define FAKE_VIDEO_ENCODER_FACTORY_H
 
 #include "api/video_codecs/video_encoder_factory.h"
-namespace avp {
+namespace ave {
 
 class FakeVideoEncoderFactory : public VideoEncoderFactory {
  public:
   std::unique_ptr<VideoEncoder> CreateVideoEncoder() override;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !FAKE_VIDEO_ENCODER_FACTORY_H */

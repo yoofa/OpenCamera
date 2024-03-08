@@ -13,7 +13,7 @@
 #include "smacros.h"
 #include "stools.h"
 
-namespace avp {
+namespace ave {
 
 OnvifPTZBindingService::OnvifPTZBindingService(struct soap* soap)
     : PTZBindingService(soap) {}
@@ -30,7 +30,7 @@ int OnvifPTZBindingService::GetServiceCapabilities(
 int OnvifPTZBindingService::GetConfigurations(
     _tptz__GetConfigurations* tptz__GetConfigurations,
     _tptz__GetConfigurationsResponse& tptz__GetConfigurationsResponse) {
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
@@ -58,7 +58,7 @@ int OnvifPTZBindingService::GetPresets(
     _tptz__GetPresets* tptz__GetPresets,
     _tptz__GetPresetsResponse& tptz__GetPresetsResponse) {
   UNUSED(tptz__GetPresets);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   soap_default_std__vectorTemplateOfPointerTott__PTZPreset(
       soap, &tptz__GetPresetsResponse._tptz__GetPresetsResponse::Preset);
@@ -88,7 +88,7 @@ int OnvifPTZBindingService::GotoPreset(
     _tptz__GotoPreset* tptz__GotoPreset,
     _tptz__GotoPresetResponse& tptz__GotoPresetResponse) {
   UNUSED(tptz__GotoPresetResponse);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   std::string preset_cmd;
 
@@ -134,7 +134,7 @@ int OnvifPTZBindingService::GetStatus(
 int OnvifPTZBindingService::GetConfiguration(
     _tptz__GetConfiguration* tptz__GetConfiguration,
     _tptz__GetConfigurationResponse& tptz__GetConfigurationResponse) {
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
@@ -225,7 +225,7 @@ int OnvifPTZBindingService::GetNodes(
     _tptz__GetNodes* tptz__GetNodes,
     _tptz__GetNodesResponse& tptz__GetNodesResponse) {
   UNUSED(tptz__GetNodes);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   soap_default_std__vectorTemplateOfPointerTott__PTZNode(
       soap, &tptz__GetNodesResponse._tptz__GetNodesResponse::PTZNode);
@@ -241,7 +241,7 @@ int OnvifPTZBindingService::GetNode(
     _tptz__GetNode* tptz__GetNode,
     _tptz__GetNodeResponse& tptz__GetNodeResponse) {
   UNUSED(tptz__GetNode);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   tptz__GetNodeResponse.PTZNode = soap_new_tt__PTZNode(this->soap);
   GetPTZNode(this->soap, tptz__GetNodeResponse.PTZNode);
@@ -259,7 +259,7 @@ int OnvifPTZBindingService::GetConfigurationOptions(
     _tptz__GetConfigurationOptions* tptz__GetConfigurationOptions,
     _tptz__GetConfigurationOptionsResponse&
         tptz__GetConfigurationOptionsResponse) {
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
 
@@ -273,7 +273,7 @@ int OnvifPTZBindingService::GotoHomePosition(
     _tptz__GotoHomePositionResponse& tptz__GotoHomePositionResponse) {
   UNUSED(tptz__GotoHomePosition);
   UNUSED(tptz__GotoHomePositionResponse);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   std::string preset_cmd;
 
@@ -316,7 +316,7 @@ int OnvifPTZBindingService::ContinuousMove(
     _tptz__ContinuousMove* tptz__ContinuousMove,
     _tptz__ContinuousMoveResponse& tptz__ContinuousMoveResponse) {
   UNUSED(tptz__ContinuousMoveResponse);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -349,7 +349,7 @@ int OnvifPTZBindingService::RelativeMove(
     _tptz__RelativeMove* tptz__RelativeMove,
     _tptz__RelativeMoveResponse& tptz__RelativeMoveResponse) {
   UNUSED(tptz__RelativeMoveResponse);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -402,7 +402,7 @@ int OnvifPTZBindingService::Stop(_tptz__Stop* tptz__Stop,
                                  _tptz__StopResponse& tptz__StopResponse) {
   UNUSED(tptz__Stop);
   UNUSED(tptz__StopResponse);
-  LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "PTZ: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -473,4 +473,4 @@ int OnvifPTZBindingService::MoveAndStartTracking(
   SOAP_EMPTY_HANDLER(tptz__MoveAndStartTracking, "PTZ");
 }
 
-}  // namespace avp
+}  // namespace ave

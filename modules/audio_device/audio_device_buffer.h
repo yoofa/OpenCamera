@@ -17,7 +17,11 @@
 #include "base/types.h"
 #include "modules/audio_device/audio_device_defines.h"
 
-namespace avp {
+namespace ave {
+
+using ::ave::base::BufferT;
+using ::ave::base::SequenceChecker;
+
 // Delta times between two successive playout callbacks are limited to this
 // value before added to an internal array.
 const size_t kMaxDeltaTimeInMs = 500;
@@ -108,6 +112,6 @@ class AudioDeviceBuffer {
   double phase_;
 #endif
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_DEVICE_BUFFER_H */

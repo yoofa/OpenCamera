@@ -10,7 +10,7 @@
 #include "base/task_util/default_task_runner_factory.h"
 #include "base/task_util/task_runner_factory.h"
 
-using namespace avp;
+using namespace ave;
 using namespace base;
 
 int main(int argc, char* argv[]) {
@@ -18,35 +18,36 @@ int main(int argc, char* argv[]) {
   auto audio_device = DefaultAudioDevice::Create(
       task_runner_factory.get(), AudioDevice::AudioLayer::kLinuxAlsa);
   int32_t ret = audio_device->Init();
-  LOG(LS_INFO) << "Init: " << ret;
+  AVE_LOG(LS_INFO) << "Init: " << ret;
 
   AudioDevice::AudioLayer layer = AudioDevice::AudioLayer::kDefaultAudio;
   ret = audio_device->ActivedAudioLayer(layer);
-  LOG(LS_INFO) << "ActivedAudioLayer return " << ret << ", layer: " << layer;
+  AVE_LOG(LS_INFO) << "ActivedAudioLayer return " << ret
+                   << ", layer: " << layer;
 
   char device_name[kAdmMaxDeviceNameSize];
   char unique_id[kAdmMaxGuidSize];
 
-  LOG(LS_INFO) << "PlayoutDevices: " << audio_device->PlayoutDevices();
+  AVE_LOG(LS_INFO) << "PlayoutDevices: " << audio_device->PlayoutDevices();
   for (int i = 0; i < audio_device->PlayoutDevices(); i++) {
     audio_device->PlayoutDeviceName(i, device_name, unique_id);
-    LOG(LS_INFO) << "PlayoutDeviceName: " << device_name;
-    LOG(LS_INFO) << "PlayoutDeviceUniqueId: " << unique_id;
+    AVE_LOG(LS_INFO) << "PlayoutDeviceName: " << device_name;
+    AVE_LOG(LS_INFO) << "PlayoutDeviceUniqueId: " << unique_id;
   }
 
-  LOG(LS_INFO) << "RecordingDevices: " << audio_device->RecordingDevices();
+  AVE_LOG(LS_INFO) << "RecordingDevices: " << audio_device->RecordingDevices();
   for (int i = 0; i < audio_device->RecordingDevices(); i++) {
     audio_device->RecordingDeviceName(i, device_name, unique_id);
-    LOG(LS_INFO) << "RecordingDeviceName: " << device_name;
-    LOG(LS_INFO) << "RecordingDeviceUniqueId: " << unique_id;
+    AVE_LOG(LS_INFO) << "RecordingDeviceName: " << device_name;
+    AVE_LOG(LS_INFO) << "RecordingDeviceUniqueId: " << unique_id;
   }
 
   if (audio_device->SetRecordingDevice(4) != 0) {
-    LOG(LS_ERROR) << "AudioDevice SetRecordingDevice failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice SetRecordingDevice failed";
   }
 
   if (audio_device->InitMicrophone() != 0) {
-    LOG(LS_ERROR) << "AudioDevice InitMicrophone failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice InitMicrophone failed";
   }
 
   return 0;

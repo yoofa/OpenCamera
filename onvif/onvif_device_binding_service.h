@@ -10,7 +10,7 @@
 
 #include "third_party/onvif_srvd/src/generated/soapDeviceBindingService.h"
 
-namespace avp {
+namespace ave {
 
 class OnvifDeviceBindingService : public DeviceBindingService {
  public:
@@ -586,6 +586,6 @@ class OnvifDeviceBindingService : public DeviceBindingService {
  private:
   /* data */
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !ONVIF_DEVICE_BINDING_SERVICE_H */

@@ -10,7 +10,7 @@
 
 #include "third_party/onvif_srvd/src/generated/soapMediaBindingService.h"
 
-namespace avp {
+namespace ave {
 
 class OnvifMediaBindingService : public MediaBindingService {
  public:
@@ -581,6 +581,6 @@ class OnvifMediaBindingService : public MediaBindingService {
   /* data */
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !ONVIF_MEDIA_BINDING_SERVICE_H */

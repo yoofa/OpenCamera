@@ -14,7 +14,7 @@
 #include "base/task_util/task_runner_factory.h"
 #include "modules/audio_device/audio_device_generic.h"
 
-namespace avp {
+namespace ave {
 class DefaultAudioDevice : public AudioDevice {
  public:
   static std::unique_ptr<AudioDevice> Create(
@@ -131,6 +131,6 @@ class DefaultAudioDevice : public AudioDevice {
   bool initialized_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !DEFAULT_AUDIO_DEVICE_H */

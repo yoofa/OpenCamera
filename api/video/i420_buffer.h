@@ -11,7 +11,7 @@
 #include "api/video/video_frame_buffer.h"
 #include "base/memory/aligned_memory.h"
 
-namespace avp {
+namespace ave {
 
 // Plain I420 buffer in standard memory.
 class I420Buffer : public I420BufferInterface {
@@ -90,9 +90,9 @@ class I420Buffer : public I420BufferInterface {
   const size_t stride_y_;
   const size_t stride_u_;
   const size_t stride_v_;
-  const std::unique_ptr<uint8_t, AlignedFreeDeleter> data_;
+  const std::unique_ptr<uint8_t, base::AlignedFreeDeleter> data_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !I420_BUFFER_H */

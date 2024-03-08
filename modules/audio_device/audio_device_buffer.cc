@@ -20,7 +20,10 @@
 // #include "common_audio/signal_processing/include/signal_processing_library.h"
 // #include "system_wrappers/include/metrics.h"
 
-namespace avp {
+namespace ave {
+
+using base::TimeMillis;
+using base::TimeSince;
 
 #ifdef AUDIO_DEVICE_PLAYS_SINUS_TONE
 static const double k2Pi = 6.28318530717959;
@@ -38,26 +41,26 @@ AudioDeviceBuffer::AudioDeviceBuffer(
       play_delay_ms_(0),
       rec_delay_ms_(0),
       play_start_time_(0) {
-  LOG(LS_DEBUG) << "AudioDeviceBuffer::ctor";
+  AVE_LOG(LS_DEBUG) << "AudioDeviceBuffer::ctor";
 #ifdef AUDIO_DEVICE_PLAYS_SINUS_TONE
   phase_ = 0.0;
-  LOG(WARNING) << "AUDIO_DEVICE_PLAYS_SINUS_TONE is defined!";
+  AVE_LOG(WARNING) << "AUDIO_DEVICE_PLAYS_SINUS_TONE is defined!";
 #endif
 }
 
 AudioDeviceBuffer::~AudioDeviceBuffer() {
-  AVP_DCHECK_RUN_ON(&main_thread_checker_);
-  DCHECK(!playing_);
-  DCHECK(!recording_);
-  LOG(LS_DEBUG) << "AudioDeviceBuffer::~dtor";
+  AVE_DCHECK_RUN_ON(&main_thread_checker_);
+  AVE_DCHECK(!playing_);
+  AVE_DCHECK(!recording_);
+  AVE_LOG(LS_DEBUG) << "AudioDeviceBuffer::~dtor";
 }
 
 int32_t AudioDeviceBuffer::RegisterAudioCallback(
     AudioTransport* audio_callback) {
-  AVP_DCHECK_RUN_ON(&main_thread_checker_);
-  LOG(LS_DEBUG) << __FUNCTION__;
+  AVE_DCHECK_RUN_ON(&main_thread_checker_);
+  AVE_LOG(LS_DEBUG) << __FUNCTION__;
   if (playing_ || recording_) {
-    LOG(LS_ERROR) << "Failed to set audio callback since media was active";
+    AVE_LOG(LS_ERROR) << "Failed to set audio callback since media was active";
     return -1;
   }
   audio_cb_ = audio_callback;
@@ -65,61 +68,61 @@ int32_t AudioDeviceBuffer::RegisterAudioCallback(
 }
 
 void AudioDeviceBuffer::StartPlayout() {
-  AVP_DCHECK_RUN_ON(&main_thread_checker_);
+  AVE_DCHECK_RUN_ON(&main_thread_checker_);
   if (playing_) {
     return;
   }
-  LOG(LS_DEBUG) << __FUNCTION__;
+  AVE_LOG(LS_DEBUG) << __FUNCTION__;
 
-  const int64_t now_time = avp::TimeMillis();
+  const int64_t now_time = TimeMillis();
   // Clear members that are only touched on the main (creating) thread.
   play_start_time_ = now_time;
   playing_ = true;
 }
 
 void AudioDeviceBuffer::StartRecording() {
-  AVP_DCHECK_RUN_ON(&main_thread_checker_);
+  AVE_DCHECK_RUN_ON(&main_thread_checker_);
   if (recording_) {
     return;
   }
-  LOG(LS_DEBUG) << __FUNCTION__;
+  AVE_LOG(LS_DEBUG) << __FUNCTION__;
 
   // Clear members that will be touched on the main (creating) thread.
-  rec_start_time_ = avp::TimeMillis();
+  rec_start_time_ = TimeMillis();
   recording_ = true;
 }
 
 void AudioDeviceBuffer::StopPlayout() {
-  AVP_DCHECK_RUN_ON(&main_thread_checker_);
+  AVE_DCHECK_RUN_ON(&main_thread_checker_);
   if (!playing_) {
     return;
   }
-  LOG(LS_DEBUG) << __FUNCTION__;
+  AVE_LOG(LS_DEBUG) << __FUNCTION__;
   playing_ = false;
 
-  LOG(LS_INFO) << "total playout time: " << avp::TimeSince(play_start_time_);
+  AVE_LOG(LS_INFO) << "total playout time: " << TimeSince(play_start_time_);
 }
 
 void AudioDeviceBuffer::StopRecording() {
-  AVP_DCHECK_RUN_ON(&main_thread_checker_);
+  AVE_DCHECK_RUN_ON(&main_thread_checker_);
   if (!recording_) {
     return;
   }
-  LOG(LS_DEBUG) << __FUNCTION__;
+  AVE_LOG(LS_DEBUG) << __FUNCTION__;
   recording_ = false;
 
-  const size_t time_since_start = avp::TimeSince(rec_start_time_);
-  LOG(LS_INFO) << "total recording time: " << time_since_start;
+  const size_t time_since_start = TimeSince(rec_start_time_);
+  AVE_LOG(LS_INFO) << "total recording time: " << time_since_start;
 }
 
 int32_t AudioDeviceBuffer::SetRecordingSampleRate(uint32_t fsHz) {
-  LOG(LS_INFO) << "SetRecordingSampleRate(" << fsHz << ")";
+  AVE_LOG(LS_INFO) << "SetRecordingSampleRate(" << fsHz << ")";
   rec_sample_rate_ = fsHz;
   return 0;
 }
 
 int32_t AudioDeviceBuffer::SetPlayoutSampleRate(uint32_t fsHz) {
-  LOG(LS_INFO) << "SetPlayoutSampleRate(" << fsHz << ")";
+  AVE_LOG(LS_INFO) << "SetPlayoutSampleRate(" << fsHz << ")";
   play_sample_rate_ = fsHz;
   return 0;
 }
@@ -133,13 +136,13 @@ uint32_t AudioDeviceBuffer::PlayoutSampleRate() const {
 }
 
 int32_t AudioDeviceBuffer::SetRecordingChannels(size_t channels) {
-  LOG(LS_INFO) << "SetRecordingChannels(" << channels << ")";
+  AVE_LOG(LS_INFO) << "SetRecordingChannels(" << channels << ")";
   rec_channels_ = channels;
   return 0;
 }
 
 int32_t AudioDeviceBuffer::SetPlayoutChannels(size_t channels) {
-  LOG(LS_INFO) << "SetPlayoutChannels(" << channels << ")";
+  AVE_LOG(LS_INFO) << "SetPlayoutChannels(" << channels << ")";
   play_channels_ = channels;
   return 0;
 }
@@ -166,7 +169,7 @@ int32_t AudioDeviceBuffer::SetRecordedBuffer(const void* audio_buffer,
   // Keep track of the size of the recording buffer. Only updated when the
   // size changes, which is a rare event.
   if (old_size != rec_buffer_.size()) {
-    LOG(LS_INFO) << "Size of recording buffer: " << rec_buffer_.size();
+    AVE_LOG(LS_INFO) << "Size of recording buffer: " << rec_buffer_.size();
   }
 
   return 0;
@@ -174,7 +177,7 @@ int32_t AudioDeviceBuffer::SetRecordedBuffer(const void* audio_buffer,
 
 int32_t AudioDeviceBuffer::DeliverRecordedData() {
   if (!audio_cb_) {
-    LOG(LS_WARNING) << "Invalid audio callback";
+    AVE_LOG(LS_WARNING) << "Invalid audio callback";
     return 0;
   }
   const size_t frames_per_channel = rec_buffer_.size() / rec_channels_;
@@ -183,7 +186,7 @@ int32_t AudioDeviceBuffer::DeliverRecordedData() {
                                           frames_per_channel, rec_channels_,
                                           rec_sample_rate_);
   if (res == -1) {
-    LOG(LS_ERROR) << "RecordedDataIsAvailable() failed";
+    AVE_LOG(LS_ERROR) << "RecordedDataIsAvailable() failed";
   }
   return 0;
 }
@@ -195,14 +198,14 @@ int32_t AudioDeviceBuffer::RequestPlayoutData(size_t samples_per_channel) {
   const size_t total_samples = play_channels_ * samples_per_channel;
   if (play_buffer_.size() != total_samples) {
     play_buffer_.SetSize(total_samples);
-    LOG(LS_INFO) << "Size of playout buffer: " << play_buffer_.size();
+    AVE_LOG(LS_INFO) << "Size of playout buffer: " << play_buffer_.size();
   }
 
   size_t num_samples_out(0);
   // It is currently supported to start playout without a valid audio
   // callback object. Leads to warning and silence.
   if (!audio_cb_) {
-    LOG(LS_WARNING) << "Invalid audio callback";
+    AVE_LOG(LS_WARNING) << "Invalid audio callback";
     return 0;
   }
 
@@ -212,14 +215,14 @@ int32_t AudioDeviceBuffer::RequestPlayoutData(size_t samples_per_channel) {
       play_buffer_.data(), bytes_per_frame, samples_per_channel, play_channels_,
       play_sample_rate_);
   if (res != 0) {
-    LOG(LS_ERROR) << "NeedMorePlayData() failed";
+    AVE_LOG(LS_ERROR) << "NeedMorePlayData() failed";
   }
 
   return static_cast<int32_t>(num_samples_out / play_channels_);
 }
 
 int32_t AudioDeviceBuffer::GetPlayoutData(void* audio_buffer) {
-  DCHECK_GT(play_buffer_.size(), 0);
+  AVE_DCHECK_GT(play_buffer_.size(), 0);
 #ifdef AUDIO_DEVICE_PLAYS_SINUS_TONE
   const double phase_increment =
       k2Pi * 440.0 / static_cast<double>(play_sample_rate_);
@@ -244,4 +247,4 @@ int32_t AudioDeviceBuffer::GetPlayoutData(void* audio_buffer) {
   return static_cast<int32_t>(play_buffer_.size() / play_channels_);
 }
 
-}  // namespace avp
+}  // namespace ave

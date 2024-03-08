@@ -13,7 +13,7 @@
 #include "smacros.h"
 #include "stools.h"
 
-namespace avp {
+namespace ave {
 
 OnvifMediaBindingService::OnvifMediaBindingService(struct soap* soap)
     : MediaBindingService(soap) {}
@@ -24,7 +24,7 @@ int OnvifMediaBindingService::GetServiceCapabilities(
     _trt__GetServiceCapabilities* trt__GetServiceCapabilities,
     _trt__GetServiceCapabilitiesResponse& trt__GetServiceCapabilitiesResponse) {
   UNUSED(trt__GetServiceCapabilities);
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -38,7 +38,7 @@ int OnvifMediaBindingService::GetVideoSources(
     _trt__GetVideoSources* trt__GetVideoSources,
     _trt__GetVideoSourcesResponse& trt__GetVideoSourcesResponse) {
   UNUSED(trt__GetVideoSources);
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -76,8 +76,8 @@ int OnvifMediaBindingService::CreateProfile(
 int OnvifMediaBindingService::GetProfile(
     _trt__GetProfile* trt__GetProfile,
     _trt__GetProfileResponse& trt__GetProfileResponse) {
-  LOG(LS_INFO) << "Media:" << __FUNCTION__
-               << "   get profile:" << trt__GetProfile->ProfileToken.c_str();
+  AVE_LOG(LS_INFO) << "Media:" << __FUNCTION__ << "   get profile:"
+                   << trt__GetProfile->ProfileToken.c_str();
 
   int ret = SOAP_FAULT;
 
@@ -98,7 +98,7 @@ int OnvifMediaBindingService::GetProfiles(
     _trt__GetProfiles* trt__GetProfiles,
     _trt__GetProfilesResponse& trt__GetProfilesResponse) {
   UNUSED(trt__GetProfiles);
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -249,7 +249,7 @@ int OnvifMediaBindingService::GetVideoSourceConfigurations(
     _trt__GetVideoSourceConfigurationsResponse&
         trt__GetVideoSourceConfigurationsResponse) {
   UNUSED(trt__GetVideoSourceConfigurations);
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -270,7 +270,7 @@ int OnvifMediaBindingService::GetVideoEncoderConfigurations(
     _trt__GetVideoEncoderConfigurationsResponse&
         trt__GetVideoEncoderConfigurationsResponse) {
   UNUSED(trt__GetVideoEncoderConfigurations);
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -332,7 +332,7 @@ int OnvifMediaBindingService::GetVideoSourceConfiguration(
     _trt__GetVideoSourceConfiguration* trt__GetVideoSourceConfiguration,
     _trt__GetVideoSourceConfigurationResponse&
         trt__GetVideoSourceConfigurationResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -356,7 +356,7 @@ int OnvifMediaBindingService::GetVideoEncoderConfiguration(
     _trt__GetVideoEncoderConfiguration* trt__GetVideoEncoderConfiguration,
     _trt__GetVideoEncoderConfigurationResponse&
         trt__GetVideoEncoderConfigurationResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -423,7 +423,7 @@ int OnvifMediaBindingService::GetCompatibleVideoEncoderConfigurations(
         trt__GetCompatibleVideoEncoderConfigurations,
     _trt__GetCompatibleVideoEncoderConfigurationsResponse&
         trt__GetCompatibleVideoEncoderConfigurationsResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -449,7 +449,7 @@ int OnvifMediaBindingService::GetCompatibleVideoSourceConfigurations(
         trt__GetCompatibleVideoSourceConfigurations,
     _trt__GetCompatibleVideoSourceConfigurationsResponse&
         trt__GetCompatibleVideoSourceConfigurationsResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -579,7 +579,7 @@ int OnvifMediaBindingService::GetVideoSourceConfigurationOptions(
         trt__GetVideoSourceConfigurationOptions,
     _trt__GetVideoSourceConfigurationOptionsResponse&
         trt__GetVideoSourceConfigurationOptionsResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   std::string token;
   int width;
@@ -657,7 +657,7 @@ int OnvifMediaBindingService::GetVideoEncoderConfigurationOptions(
         trt__GetVideoEncoderConfigurationOptions,
     _trt__GetVideoEncoderConfigurationOptionsResponse&
         trt__GetVideoEncoderConfigurationOptionsResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   std::string token;
   OnvifServer* server = (OnvifServer*)this->soap->user;
@@ -833,7 +833,7 @@ int OnvifMediaBindingService::GetGuaranteedNumberOfVideoEncoderInstances(
     _trt__GetGuaranteedNumberOfVideoEncoderInstancesResponse&
         trt__GetGuaranteedNumberOfVideoEncoderInstancesResponse) {
   UNUSED(trt__GetGuaranteedNumberOfVideoEncoderInstances);
-  LOG(LS_INFO) << "Media: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -870,8 +870,8 @@ int OnvifMediaBindingService::GetGuaranteedNumberOfVideoEncoderInstances(
 int OnvifMediaBindingService::GetStreamUri(
     _trt__GetStreamUri* trt__GetStreamUri,
     _trt__GetStreamUriResponse& trt__GetStreamUriResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__
-               << "   for profile:" << trt__GetStreamUri->ProfileToken.c_str();
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__ << "   for profile:"
+                   << trt__GetStreamUri->ProfileToken.c_str();
 
   int ret = SOAP_FAULT;
 
@@ -913,8 +913,8 @@ int OnvifMediaBindingService::SetSynchronizationPoint(
 int OnvifMediaBindingService::GetSnapshotUri(
     _trt__GetSnapshotUri* trt__GetSnapshotUri,
     _trt__GetSnapshotUriResponse& trt__GetSnapshotUriResponse) {
-  LOG(LS_INFO) << "Media: " << __FUNCTION__ << "   for profile:"
-               << trt__GetSnapshotUri->ProfileToken.c_str();
+  AVE_LOG(LS_INFO) << "Media: " << __FUNCTION__ << "   for profile:"
+                   << trt__GetSnapshotUri->ProfileToken.c_str();
 
   int ret = SOAP_FAULT;
 
@@ -980,4 +980,4 @@ int OnvifMediaBindingService::DeleteOSD(
     _trt__DeleteOSDResponse& trt__DeleteOSDResponse) {
   SOAP_EMPTY_HANDLER(trt__DeleteOSD, "Media");
 }
-}  // namespace avp
+}  // namespace ave

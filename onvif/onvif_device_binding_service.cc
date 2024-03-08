@@ -16,7 +16,7 @@
 #include "third_party/onvif_srvd/src/src/smacros.h"
 #include "third_party/onvif_srvd/src/src/stools.h"
 
-namespace avp {
+namespace ave {
 
 OnvifDeviceBindingService::OnvifDeviceBindingService(struct soap* soap)
     : DeviceBindingService(soap) {}
@@ -26,7 +26,7 @@ OnvifDeviceBindingService::~OnvifDeviceBindingService() {}
 int OnvifDeviceBindingService::GetServices(
     _tds__GetServices* tds__GetServices,
     _tds__GetServicesResponse& tds__GetServicesResponse) {
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -101,7 +101,7 @@ int OnvifDeviceBindingService::GetServiceCapabilities(
     _tds__GetServiceCapabilities* tds__GetServiceCapabilities,
     _tds__GetServiceCapabilitiesResponse& tds__GetServiceCapabilitiesResponse) {
   UNUSED(tds__GetServiceCapabilities);
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -115,7 +115,7 @@ int OnvifDeviceBindingService::GetDeviceInformation(
     _tds__GetDeviceInformation* tds__GetDeviceInformation,
     _tds__GetDeviceInformationResponse& tds__GetDeviceInformationResponse) {
   UNUSED(tds__GetDeviceInformation);
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -138,7 +138,7 @@ int OnvifDeviceBindingService::GetSystemDateAndTime(
     _tds__GetSystemDateAndTime* tds__GetSystemDateAndTime,
     _tds__GetSystemDateAndTimeResponse& tds__GetSystemDateAndTimeResponse) {
   UNUSED(tds__GetSystemDateAndTime);
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   const time_t timestamp = time(NULL);
   struct tm* tm = gmtime(&timestamp);
@@ -222,7 +222,7 @@ int OnvifDeviceBindingService::GetScopes(
     _tds__GetScopes* tds__GetScopes,
     _tds__GetScopesResponse& tds__GetScopesResponse) {
   UNUSED(tds__GetScopes);
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -305,7 +305,7 @@ int OnvifDeviceBindingService::GetUsers(
     _tds__GetUsers* tds__GetUsers,
     _tds__GetUsersResponse& tds__GetUsersResponse) {
   UNUSED(tds__GetUsers);
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -340,7 +340,7 @@ int OnvifDeviceBindingService::GetWsdlUrl(
     _tds__GetWsdlUrl* tds__GetWsdlUrl,
     _tds__GetWsdlUrlResponse& tds__GetWsdlUrlResponse) {
   UNUSED(tds__GetWsdlUrl);
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   std::string url = soap->endpoint;
   tds__GetWsdlUrlResponse.WsdlUrl = url.c_str();
@@ -351,7 +351,7 @@ int OnvifDeviceBindingService::GetWsdlUrl(
 int OnvifDeviceBindingService::GetCapabilities(
     _tds__GetCapabilities* tds__GetCapabilities,
     _tds__GetCapabilitiesResponse& tds__GetCapabilitiesResponse) {
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -495,7 +495,7 @@ int OnvifDeviceBindingService::GetNetworkInterfaces(
     _tds__GetNetworkInterfaces* tds__GetNetworkInterfaces,
     _tds__GetNetworkInterfacesResponse& tds__GetNetworkInterfacesResponse) {
   UNUSED(tds__GetNetworkInterfaces);
-  LOG(LS_INFO) << "Device: " << __FUNCTION__;
+  AVE_LOG(LS_INFO) << "Device: " << __FUNCTION__;
 
   OnvifServer* server = (OnvifServer*)this->soap->user;
   ServiceContext* ctx = (ServiceContext*)server->service_info_.get();
@@ -845,4 +845,4 @@ int OnvifDeviceBindingService::DeleteGeoLocation(
     _tds__DeleteGeoLocationResponse& tds__DeleteGeoLocationResponse) {
   SOAP_EMPTY_HANDLER(tds__DeleteGeoLocation, "Device");
 }
-}  // namespace avp
+}  // namespace ave

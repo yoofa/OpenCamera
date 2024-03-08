@@ -13,7 +13,7 @@
 #include "common/media_source.h"
 #include "common/meta_data.h"
 
-namespace avp {
+namespace ave {
 
 #define FRAME_MAX_SIZE (1024 * 500)
 
@@ -36,9 +36,9 @@ class H264FileSource : public MediaSource {
   int fd_;
   std::unique_ptr<uint8_t[]> buf_;
 
-  AVP_DISALLOW_COPY_AND_ASSIGN(H264FileSource);
+  AVE_DISALLOW_COPY_AND_ASSIGN(H264FileSource);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !H264_FILE_SOURCE_H */

@@ -13,7 +13,7 @@
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame.h"
 
-namespace avp {
+namespace ave {
 namespace test {
 
 bool EqualPlane(const uint8_t* data1,
@@ -39,6 +39,6 @@ bool FrameBufsEqual(const std::shared_ptr<VideoFrameBuffer>& f1,
 std::shared_ptr<I420Buffer> ReadI420Buffer(int width, int height, FILE*);
 
 }  // namespace test
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !FRAME_UTILS_H */

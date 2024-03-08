@@ -11,7 +11,7 @@
 #include "common/video_codec_property.h"
 #include "modules/video_coding/codecs/h264/openh264_encoder.h"
 
-namespace avp {
+namespace ave {
 
 class BuiltinVideoEncoder : public VideoEncoder {
  public:
@@ -49,4 +49,4 @@ class BuiltinVideoEncoderFactory : public VideoEncoderFactory {
 std::unique_ptr<VideoEncoderFactory> CreateBuiltinVideoEncoderFactory() {
   return std::make_unique<BuiltinVideoEncoderFactory>();
 }
-}  // namespace avp
+}  // namespace ave

@@ -18,7 +18,7 @@
 
 struct soap;
 class ServiceContext;
-namespace avp {
+namespace ave {
 
 class OnvifDeviceBindingService;
 class OnvifMediaBindingService;
@@ -60,6 +60,6 @@ class OnvifServer : public Handler {
   void onStart(const std::shared_ptr<Message>& msg);
   void onStop(const std::shared_ptr<Message>& msg);
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !ONVIF_SERVER_H */

@@ -36,7 +36,7 @@ oc_library("encoded_image") {
   deps = [ ":video_frame" ]
 }
 
-if (avp_include_test) {
+if (ave_include_test) {
   oc_library("video_unittests") {
     testonly = true
   }

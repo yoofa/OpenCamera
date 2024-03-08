@@ -14,7 +14,7 @@
 #include "common/video_codec_property.h"
 #include "media/video/video_stream_helper.h"
 
-namespace avp {
+namespace ave {
 
 VideoStreamEncoder::VideoStreamEncoder(
     base::TaskRunnerFactory* task_runner_factory,
@@ -31,14 +31,14 @@ VideoStreamEncoder::VideoStreamEncoder(
           "VideoStreamEncoder",
           base::TaskRunnerFactory::Priority::NORMAL)) {
   // TODO(youfa) check encoder_factory to ignore build warning
-  DCHECK(encoder_factory_);
+  AVE_DCHECK(encoder_factory_);
 }
 
 VideoStreamEncoder::~VideoStreamEncoder() {}
 
 void VideoStreamEncoder::SetSource(
     VideoSourceInterface<std::shared_ptr<VideoFrame>>* source) {
-  DCHECK(source != nullptr);
+  AVE_DCHECK(source != nullptr);
   source->AddOrUpdateSink(this, VideoSinkWants());
 }
 
@@ -48,8 +48,8 @@ void VideoStreamEncoder::SetStartBitrate(int start_bitrate_bps) {}
 
 void VideoStreamEncoder::SendKeyFrame() {
   encoder_runner_.PostTask([this]() {
-    AVP_DCHECK_RUN_ON(&encoder_runner_);
-    LOG(LS_INFO) << "key request";
+    AVE_DCHECK_RUN_ON(&encoder_runner_);
+    AVE_LOG(LS_INFO) << "key request";
     if (encoder_) {
       encoder_->RequestKeyFrame();
     }
@@ -60,8 +60,8 @@ void VideoStreamEncoder::ConfigureEncoder(VideoEncoderConfig config,
                                           size_t max_data_payload_length) {
   encoder_runner_.PostTask(
       [this, config = std::move(config), max_data_payload_length]() mutable {
-        AVP_DCHECK_RUN_ON(&encoder_runner_);
-        LOG(LS_INFO) << "request configureEncoder";
+        AVE_DCHECK_RUN_ON(&encoder_runner_);
+        AVE_LOG(LS_INFO) << "request configureEncoder";
         pending_encoder_creation_ =
             (!encoder_ || max_data_payload_length_ != max_data_payload_length);
         encoder_config_ = std::move(config);
@@ -79,14 +79,14 @@ void VideoStreamEncoder::ConfigureEncoder(VideoEncoderConfig config,
 
 void VideoStreamEncoder::OnFrame(const std::shared_ptr<VideoFrame>& frame) {
   encoder_runner_.PostTask([this, frame]() {
-    // LOG(LS_INFO) << "VideoStreamEncoder::OnFrame";
+    // AVE_LOG(LS_INFO) << "VideoStreamEncoder::OnFrame";
     MaybeEncodeVideoFrame(frame);
   });
 }
 
 void VideoStreamEncoder::MaybeEncodeVideoFrame(
     const std::shared_ptr<VideoFrame>& frame) {
-  AVP_DCHECK_RUN_ON(&encoder_runner_);
+  AVE_DCHECK_RUN_ON(&encoder_runner_);
 
   // check if encoder need reconfigure
   if (!last_frame_info_ || last_frame_info_->width != frame->width() ||
@@ -95,11 +95,11 @@ void VideoStreamEncoder::MaybeEncodeVideoFrame(
     pending_encoder_reconfiguration_ = true;
     last_frame_info_ = VideoFrameInfo(frame->width(), frame->height(),
                                       frame->video_frame_buffer()->type());
-    LOG(LS_INFO) << "video frame info changed, "
-                 << VideoFrameBuffer::TypeToString(
-                        frame->video_frame_buffer()->type())
-                 << " : [" << last_frame_info_->width << ", "
-                 << last_frame_info_->height << "]";
+    AVE_LOG(LS_INFO) << "video frame info changed, "
+                     << VideoFrameBuffer::TypeToString(
+                            frame->video_frame_buffer()->type())
+                     << " : [" << last_frame_info_->width << ", "
+                     << last_frame_info_->height << "]";
   }
 
   if (pending_encoder_reconfiguration_) {
@@ -110,31 +110,31 @@ void VideoStreamEncoder::MaybeEncodeVideoFrame(
 
 void VideoStreamEncoder::EncodeVideoFrame(
     const std::shared_ptr<VideoFrame>& frame) {
-  AVP_DCHECK_RUN_ON(&encoder_runner_);
+  AVE_DCHECK_RUN_ON(&encoder_runner_);
   if (!encoder_) {
-    LOG(LS_ERROR) << "Encoder not created";
+    AVE_LOG(LS_ERROR) << "Encoder not created";
     return;
   }
   status_t ret = encoder_->Encode(frame);
   if (ret < 0) {
-    LOG(LS_ERROR) << "Encode failed: " << ret;
+    AVE_LOG(LS_ERROR) << "Encode failed: " << ret;
   }
 }
 
 void VideoStreamEncoder::ReConfigureEncoder() {
-  DCHECK(pending_encoder_reconfiguration_);
+  AVE_DCHECK(pending_encoder_reconfiguration_);
 
   bool encoder_reset_required = false;
   if (pending_encoder_creation_) {
     encoder_reset_required = true;
     encoder_.reset();
-    LOG(LS_INFO) << "create encoder";
+    AVE_LOG(LS_INFO) << "create encoder";
     encoder_ = encoder_factory_->CreateVideoEncoder();
-    CHECK(encoder_);
+    AVE_CHECK(encoder_);
 
     pending_encoder_creation_ = false;
     pending_encoder_reconfiguration_ = false;
-    LOG(LS_INFO) << "encoder_config:" << encoder_config_.ToString();
+    AVE_LOG(LS_INFO) << "encoder_config:" << encoder_config_.ToString();
   }
 
   std::vector<VideoStreamConfig> stream_configs = CreateVideoStreamConfig(
@@ -144,7 +144,7 @@ void VideoStreamEncoder::ReConfigureEncoder() {
 
   if (!SetupVideoCodecProperity(encoder_config_, stream_configs,
                                 &codec_property)) {
-    LOG(LS_ERROR) << "SetVideoCodecProperity failed";
+    AVE_LOG(LS_ERROR) << "SetVideoCodecProperity failed";
     return;
   }
 
@@ -164,7 +164,7 @@ void VideoStreamEncoder::ReConfigureEncoder() {
 }
 
 void VideoStreamEncoder::ReleaseEncoder() {
-  LOG(LS_INFO) << "release encoder";
+  AVE_LOG(LS_INFO) << "release encoder";
 
   if (!encoder_ || !encoder_initialized_) {
     return;
@@ -175,4 +175,4 @@ void VideoStreamEncoder::ReleaseEncoder() {
 
 void VideoStreamEncoder::Stop() {}
 
-}  // namespace avp
+}  // namespace ave

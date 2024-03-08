@@ -17,7 +17,7 @@ namespace {
 // constexpr uint16_t kAudioDeviceId = 0;
 }
 
-namespace avp {
+namespace ave {
 namespace {
 // We want to process at the lowest sample rate and channel count possible
 // without losing information. Choose the lowest native rate at least equal to
@@ -28,7 +28,7 @@ namespace {
 //                            size_t input_num_channels,
 //                            size_t send_num_channels,
 //                            AudioFrame* audio_frame) {
-//  DCHECK(audio_frame);
+//  AVE_DCHECK(audio_frame);
 //  int min_processing_rate_hz = std::min(input_sample_rate,
 //  send_sample_rate_hz); audio_frame->sample_rate_hz_ = min_processing_rate_hz;
 //  audio_frame->num_channels_ = std::min(input_num_channels,
@@ -49,28 +49,28 @@ bool AudioFlinger::InitIfNeed() {
   }
 
   if (audio_device_->Init() != 0) {
-    LOG(LS_ERROR) << "AudioDevice Init failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice Init failed";
   }
 
   if (audio_device_->SetRecordingDevice(4) != 0) {
-    LOG(LS_ERROR) << "AudioDevice SetRecordingDevice failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice SetRecordingDevice failed";
   }
 
   if (audio_device_->InitMicrophone() != 0) {
-    LOG(LS_ERROR) << "AudioDevice InitMicrophone failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice InitMicrophone failed";
   }
 
   if (audio_device_->RegisterAudioCallback(this) != 0) {
-    LOG(LS_ERROR) << "AudioDevice RegisterAudioCallback failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice RegisterAudioCallback failed";
   }
 
   // TODO(youfa) move to audio stream sender create time
   if (audio_device_->InitRecording() != 0) {
-    LOG(LS_ERROR) << "AudioDevice InitRecording failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice InitRecording failed";
   }
 
   if (audio_device_->StartRecording() != 0) {
-    LOG(LS_ERROR) << "AudioDevice StartRecording failed";
+    AVE_LOG(LS_ERROR) << "AudioDevice StartRecording failed";
   }
 
   return true;
@@ -81,7 +81,7 @@ status_t AudioFlinger::DataIsRecorded(const void* audio_data,
                                       uint32_t samples_per_channel,
                                       uint32_t num_channels,
                                       uint32_t sample_rate_hz) {
-  LOG(LS_VERBOSE) << "AudioFlinger::DataIsRecorded";
+  AVE_LOG(LS_VERBOSE) << "AudioFlinger::DataIsRecorded";
   // remix and resample
   uint32_t send_sample_rate_hz = 0;
   size_t send_num_channels = 0;
@@ -133,7 +133,7 @@ void AudioFlinger::SendFrame(std::unique_ptr<AudioFrame> audio_frame) {
 
 void AudioFlinger::UpdateSender(
     std::vector<std::shared_ptr<AudioSendStream>> senders) {
-  LOG(LS_ERROR) << "AudioFlinger::UpdateSender";
+  AVE_LOG(LS_ERROR) << "AudioFlinger::UpdateSender";
   lock_guard l(&sender_lock_);
   senders_ = senders;
 
@@ -149,4 +149,4 @@ void AudioFlinger::UpdateSender(
   num_channels_ = num_channels;
 }
 
-}  // namespace avp
+}  // namespace ave

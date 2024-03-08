@@ -15,7 +15,7 @@
 #include "modules/audio_device/audio_device_defines.h"
 #include "modules/audio_device/linux/alsasymboltable_linux.h"
 
-namespace avp {
+namespace ave {
 
 class AudioMixerManagerLinuxALSA {
  public:
@@ -64,6 +64,6 @@ class AudioMixerManagerLinuxALSA {
   mutable snd_mixer_elem_t* _inputMixerElement;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_MIXER_MANAGER_ALSA_LINUX_H */

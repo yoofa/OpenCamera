@@ -10,7 +10,7 @@
 
 #include "base/types.h"
 
-namespace avp {
+namespace ave {
 class AudioResampler {
  public:
   static void Resample_s16(const int16_t* src,
@@ -22,6 +22,6 @@ class AudioResampler {
                            uint32_t dst_sample_rate);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_RESAMPLER_H */

@@ -14,7 +14,7 @@
 #include "third_party/libyuv/include/libyuv/convert.h"
 #include "third_party/libyuv/include/libyuv/planar_functions.h"
 
-namespace avp {
+namespace ave {
 
 namespace {
 
@@ -37,11 +37,11 @@ YUYVBuffer::YUYVBuffer(size_t width,
       height_(height),
       stride_yuyv_(stride_yuyv),
       data_(static_cast<uint8_t*>(
-          AlignedMalloc(YUYVDataSize(height_, stride_yuyv_),
-                        kBufferAlignment))) {
-  DCHECK_GT(width, 0);
-  DCHECK_GT(height, 0);
-  DCHECK_GE(stride_yuyv, width);
+          base::AlignedMalloc(YUYVDataSize(height_, stride_yuyv_),
+                              kBufferAlignment))) {
+  AVE_DCHECK_GT(width, 0);
+  AVE_DCHECK_GT(height, 0);
+  AVE_DCHECK_GE(stride_yuyv, width);
 }
 
 YUYVBuffer::~YUYVBuffer() = default;
@@ -119,13 +119,13 @@ void YUYVBuffer::CropAndScaleFrom(const YUYVBufferInterface& src,
                                   size_t offset_y,
                                   size_t crop_width,
                                   size_t crop_height) {
-  CHECK_LE(crop_width, src.width());
-  CHECK_LE(crop_height, src.height());
-  CHECK_LE(crop_width + offset_x, src.width());
-  CHECK_LE(crop_height + offset_y, src.height());
-  CHECK_GE(offset_x, 0);
-  CHECK_GE(offset_y, 0);
+  AVE_CHECK_LE(crop_width, src.width());
+  AVE_CHECK_LE(crop_height, src.height());
+  AVE_CHECK_LE(crop_width + offset_x, src.width());
+  AVE_CHECK_LE(crop_height + offset_y, src.height());
+  AVE_CHECK_GE(offset_x, 0);
+  AVE_CHECK_GE(offset_y, 0);
   // TODO(youfa) not support now
 }
 
-}  // namespace avp
+}  // namespace ave

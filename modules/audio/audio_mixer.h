@@ -10,7 +10,7 @@
 
 #include "base/types.h"
 
-namespace avp {
+namespace ave {
 
 class AudioMixer {
  public:
@@ -27,6 +27,6 @@ class AudioMixer {
                     int16_t* dst);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_MIXER_H */

@@ -16,7 +16,7 @@
 #include "common/meta_data.h"
 #include "common/utils.h"
 
-namespace avp {
+namespace ave {
 
 static inline bool startCode3(uint8_t* buf) {
   if (buf[0] == 0 && buf[1] == 0 && buf[2] == 1)
@@ -58,7 +58,7 @@ H264FileSource::H264FileSource(const char* path)
 
   fd_ = open(path, O_LARGEFILE | O_RDONLY);
   if (fd_ <= 0) {
-    LOG(LS_ERROR) << "open file error";
+    AVE_LOG(LS_ERROR) << "open file error";
   }
 }
 
@@ -111,4 +111,4 @@ status_t H264FileSource::read(std::shared_ptr<Buffer>& buffer,
   return OK;
 }
 
-}  // namespace avp
+}  // namespace ave

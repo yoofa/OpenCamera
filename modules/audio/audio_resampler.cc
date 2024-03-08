@@ -7,7 +7,7 @@
 
 #include "audio_resampler.h"
 
-namespace avp {
+namespace ave {
 
 void AudioResampler::Resample_s16(const int16_t* src,
                                   uint32_t src_sample_rate,
@@ -19,4 +19,4 @@ void AudioResampler::Resample_s16(const int16_t* src,
   //
 }
 
-}  // namespace avp
+}  // namespace ave

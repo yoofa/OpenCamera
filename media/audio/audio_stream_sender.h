@@ -17,7 +17,7 @@
 #include "base/thread_annotation.h"
 #include "common/media_packet.h"
 
-namespace avp {
+namespace ave {
 class AudioStreamSender : public AudioSinkInterface<MediaPacket> {
  public:
   using AudioBufferT = MediaPacket;
@@ -36,6 +36,6 @@ class AudioStreamSender : public AudioSinkInterface<MediaPacket> {
   base::TaskRunner* transport_runner_;
   std::vector<std::shared_ptr<AudioSinkT>> sinks_ GUARDED_BY(transport_runner_);
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_STREAM_SENDER_H */

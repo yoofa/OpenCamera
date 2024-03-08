@@ -24,7 +24,7 @@
 #include "media/video/file_sink.h"
 #include "media/video/video_capturer.h"
 
-namespace avp {
+namespace ave {
 
 class MediaService : public Handler {
  public:
@@ -109,9 +109,9 @@ class MediaService : public Handler {
 
   std::vector<EncodedAudioSinkWrapper> audio_sinks_;
 
-  AVP_DISALLOW_COPY_AND_ASSIGN(MediaService);
+  AVE_DISALLOW_COPY_AND_ASSIGN(MediaService);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !MEDIA_SERVICE_H */

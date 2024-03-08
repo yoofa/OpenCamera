@@ -15,7 +15,7 @@
 #include "base/types.h"
 #include "third_party/inih/src/INIReader.h"
 
-namespace avp {
+namespace ave {
 struct AppConfig {
   /************ oc info *************/
   float version;
@@ -95,8 +95,8 @@ struct AppConfig {
     appConfig.snapurl = reader.Get("onvif", "snapurl", "https://google.com");
     appConfig.stream_type = reader.Get("onvif", "stream_type", "H264");
 
-    LOG(LS_INFO) << "stream:" << appConfig.stream_url
-                 << ", name:" << appConfig.name;
+    AVE_LOG(LS_INFO) << "stream:" << appConfig.stream_url
+                     << ", name:" << appConfig.name;
 
     // onvif ptz
     appConfig.ptz_enable = reader.GetBoolean("ptz", "ptz_enable", false);
@@ -115,6 +115,6 @@ struct AppConfig {
     return appConfig;
   }
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !APP_CONFIG_H */

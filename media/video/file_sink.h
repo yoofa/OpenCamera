@@ -20,7 +20,7 @@
 #include "common/buffer.h"
 #include "common/message.h"
 
-namespace avp {
+namespace ave {
 
 template <typename T>
 class FileSink : public VideoSinkInterface<T>, public MessageObject {
@@ -35,13 +35,13 @@ class FileSink : public VideoSinkInterface<T>, public MessageObject {
         buffer->pixel_format() == VideoFrameBuffer::PixelFormat::kYUY2) {
       std::shared_ptr<YUYVBufferInterface> frame_buffer =
           std::dynamic_pointer_cast<YUYVBufferInterface>(buffer);
-      LOG(LS_INFO) << "YUY2: " << frame_buffer->Stride()
-                   << frame_buffer->height();
+      AVE_LOG(LS_INFO) << "YUY2: " << frame_buffer->Stride()
+                       << frame_buffer->height();
       file_.write((char*)frame_buffer->Data(),
                   frame_buffer->Stride() * frame_buffer->height());
       // std::shared_ptr<YUYVBufferInterface> yuyv_buffer =
       //    YUYVBuffer::Create(640, 480);
-      // LOG(LS_INFO) << "yuyv_buffer: " << yuyv_buffer->Stride();
+      // AVE_LOG(LS_INFO) << "yuyv_buffer: " << yuyv_buffer->Stride();
 
     } else {
       auto i420_buffer = buffer->ToI420();
@@ -54,7 +54,7 @@ class FileSink : public VideoSinkInterface<T>, public MessageObject {
     }
   }
   void OnFrameInternal(const EncodedImage& frame) {
-    // LOG(LS_INFO) << "EncodedImage, size: " << frame.Size();
+    // AVE_LOG(LS_INFO) << "EncodedImage, size: " << frame.Size();
     file_.write((char*)frame.Data(), frame.Size());
   }
 
@@ -79,6 +79,6 @@ class FileSink : public VideoSinkInterface<T>, public MessageObject {
   std::ofstream file_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !FILE_SINK_H */

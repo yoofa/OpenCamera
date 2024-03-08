@@ -7,7 +7,7 @@
 
 #include "remix_resample.h"
 
-namespace avp {
+namespace ave {
 
 void RemixAndResample(const int16_t* src,
                       uint32_t src_channels,
@@ -19,4 +19,4 @@ void RemixAndResample(const int16_t* src,
   //
 }
 
-}  // namespace avp
+}  // namespace ave

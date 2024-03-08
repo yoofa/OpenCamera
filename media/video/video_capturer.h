@@ -23,7 +23,7 @@
 #include "common/message.h"
 #include "media/video/video_source_base.h"
 
-namespace avp {
+namespace ave {
 
 class VideoCapturer : public VideoSinkInterface<std::shared_ptr<VideoFrame>>,
                       public VideoProcessorSink<std::shared_ptr<VideoFrame>>,
@@ -65,7 +65,7 @@ class VideoCapturer : public VideoSinkInterface<std::shared_ptr<VideoFrame>>,
   // capture runner, used to handle capture task
   std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
   std::unique_ptr<base::TaskRunner> task_runner_;
-  RepeatingTaskHandle repeating_task_handler_;
+  base::RepeatingTaskHandle repeating_task_handler_;
 
   VideoSource* video_source_;
 
@@ -79,6 +79,6 @@ class VideoCapturer : public VideoSinkInterface<std::shared_ptr<VideoFrame>>,
   uint64_t frame_sent_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_CAPTURER_H */

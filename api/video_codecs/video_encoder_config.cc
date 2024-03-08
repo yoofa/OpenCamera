@@ -13,7 +13,7 @@
 
 #include "base/checks.h"
 
-namespace avp {
+namespace ave {
 
 VideoStreamConfig::VideoStreamConfig()
     : width(0),
@@ -95,23 +95,23 @@ void VideoEncoderConfig::EncoderSpecificSettings::FillEncoderSpecificSettings(
   } else if (codec->codec_id == CodecId::AV_CODEC_ID_VP9) {
     FillVideoCodecVp9(codec->VP9());
   } else {
-    AVP_NOTREACHED() << "Encoder specifics set/used for unknown codec type.";
+    AVE_NOTREACHED() << "Encoder specifics set/used for unknown codec type.";
   }
 }
 
 void VideoEncoderConfig::EncoderSpecificSettings::FillVideoCodecH264(
     H264Specific* h264_settings) const {
-  AVP_NOTREACHED();
+  AVE_NOTREACHED();
 }
 
 void VideoEncoderConfig::EncoderSpecificSettings::FillVideoCodecVp8(
     VP8Specific* vp8_settings) const {
-  AVP_NOTREACHED();
+  AVE_NOTREACHED();
 }
 
 void VideoEncoderConfig::EncoderSpecificSettings::FillVideoCodecVp9(
     VP9Specific* vp9_settings) const {
-  AVP_NOTREACHED();
+  AVE_NOTREACHED();
 }
 
 VideoEncoderConfig::H264EncoderSpecificSettings::H264EncoderSpecificSettings(
@@ -141,4 +141,4 @@ void VideoEncoderConfig::Vp9EncoderSpecificSettings::FillVideoCodecVp9(
   *vp9_settings = specifics_;
 }
 
-}  // namespace avp
+}  // namespace ave

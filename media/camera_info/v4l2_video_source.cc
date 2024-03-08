@@ -21,7 +21,7 @@
 #include "common/looper.h"
 #include "common/message.h"
 
-namespace avp {
+namespace ave {
 namespace {
 
 // Desired number of v4l2 video buffers to allocate.
@@ -131,7 +131,7 @@ V4L2VideoSourceForCameraInfo::V4L2VideoSourceForCameraInfo(const char* device)
     : fd_(-1) {
   fd_ = ::open(device, O_RDWR);
   if (fd_ < 0) {
-    LOG(LS_ERROR) << "open " << device << " fail, maybe no permission";
+    AVE_LOG(LS_ERROR) << "open " << device << " fail, maybe no permission";
     return;
   }
 
@@ -142,7 +142,7 @@ V4L2VideoSourceForCameraInfo::V4L2VideoSourceForCameraInfo(const char* device)
          ((cap.capabilities & V4L2_CAP_DEVICE_CAPS) &&
           (cap.device_caps & V4L2_CAP_VIDEO_CAPTURE) &&
           !(cap.device_caps & V4L2_CAP_VIDEO_OUTPUT))))) {
-    LOG(LS_ERROR) << "get cap error, not v4l2 device";
+    AVE_LOG(LS_ERROR) << "get cap error, not v4l2 device";
     return;
   }
   v4l2_capability_ = cap;
@@ -152,8 +152,8 @@ V4L2VideoSourceForCameraInfo::V4L2VideoSourceForCameraInfo(const char* device)
   for (; DoIoctl(VIDIOC_ENUM_FMT, &fmtdesc) == 0; ++fmtdesc.index) {
     char cc[5];
     V4L2MakeFourCCString(fmtdesc.pixelformat, cc);
-    LOG(LS_DEBUG) << "support format: " << cc
-                  << ", desc: " << fmtdesc.description;
+    AVE_LOG(LS_DEBUG) << "support format: " << cc
+                      << ", desc: " << fmtdesc.description;
     mV4L2Formats.push_back(fmtdesc);
   }
   //
@@ -174,12 +174,12 @@ status_t V4L2VideoSourceForCameraInfo::start(MetaData* params) {
 
   // read params
   int32_t width = 0;
-  CHECK(params->findInt32(kKeyWidth, &width));
+  AVE_CHECK(params->findInt32(kKeyWidth, &width));
   int32_t height = 0;
-  CHECK(params->findInt32(kKeyHeight, &height));
+  AVE_CHECK(params->findInt32(kKeyHeight, &height));
 
   int32_t preferColorFormat = -1;
-  CHECK(params->findInt32(kKeyColorFormat, &preferColorFormat));
+  AVE_CHECK(params->findInt32(kKeyColorFormat, &preferColorFormat));
 
   // 1. prefer format, 2. support formats by device, support formats in code;
   uint32_t colorFormat = PreferFormatFourCc(mV4L2Formats, preferColorFormat);
@@ -189,18 +189,18 @@ status_t V4L2VideoSourceForCameraInfo::start(MetaData* params) {
 
   char cc[5];
   V4L2MakeFourCCString(colorFormat, cc);
-  LOG(LS_INFO) << "choosen pixel format is " << cc;
+  AVE_LOG(LS_INFO) << "choosen pixel format is " << cc;
   color_format_ = colorFormat;
 
   FillV4L2Format(&video_format_, width, height, colorFormat);
   if (DoIoctl(VIDIOC_S_FMT, &video_format_) < 0) {
-    LOG(LS_ERROR) << "failed to set video format";
+    AVE_LOG(LS_ERROR) << "failed to set video format";
     return ERROR_UNSUPPORTED;
   }
   V4L2MakeFourCCString(video_format_.fmt.pix.pixelformat, cc);
-  LOG(LS_INFO) << "set format: " << cc
-               << ", width: " << video_format_.fmt.pix.width
-               << ", height: " << video_format_.fmt.pix.height;
+  AVE_LOG(LS_INFO) << "set format: " << cc
+                   << ", width: " << video_format_.fmt.pix.width
+                   << ", height: " << video_format_.fmt.pix.height;
 
   width_ = video_format_.fmt.pix.width;
   height_ = video_format_.fmt.pix.height;
@@ -218,12 +218,12 @@ status_t V4L2VideoSourceForCameraInfo::start(MetaData* params) {
                       : (kTypicalFramerate * kFrameRatePrecision);
 
       if (DoIoctl(VIDIOC_S_PARM, &streamparm) < 0) {
-        LOG(LS_ERROR) << "fail to set camera framerate";
+        AVE_LOG(LS_ERROR) << "fail to set camera framerate";
         return ERROR_UNSUPPORTED;
       }
-      LOG(LS_INFO) << "camera driver framerate: "
-                   << streamparm.parm.capture.timeperframe.denominator << "/"
-                   << streamparm.parm.capture.timeperframe.numerator;
+      AVE_LOG(LS_INFO) << "camera driver framerate: "
+                       << streamparm.parm.capture.timeperframe.denominator
+                       << "/" << streamparm.parm.capture.timeperframe.numerator;
     }
   }
 
@@ -238,7 +238,7 @@ bool V4L2VideoSourceForCameraInfo::MapAndQueueBuffer(int index) {
   v4l2_buffer buffer;
   FillV4L2Buffer(&buffer, index);
   if (DoIoctl(VIDIOC_QUERYBUF, &buffer) < 0) {
-    LOG(LS_ERROR) << "error querying status of a MMAP V4L2 buffer";
+    AVE_LOG(LS_ERROR) << "error querying status of a MMAP V4L2 buffer";
     return false;
   }
 
@@ -247,7 +247,7 @@ bool V4L2VideoSourceForCameraInfo::MapAndQueueBuffer(int index) {
       ::mmap(nullptr, buffer.length, kFlags, MAP_SHARED, fd_, buffer.m.offset);
 
   if (start == MAP_FAILED) {
-    LOG(LS_ERROR) << "Error mmap()ing a V4L2 buffer into userspace";
+    AVE_LOG(LS_ERROR) << "Error mmap()ing a V4L2 buffer into userspace";
     return false;
   }
 
@@ -258,7 +258,7 @@ bool V4L2VideoSourceForCameraInfo::MapAndQueueBuffer(int index) {
 
   // enqueue the buffer
   if (DoIoctl(VIDIOC_QBUF, &buffer) < 0) {
-    LOG(LS_ERROR) << "Error enqueuing a V4L2 buffer back into the driver";
+    AVE_LOG(LS_ERROR) << "Error enqueuing a V4L2 buffer back into the driver";
     return false;
   }
 
@@ -269,20 +269,20 @@ bool V4L2VideoSourceForCameraInfo::StartStream() {
   v4l2_requestbuffers r_buffer;
   FillV4L2RequestBuffer(&r_buffer, kNumVideoBuffers);
   if (DoIoctl(VIDIOC_REQBUFS, &r_buffer) < 0) {
-    LOG(LS_ERROR) << "failed to mmap buffers from V4L2";
+    AVE_LOG(LS_ERROR) << "failed to mmap buffers from V4L2";
     return false;
   }
 
   for (unsigned int i = 0; i < r_buffer.count; ++i) {
     if (!MapAndQueueBuffer(i)) {
-      LOG(LS_ERROR) << "Allocate buffer failed";
+      AVE_LOG(LS_ERROR) << "Allocate buffer failed";
       return false;
     }
   }
 
   v4l2_buf_type capture_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(VIDIOC_STREAMON, &capture_type) < 0) {
-    LOG(LS_ERROR) << "VIDIOC_STREAMON failed";
+    AVE_LOG(LS_ERROR) << "VIDIOC_STREAMON failed";
     return false;
   }
 
@@ -297,7 +297,7 @@ status_t V4L2VideoSourceForCameraInfo::stop() {
 bool V4L2VideoSourceForCameraInfo::StopStream() {
   v4l2_buf_type capture_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(VIDIOC_STREAMOFF, &capture_type) < 0) {
-    LOG(LS_ERROR) << "VIDIOC_STREAMOFF failed";
+    AVE_LOG(LS_ERROR) << "VIDIOC_STREAMOFF failed";
 
     return false;
   }
@@ -305,7 +305,7 @@ bool V4L2VideoSourceForCameraInfo::StopStream() {
   v4l2_requestbuffers r_buffer;
   FillV4L2RequestBuffer(&r_buffer, 0);
   if (DoIoctl(VIDIOC_REQBUFS, &r_buffer) < 0) {
-    LOG(LS_ERROR) << "Failed to VIDIOC_REQBUFS with count = 0";
+    AVE_LOG(LS_ERROR) << "Failed to VIDIOC_REQBUFS with count = 0";
 
     return false;
   }
@@ -323,14 +323,14 @@ status_t V4L2VideoSourceForCameraInfo::read(std::shared_ptr<Buffer>& buffer,
   pfd.events = POLLIN;
   const int result = ::poll(&pfd, 1, kCaptureTimeoutMs);
   if (result < 0) {
-    LOG(LS_ERROR) << "poll failed " << result;
+    AVE_LOG(LS_ERROR) << "poll failed " << result;
     return result;
   }
 
   if (result == 0) {
     return ERROR_RETRY;
   }
-  //  LOG(LS_VERBOSE) << "pfd.events:" << pfd.events
+  //  AVE_LOG(LS_VERBOSE) << "pfd.events:" << pfd.events
   //                  << ", pfd.revents:" << pfd.revents;
 
   if (pfd.revents & POLLIN) {
@@ -338,7 +338,7 @@ status_t V4L2VideoSourceForCameraInfo::read(std::shared_ptr<Buffer>& buffer,
     FillV4L2Buffer(&v4lBuffer, 0);
 
     if (DoIoctl(VIDIOC_DQBUF, &v4lBuffer) < 0) {
-      LOG(LS_ERROR) << "failed to dequeue capture buffer";
+      AVE_LOG(LS_ERROR) << "failed to dequeue capture buffer";
       return UNKNOWN_ERROR;
     }
 
@@ -351,7 +351,7 @@ status_t V4L2VideoSourceForCameraInfo::read(std::shared_ptr<Buffer>& buffer,
     buffer->meta()->setInt32("height", height_);
 
     if (DoIoctl(VIDIOC_QBUF, &v4lBuffer) < 0) {
-      LOG(LS_ERROR) << "failed to enqueue capture buffer";
+      AVE_LOG(LS_ERROR) << "failed to enqueue capture buffer";
       return UNKNOWN_ERROR;
     }
 
@@ -384,7 +384,7 @@ class V4l2VideoSourceFactory : public VideoSourceFactory {
       std::shared_ptr<Message> info) {
     // TODO
     std::string v4l2_dev;
-    CHECK(info->findString("v4l2-dev", v4l2_dev));
+    AVE_CHECK(info->findString("v4l2-dev", v4l2_dev));
     return std::make_unique<V4L2VideoSourceForCameraInfo>(v4l2_dev.c_str());
   }
 
@@ -397,4 +397,4 @@ std::unique_ptr<VideoSourceFactory> CreateV4l2VideoSourceFactory() {
   return std::make_unique<V4l2VideoSourceFactory>();
 }
 
-}  // namespace avp
+}  // namespace ave

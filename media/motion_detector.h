@@ -10,7 +10,7 @@
 
 #include "media/video_sink.h"
 
-namespace avp {
+namespace ave {
 
 class MotionDetector : public VideoSink {
  public:
@@ -25,6 +25,6 @@ class MotionDetector : public VideoSink {
  private:
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !MOTION_DETECTOR_H */

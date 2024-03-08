@@ -12,13 +12,13 @@
 
 #include "api/video/video_frame.h"
 #include "api/video/video_sink_interface.h"
-namespace avp {
+namespace ave {
 
 class VideoEncoderInterface
     : public VideoSinkInterface<std::shared_ptr<VideoFrame>> {
  public:
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_ENCODER_INTERFACE_H */

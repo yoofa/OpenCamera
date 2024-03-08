@@ -19,7 +19,7 @@
 #include "media/audio/audio_stream_sender.h"
 #include "media/video/video_stream_sender.h"
 
-namespace avp {
+namespace ave {
 class MediaTransport {
   using EncodedVideoSink = std::shared_ptr<VideoSinkInterface<EncodedImage>>;
   using EncodedAudioBuffer = MediaPacket;
@@ -64,6 +64,6 @@ class MediaTransport {
   std::vector<AudioStreamSenderInfo> audio_stream_senders_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !MEDIA_TRANSPORT_H */

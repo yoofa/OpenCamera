@@ -10,7 +10,7 @@
 
 #include "third_party/onvif_srvd/src/generated/soapPTZBindingService.h"
 
-namespace avp {
+namespace ave {
 class OnvifPTZBindingService : public PTZBindingService {
  public:
   OnvifPTZBindingService(struct soap* soap);
@@ -202,5 +202,5 @@ class OnvifPTZBindingService : public PTZBindingService {
  private:
   /* data */
 };
-}  // namespace avp
+}  // namespace ave
 #endif /* !ONVIF_PTZ_BINDING_SERVICE_H */

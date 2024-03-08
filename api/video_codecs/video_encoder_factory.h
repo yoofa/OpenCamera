@@ -12,7 +12,7 @@
 
 #include "api/video_codecs/video_encoder.h"
 
-namespace avp {
+namespace ave {
 
 class VideoEncoderFactory {
  public:
@@ -21,5 +21,5 @@ class VideoEncoderFactory {
   virtual std::unique_ptr<VideoEncoder> CreateVideoEncoder() = 0;
 };
 
-}  // namespace avp
+}  // namespace ave
 #endif /* !VIDEO_ENCODER_FACTORY_H */

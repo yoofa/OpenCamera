@@ -10,7 +10,7 @@
 
 #include "modules/audio_device/linux/latebindingsymboltable_linux.h"
 
-namespace avp {
+namespace ave {
 namespace adm_linux_alsa {
 
 // The ALSA symbols we need, as an X-Macro list.
@@ -123,6 +123,6 @@ ALSA_SYMBOLS_LIST
 LATE_BINDING_SYMBOL_TABLE_DECLARE_END(AlsaSymbolTable)
 
 }  // namespace adm_linux_alsa
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !ALSASYMBOLTABLE_LINUX_H */

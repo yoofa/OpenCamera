@@ -11,7 +11,7 @@
 #include "base/types.h"
 #include "modules/audio_device/audio_device_defines.h"
 
-namespace avp {
+namespace ave {
 
 class AudioTransport;
 class AudioDeviceBuffer;
@@ -120,6 +120,6 @@ class AudioDevice {
   // virtual int32_t GetPlayoutUnderrunCount() const;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_DEVICE_H */

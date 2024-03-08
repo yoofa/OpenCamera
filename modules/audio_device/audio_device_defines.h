@@ -15,7 +15,7 @@
 #include "base/checks.h"
 #include "base/types.h"
 
-namespace avp {
+namespace ave {
 
 static const int kAdmMaxDeviceNameSize = 128;
 static const int kAdmMaxFileNameSize = 512;
@@ -45,6 +45,6 @@ class AudioTransport {
  protected:
   virtual ~AudioTransport() {}
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_DEVICE_DEFINES_H */

@@ -14,7 +14,7 @@
 #include "common/audio_codec_property.h"
 #include "common/media_packet.h"
 
-namespace avp {
+namespace ave {
 
 class AudioEncoder {
  public:
@@ -39,6 +39,6 @@ class AudioEncoder {
   // virtual void SetRate(rate);
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_ENCODER_H */

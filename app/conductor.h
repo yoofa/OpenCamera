@@ -21,7 +21,7 @@
 #include "rtsp/h264_file_source.h"
 #include "rtsp/rtsp_server.h"
 
-namespace avp {
+namespace ave {
 namespace oc {
 
 class Conductor : public Handler {
@@ -80,6 +80,6 @@ class Conductor : public Handler {
   std::condition_variable condition_;
 };
 }  // namespace oc
-}  // namespace avp
+}  // namespace ave
 
 #endif /*conductor_t_H */

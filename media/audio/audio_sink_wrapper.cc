@@ -7,4 +7,4 @@
 
 #include "audio_sink_wrapper.h"
 
-namespace avp {}  // namespace avp
+namespace ave {}  // namespace ave

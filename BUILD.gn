@@ -10,7 +10,7 @@ group("default") {
   ]
 
   #  deps += [ "examples" ]
-  if (avp_include_test) {
+  if (ave_include_test) {
     deps += [
       ":oc_unittests",
       "base:base_unittests",
@@ -41,30 +41,30 @@ config("common_inherited_config") {
   }
 
   if (is_posix || is_fuchsia) {
-    defines += [ "AVP_POSIX" ]
+    defines += [ "AVE_POSIX" ]
   }
   if (is_ios) {
     defines += [
-      "AVP_MAC",
-      "AVP_IOS",
+      "AVE_MAC",
+      "AVE_IOS",
     ]
   }
   if (is_linux || is_chromeos) {
-    defines += [ "AVP_LINUX" ]
+    defines += [ "AVE_LINUX" ]
   }
   if (is_mac) {
-    defines += [ "AVP_MAC" ]
+    defines += [ "AVE_MAC" ]
   }
   if (is_fuchsia) {
-    defines += [ "AVP_FUCHSIA" ]
+    defines += [ "AVE_FUCHSIA" ]
   }
   if (is_win) {
-    defines += [ "AVP_WIN" ]
+    defines += [ "AVE_WIN" ]
   }
   if (is_android) {
     defines += [
-      "AVP_LINUX",
-      "AVP_ANDROID",
+      "AVE_LINUX",
+      "AVE_ANDROID",
     ]
   }
 

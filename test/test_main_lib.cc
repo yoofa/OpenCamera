@@ -13,7 +13,7 @@
 #include "base/logging.h"
 #include "test/gtest.h"
 
-namespace avp {
+namespace ave {
 
 namespace {
 
@@ -62,4 +62,4 @@ std::unique_ptr<TestMain> TestMain::Create() {
   return std::make_unique<TestMainImpl>();
 }
 
-}  // namespace avp
+}  // namespace ave

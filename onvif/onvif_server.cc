@@ -19,7 +19,7 @@
 #include "third_party/onvif_srvd/src/generated/soapH.h"
 #include "third_party/onvif_srvd/src/src/ServiceContext.h"
 
-namespace avp {
+namespace ave {
 
 status_t convertConfig(ServiceContext* serviceContext, AppConfig* appConfig) {
   bool noerr = true;
@@ -79,7 +79,7 @@ OnvifServer::OnvifServer(AppConfig appConfig, std::shared_ptr<Message> notify)
       device_service_(new OnvifDeviceBindingService(soap_.get())),
       media_service_(new OnvifMediaBindingService(soap_.get())),
       ptz_service_(new OnvifPTZBindingService(soap_.get())) {
-  DCHECK(!app_config_.error);
+  AVE_DCHECK(!app_config_.error);
   looper_->setName("OnvifServer");
 }
 
@@ -94,7 +94,7 @@ status_t OnvifServer::Init() {
 
   status_t err = convertConfig(service_info_.get(), &app_config_);
   if (err) {
-    LOG(LS_ERROR) << "init config error";
+    AVE_LOG(LS_ERROR) << "init config error";
     return err;
   }
 
@@ -102,8 +102,8 @@ status_t OnvifServer::Init() {
           soap_bind(soap_.get(), NULL, service_info_->port, 10))) {
     std::stringstream ss;
     soap_stream_fault(soap_.get(), ss);
-    LOG(LS_ERROR) << "bind socket error, port:" << service_info_->port << ", "
-                  << ss.str();
+    AVE_LOG(LS_ERROR) << "bind socket error, port:" << service_info_->port
+                      << ", " << ss.str();
     return UNKNOWN_ERROR;
   }
 
@@ -150,7 +150,7 @@ void OnvifServer::onStart(const std::shared_ptr<Message>& msg) {
       if (!soap_valid_socket(soap_accept(soap_.get()))) {
         ss.clear();
         soap_stream_fault(soap_.get(), ss);
-        LOG(LS_ERROR) << "start with no valid socket." << ss.str();
+        AVE_LOG(LS_ERROR) << "start with no valid socket." << ss.str();
         // TODO notify OnvifServer
       }
 
@@ -158,24 +158,24 @@ void OnvifServer::onStart(const std::shared_ptr<Message>& msg) {
       if (soap_begin_serve(soap_.get())) {
         ss.clear();
         soap_stream_fault(soap_.get(), ss);
-        LOG(LS_ERROR) << ss.str();
+        AVE_LOG(LS_ERROR) << ss.str();
       } else if (device_service_->dispatch() != SOAP_NO_METHOD) {
         ss.clear();
         soap_send_fault(soap_.get());
         soap_stream_fault(soap_.get(), ss);
-        LOG(LS_ERROR) << ss.str();
+        AVE_LOG(LS_ERROR) << ss.str();
       } else if (media_service_->dispatch() != SOAP_NO_METHOD) {
         ss.clear();
         soap_send_fault(soap_.get());
         soap_stream_fault(soap_.get(), ss);
-        LOG(LS_ERROR) << ss.str();
+        AVE_LOG(LS_ERROR) << ss.str();
       } else if (ptz_service_->dispatch() != SOAP_NO_METHOD) {
         ss.clear();
         soap_send_fault(soap_.get());
         soap_stream_fault(soap_.get(), ss);
-        LOG(LS_ERROR) << ss.str();
+        AVE_LOG(LS_ERROR) << ss.str();
       } else {
-        LOG(LS_WARNING) << "UNKNOWN SERVICE";
+        AVE_LOG(LS_WARNING) << "UNKNOWN SERVICE";
       }
 
       soap_destroy(soap_.get());
@@ -186,4 +186,4 @@ void OnvifServer::onStart(const std::shared_ptr<Message>& msg) {
 
 void OnvifServer::onStop(const std::shared_ptr<Message>& msg) {}
 
-}  // namespace avp
+}  // namespace ave

@@ -10,7 +10,7 @@
 
 #include "api/audio_codecs/audio_encoder_factory.h"
 
-namespace avp {
+namespace ave {
 std::unique_ptr<AudioEncoderFactory> CreateBuiltinAudioEncoderFactory();
 
 }

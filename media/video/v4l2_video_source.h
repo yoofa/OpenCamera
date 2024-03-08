@@ -17,7 +17,7 @@
 #include "common/meta_data.h"
 #include "media/video/video_source_base.h"
 
-namespace avp {
+namespace ave {
 class V4L2VideoSource : public VideoSourceBase<std::shared_ptr<VideoFrame>> {
  protected:
   // for private construct
@@ -58,7 +58,7 @@ class V4L2VideoSource : public VideoSourceBase<std::shared_ptr<VideoFrame>> {
 
   std::unique_ptr<base::TaskRunnerFactory> task_runner_factory_;
   std::unique_ptr<base::TaskRunner> task_runner_;
-  RepeatingTaskHandle repeating_task_handler_;
+  base::RepeatingTaskHandle repeating_task_handler_;
 
   int mFd;
   v4l2_capability mV4L2Capability;
@@ -73,6 +73,6 @@ class V4L2VideoSource : public VideoSourceBase<std::shared_ptr<VideoFrame>> {
 
 // std::unique_ptr<VideoSourceFactory> CreateV4l2VideoSourceFactory();
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !V4L2_VIDEO_SOURCE_H */

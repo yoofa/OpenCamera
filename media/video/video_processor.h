@@ -13,7 +13,7 @@
 #include "common/buffer.h"
 #include "media/video_sink.h"
 
-namespace avp {
+namespace ave {
 class VideoProcessor {
  public:
   virtual ~VideoProcessor() = default;
@@ -36,6 +36,6 @@ class VideoProcessor {
   VideoSink* video_sink_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_PROCESSOR_H */

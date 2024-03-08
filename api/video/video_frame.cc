@@ -7,7 +7,7 @@
 
 #include "video_frame.h"
 
-namespace avp {
+namespace ave {
 VideoFrame::VideoFrame(uint64_t id,
                        std::shared_ptr<VideoFrameBuffer> video_frame_buffer,
                        uint64_t timestamp_us,
@@ -45,4 +45,4 @@ void VideoFrame::set_video_frame_buffer(
   video_frame_buffer_ = std::move(video_frame_buffer);
 }
 
-}  // namespace avp
+}  // namespace ave

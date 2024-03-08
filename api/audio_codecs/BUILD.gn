@@ -16,6 +16,6 @@ oc_library("builtin_audio_encoder") {
   ]
   deps = [
     ":audio_encoder_api",
-    "../../modules/audio_coding:avp_fdkaac",
+    "../../modules/audio_coding:ave_fdkaac",
   ]
 }

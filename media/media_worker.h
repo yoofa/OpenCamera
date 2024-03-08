@@ -19,7 +19,7 @@
 #include "base/task_util/task.h"
 #include "base/task_util/task_runner_factory.h"
 
-namespace avp {
+namespace ave {
 
 class MediaWorker {
   using VideoSource =
@@ -84,6 +84,6 @@ class MediaWorker {
   AudioDevice* audio_device_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !MEDIA_WORKER_H */

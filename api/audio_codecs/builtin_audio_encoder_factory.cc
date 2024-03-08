@@ -9,7 +9,7 @@
 #include "api/audio_codecs/audio_encoder_factory.h"
 #include "modules/audio_coding/codecs/aac/fdkaac_encoder.h"
 
-namespace avp {
+namespace ave {
 
 class BuiltinAudioEncoderFactory : public AudioEncoderFactory {
  public:
@@ -28,4 +28,4 @@ std::unique_ptr<AudioEncoderFactory> CreateBuiltinAudioEncoderFactory() {
   return std::make_unique<BuiltinAudioEncoderFactory>();
 }
 
-}  // namespace avp
+}  // namespace ave

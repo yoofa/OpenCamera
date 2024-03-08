@@ -8,10 +8,10 @@
 #include "media/camera_info/default_video_source_factory.h"
 #include "media/camera_info/v4l2_video_source.h"
 
-namespace avp {
+namespace ave {
 
 std::unique_ptr<VideoSourceFactory> CreateDefaultVideoSourceFactory() {
   return CreateV4l2VideoSourceFactory();
 }
 
-}  // namespace avp
+}  // namespace ave

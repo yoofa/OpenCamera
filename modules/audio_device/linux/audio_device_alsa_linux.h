@@ -19,10 +19,10 @@
 #include "modules/audio_device/audio_device_generic.h"
 #include "modules/audio_device/linux/audio_mixer_manager_alsa_linux.h"
 
-typedef avp::adm_linux_alsa::AlsaSymbolTable AVPAlsaSymbolTable;
+typedef ave::adm_linux_alsa::AlsaSymbolTable AVPAlsaSymbolTable;
 AVPAlsaSymbolTable* GetAlsaSymbolTable();
 
-namespace avp {
+namespace ave {
 
 class AudioDeviceLinuxALSA : public AudioDeviceGeneric {
  public:
@@ -190,6 +190,6 @@ class AudioDeviceLinuxALSA : public AudioDeviceGeneric {
 #endif
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_DEVICE_ALSA_LINUX_H */

@@ -13,7 +13,7 @@
 #include "base/sequence_checker.h"
 #include "media/video/video_stream_encoder.h"
 
-namespace avp {
+namespace ave {
 
 VideoSendStream::VideoSendStream(
     base::TaskRunnerFactory* task_runner_factory,
@@ -40,7 +40,7 @@ VideoSendStream::VideoSendStream(
 VideoSendStream::~VideoSendStream() {}
 
 void VideoSendStream::Start() {
-  task_runner_->PostTask([this]() { AVP_DCHECK_RUN_ON(task_runner_); });
+  task_runner_->PostTask([this]() { AVE_DCHECK_RUN_ON(task_runner_); });
 }
 
 void VideoSendStream::Stop() {
@@ -61,4 +61,4 @@ void VideoSendStream::ReConfigureEncoder(VideoEncoderConfig config) {
   video_stream_encoder_->ConfigureEncoder(std::move(config), 10000);
 }
 
-}  // namespace avp
+}  // namespace ave

@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace avp {
+namespace ave {
 
 class MediaStream {
  public:
@@ -26,6 +26,6 @@ class MediaStream {
   std::string id_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !MEDIA_STREAM_H */

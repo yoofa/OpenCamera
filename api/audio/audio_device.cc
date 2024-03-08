@@ -10,7 +10,7 @@
 #include "base/checks.h"
 #include "media/audio/audio_callback.h"
 
-namespace avp {
+namespace ave {
 
 status_t AudioDevice::RegisterAudioCallback(AudioCallback* callback) {
   callback_ = callback;
@@ -41,4 +41,4 @@ status_t AudioDevice::GetPlaybackData(void* audio_data,
   return NO_INIT;
 }
 
-}  // namespace avp
+}  // namespace ave

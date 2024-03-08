@@ -18,7 +18,7 @@
 #include "media/audio/audio_flinger.h"
 #include "media/video/video_stream_sender.h"
 
-namespace avp {
+namespace ave {
 
 HybirdWorker::HybirdWorker(base::TaskRunnerFactory* task_factory,
                            AudioEncoderFactory* audio_encoder_factory,
@@ -44,14 +44,14 @@ void HybirdWorker::AddVideoSource(VideoSource& video_source,
                                   VideoEncoderConfig& encoder_config) {
   worker_task_runner_.PostTask([this, video_source, stream_id,
                                 config = encoder_config.Copy()]() mutable {
-    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    AVE_DCHECK_RUN_ON(&worker_task_runner_);
     // warning if sources already exist in video_sources_
     auto it = std::find_if(video_sources_.begin(), video_sources_.end(),
                            [&video_source](const VideoSourceInfo& source) {
                              return source.video_source == video_source;
                            });
     if (it != video_sources_.end()) {
-      LOG(LS_WARNING) << "VideoSource already exist in video_sources_";
+      AVE_LOG(LS_WARNING) << "VideoSource already exist in video_sources_";
       return;
     }
 
@@ -80,18 +80,18 @@ void HybirdWorker::AddVideoSource(VideoSource& video_source,
 void HybirdWorker::RemoveVideoSource(VideoSource& video_source,
                                      int32_t stream_id) {
   worker_task_runner_.PostTask([this, video_source, stream_id]() {
-    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    AVE_DCHECK_RUN_ON(&worker_task_runner_);
     auto it_video_source =
         std::find_if(video_sources_.begin(), video_sources_.end(),
                      [&video_source](const VideoSourceInfo& source) {
                        return source.video_source == video_source;
                      });
     if (it_video_source == video_sources_.end()) {
-      LOG(LS_WARNING) << "VideoSource not exist in video_sources_";
+      AVE_LOG(LS_WARNING) << "VideoSource not exist in video_sources_";
       return;
     }
 
-    DCHECK(it_video_source->stream_id == stream_id);
+    AVE_DCHECK(it_video_source->stream_id == stream_id);
 
     // find, stop and erase video send stream
     auto it_send_stream =
@@ -99,7 +99,7 @@ void HybirdWorker::RemoveVideoSource(VideoSource& video_source,
                      [&it_video_source](const VideoSendStreamInfo& stream) {
                        return stream.stream_id == it_video_source->stream_id;
                      });
-    DCHECK(it_send_stream != video_send_streams_.end());
+    AVE_DCHECK(it_send_stream != video_send_streams_.end());
 
     it_send_stream->video_send_stream->Stop();
     video_send_streams_.erase(it_send_stream);
@@ -115,7 +115,7 @@ void HybirdWorker::RemoveVideoSource(VideoSource& video_source,
 void HybirdWorker::AddEncodedVideoSink(EncodedVideoSink& encoded_image_sink,
                                        int32_t stream_id) {
   worker_task_runner_.PostTask([this, encoded_image_sink, stream_id]() {
-    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    AVE_DCHECK_RUN_ON(&worker_task_runner_);
     // already has sink means video send stream already started
     bool started = media_transport_->frame_wanted(stream_id);
     media_transport_->AddVideoSink(encoded_image_sink, stream_id);
@@ -136,7 +136,7 @@ void HybirdWorker::AddEncodedVideoSink(EncodedVideoSink& encoded_image_sink,
 void HybirdWorker::RemoveEncodedVideoSink(EncodedVideoSink& encoded_image_sink,
                                           int32_t stream_id) {
   worker_task_runner_.PostTask([this, encoded_image_sink, stream_id]() {
-    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    AVE_DCHECK_RUN_ON(&worker_task_runner_);
     media_transport_->RemoveVideoSink(encoded_image_sink);
     // stop video send stream if no sink exist
     if (!media_transport_->frame_wanted(stream_id)) {
@@ -154,7 +154,7 @@ void HybirdWorker::RemoveEncodedVideoSink(EncodedVideoSink& encoded_image_sink,
 
 void HybirdWorker::RequestKeyFrame() {
   worker_task_runner_.PostTask([this]() {
-    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    AVE_DCHECK_RUN_ON(&worker_task_runner_);
     for (auto it = video_send_streams_.begin(); it != video_send_streams_.end();
          ++it) {
       it->video_send_stream->RequestKeyFrame();
@@ -167,7 +167,7 @@ void HybirdWorker::AddEncodedAudioSink(
     int32_t stream_id,
     CodecId codec_id) {
   worker_task_runner_.PostTask([this, audio_sink, stream_id, codec_id]() {
-    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    AVE_DCHECK_RUN_ON(&worker_task_runner_);
 
     auto send_stream_it =
         std::find_if(audio_send_streams_.begin(), audio_send_streams_.end(),
@@ -210,13 +210,13 @@ void HybirdWorker::RemoveEncodedAudioSink(
     std::shared_ptr<AudioSinkInterface<MediaPacket>>& audio_sink,
     CodecId codec_id) {
   worker_task_runner_.PostTask([this, audio_sink, codec_id]() {
-    AVP_DCHECK_RUN_ON(&worker_task_runner_);
+    AVE_DCHECK_RUN_ON(&worker_task_runner_);
     auto send_stream_it =
         std::find_if(audio_send_streams_.begin(), audio_send_streams_.end(),
                      [codec_id](const AudioSendStreamInfo& stream) {
                        return stream.codec_id == codec_id;
                      });
-    DCHECK(send_stream_it != audio_send_streams_.end());
+    AVE_DCHECK(send_stream_it != audio_send_streams_.end());
 
     send_stream_it->sink_count--;
     media_transport_->RemoveAudioSenderSink(audio_sink);
@@ -234,7 +234,7 @@ void HybirdWorker::AddAudioStreamReceiver() {}
 void HybirdWorker::RemoveAudioStreamReceiver() {}
 
 void HybirdWorker::UpdateAudioFlingerWithSenders() {
-  LOG(LS_INFO) << "UpdateAudioFlingerWithSenders";
+  AVE_LOG(LS_INFO) << "UpdateAudioFlingerWithSenders";
   std::vector<std::shared_ptr<AudioSendStream>> senders;
   for (auto& sender : audio_send_streams_) {
     senders.push_back(sender.audio_send_stream);
@@ -242,4 +242,4 @@ void HybirdWorker::UpdateAudioFlingerWithSenders() {
   audio_flinger_.UpdateSender(senders);
 }
 
-}  // namespace avp
+}  // namespace ave

@@ -10,10 +10,10 @@
 
 #include "api/video_codecs/video_encoder_factory.h"
 
-namespace avp {
+namespace ave {
 
 std::unique_ptr<VideoEncoderFactory> CreateBuiltinVideoEncoderFactory();
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !BUILTIN_VIDEO_ENCODER_FACTORY_H */

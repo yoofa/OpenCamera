@@ -9,7 +9,7 @@
 #include "base/task_util/task_runner_factory.h"
 #include "media/audio/audio_stream_sender.h"
 
-namespace avp {
+namespace ave {
 
 MediaTransport::MediaTransport(base::TaskRunnerFactory* task_runner_factory)
     : transport_runner_(task_runner_factory->CreateTaskRunner(
@@ -37,7 +37,7 @@ void MediaTransport::RemoveVideoStreamSender(int32_t id) {
       video_stream_senders_.begin(), video_stream_senders_.end(),
       [id](const VideoStreamSenderInfo& info) { return info.id == id; });
   if (it == video_stream_senders_.end()) {
-    LOG(LS_WARNING)
+    AVE_LOG(LS_WARNING)
         << "RemoveVideoStreamSender failed, video_stream_sender not found";
 
     return;
@@ -88,7 +88,7 @@ void MediaTransport::RemoveAudioStreamSender(CodecId codec_id) {
                      return info.codec_id == codec_id;
                    });
   if (it == audio_stream_senders_.end()) {
-    LOG(LS_WARNING)
+    AVE_LOG(LS_WARNING)
         << "RemoveAudioStreamSender failed, audio_stream_sender not found";
 
     return;
@@ -111,4 +111,4 @@ void MediaTransport::RemoveAudioSenderSink(const EncodedAudioSink& sink) {
   }
 }
 
-}  // namespace avp
+}  // namespace ave

@@ -14,7 +14,7 @@
 #include "base/types.h"
 #include "common/video_codec_property.h"
 
-namespace avp {
+namespace ave {
 
 class FakeVideoEncoder : public VideoEncoder {
   status_t InitEncoder(const VideoCodecProperty& codec_settings,
@@ -68,4 +68,4 @@ std::unique_ptr<VideoEncoder> FakeVideoEncoderFactory::CreateVideoEncoder() {
   return std::make_unique<FakeVideoEncoder>();
 }
 
-}  // namespace avp
+}  // namespace ave

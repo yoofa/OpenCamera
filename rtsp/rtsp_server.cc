@@ -17,7 +17,7 @@
 #include "common/utils.h"
 #include "third_party/rtsp_server/src/src/net/EventLoop.h"
 
-namespace avp {
+namespace ave {
 
 RtspServer::RtspServer(std::shared_ptr<Message> notify)
     : notify_(std::move(notify)),
@@ -113,11 +113,11 @@ void RtspServer::OnClientConnected(const std::shared_ptr<Message>& msg) {
   int32_t sessionId = 0;
   std::string ip{};
   int32_t port = 0;
-  CHECK(msg->findInt32("sessionId", &sessionId));
-  CHECK(msg->findString("ip", ip));
-  CHECK(msg->findInt32("port", &port));
-  LOG(LS_INFO) << "client connect, sessionId: " << sessionId << ", ip: " << ip
-               << ", port: " << port;
+  AVE_CHECK(msg->findInt32("sessionId", &sessionId));
+  AVE_CHECK(msg->findString("ip", ip));
+  AVE_CHECK(msg->findInt32("port", &port));
+  AVE_LOG(LS_INFO) << "client connect, sessionId: " << sessionId
+                   << ", ip: " << ip << ", port: " << port;
 
   auto notify = notify_->dup();
   notify->setInt32("what", kWhatClientConnectedNotify);
@@ -128,11 +128,11 @@ void RtspServer::OnClientDisconnected(const std::shared_ptr<Message>& msg) {
   int32_t sessionId = 0;
   std::string ip{};
   int32_t port = 0;
-  CHECK(msg->findInt32("sessionId", &sessionId));
-  CHECK(msg->findString("ip", ip));
-  CHECK(msg->findInt32("port", &port));
-  LOG(LS_INFO) << "client disconnect, sessionId: " << sessionId
-               << ", ip: " << ip << ", port: " << port;
+  AVE_CHECK(msg->findInt32("sessionId", &sessionId));
+  AVE_CHECK(msg->findString("ip", ip));
+  AVE_CHECK(msg->findInt32("port", &port));
+  AVE_LOG(LS_INFO) << "client disconnect, sessionId: " << sessionId
+                   << ", ip: " << ip << ", port: " << port;
 
   auto notify = notify_->dup();
   notify->setInt32("what", kWhatClientDisconnectedNotify);
@@ -141,13 +141,13 @@ void RtspServer::OnClientDisconnected(const std::shared_ptr<Message>& msg) {
 
 void RtspServer::OnRequestAudioSink(const std::shared_ptr<Message>& msg) {
   int32_t stream_id;
-  CHECK(msg->findInt32("stream_id", &stream_id));
+  AVE_CHECK(msg->findInt32("stream_id", &stream_id));
   int32_t codec_id;
-  CHECK(msg->findInt32("codec_format", &codec_id));
+  AVE_CHECK(msg->findInt32("codec_format", &codec_id));
   int32_t sample_rate;
-  CHECK(msg->findInt32("sample_rate", &sample_rate));
+  AVE_CHECK(msg->findInt32("sample_rate", &sample_rate));
   int32_t channels;
-  CHECK(msg->findInt32("channels", &channels));
+  AVE_CHECK(msg->findInt32("channels", &channels));
 
   CodecId codec = static_cast<CodecId>(codec_id);
   switch (codec) {
@@ -159,9 +159,9 @@ void RtspServer::OnRequestAudioSink(const std::shared_ptr<Message>& msg) {
     case CodecId::AV_CODEC_ID_PCM_ALAW: {
       // xop::rtsp only support 8000hz, 1 channel
       if (sample_rate != 8000 || channels != 1) {
-        LOG(LS_WARNING) << "RequestAudioSink G711ALAW, sample_rate: "
-                        << sample_rate << ", channels: " << channels
-                        << " change to 8000hz, 1 channel";
+        AVE_LOG(LS_WARNING)
+            << "RequestAudioSink G711ALAW, sample_rate: " << sample_rate
+            << ", channels: " << channels << " change to 8000hz, 1 channel";
       }
       sample_rate = 8000;
       channels = 1;
@@ -190,9 +190,9 @@ void RtspServer::OnRequestAudioSink(const std::shared_ptr<Message>& msg) {
 
 void RtspServer::OnRequestVideoSink(const std::shared_ptr<Message>& msg) {
   int32_t stream_id;
-  CHECK(msg->findInt32("stream_id", &stream_id));
+  AVE_CHECK(msg->findInt32("stream_id", &stream_id));
   int32_t codec_id;
-  CHECK(msg->findInt32("codec_format", &codec_id));
+  AVE_CHECK(msg->findInt32("codec_format", &codec_id));
 
   if (media_session_ == nullptr) {
     return;
@@ -213,8 +213,8 @@ void RtspServer::OnRequestVideoSink(const std::shared_ptr<Message>& msg) {
     }
   }
 
-  LOG(LS_INFO) << "add video sink, stream_id: " << stream_id
-               << ", codec_id: " << codec_id;
+  AVE_LOG(LS_INFO) << "add video sink, stream_id: " << stream_id
+                   << ", codec_id: " << codec_id;
 
   auto notify = notify_->dup();
   notify->setInt32("what", kWhatVideoSinkAdded);
@@ -228,7 +228,7 @@ void RtspServer::OnRequestVideoSink(const std::shared_ptr<Message>& msg) {
 
 void RtspServer::OnPullAudioSource() {
   if (!audio_queue_->queue().empty()) {
-    LOG(LS_VERBOSE) << "OnPullAudioSource";
+    AVE_LOG(LS_VERBOSE) << "OnPullAudioSource";
     auto packet = audio_queue_->queue().front();
     auto packet_info = packet.audio_info();
     audio_queue_->queue().pop();
@@ -240,8 +240,8 @@ void RtspServer::OnPullAudioSource() {
     frame.buffer.reset(new uint8_t[frame.size]);
     memcpy(frame.buffer.get(), packet.data(), frame.size);
 
-    LOG(LS_VERBOSE) << "push audio frame, size: " << frame.size
-                    << ", timestamp: " << frame.timestamp;
+    AVE_LOG(LS_VERBOSE) << "push audio frame, size: " << frame.size
+                        << ", timestamp: " << frame.timestamp;
     server_->PushFrame(session_id_, xop::channel_1, frame);
   }
 
@@ -262,15 +262,15 @@ void RtspServer::OnPullVideoSource() {
     frame.type = 0;
     frame.size = image.Size();
     // int64_t pts = image.Timestamp();
-    // CHECK(buffer->meta()->findInt64("timeUs", &pts));
+    // AVE_CHECK(buffer->meta()->findInt64("timeUs", &pts));
     frame.timestamp = image.Timestamp() / 1000 * 90;
 
     if (image.frame_type_ == VideoFrameType::kVideoFrameKey) {
-      LOG(LS_INFO) << "OnPullVideoSource, queue.size:"
-                   << video_queue_->queue().size()
-                   << ", image size: " << image.Size()
-                   << ", timestamp_us: " << image.Timestamp()
-                   << ", frame_type:" << image.frame_type_;
+      AVE_LOG(LS_INFO) << "OnPullVideoSource, queue.size:"
+                       << video_queue_->queue().size()
+                       << ", image size: " << image.Size()
+                       << ", timestamp_us: " << image.Timestamp()
+                       << ", frame_type:" << image.frame_type_;
     }
 
     frame.buffer.reset(new uint8_t[frame.size]);
@@ -289,7 +289,7 @@ void RtspServer::OnPullVideoSource() {
 
 void RtspServer::OnStart(const std::shared_ptr<Message>& msg) {
   server_->Start("0.0.0.0", 8554);
-  LOG(LS_INFO) << "rtsp server run at 127.0.0.1:8554/live";
+  AVE_LOG(LS_INFO) << "rtsp server run at 127.0.0.1:8554/live";
 
   started_ = true;
 }
@@ -342,4 +342,4 @@ void RtspServer::onMessageReceived(const std::shared_ptr<Message>& msg) {
   }
 }
 
-}  // namespace avp
+}  // namespace ave

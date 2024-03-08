@@ -10,7 +10,7 @@
 #include "base/types.h"
 #include "common/video_codec_property.h"
 
-namespace avp {
+namespace ave {
 
 H264Specific VideoEncoder::GetDefaultH264Specific() {
   H264Specific h264_specific;
@@ -55,4 +55,4 @@ status_t VideoEncoder::InitEncoder(const VideoCodecProperty& codec_settings,
                                    const Settings& settings) {
   return OK;
 }
-}  // namespace avp
+}  // namespace ave

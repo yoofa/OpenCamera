@@ -20,7 +20,7 @@ oc_library("builtin_video_encoder") {
   deps = [
     ":video_encoder_api",
     "//api/video:encoded_image",
-    "//modules/video_coding:avp_openh264",
+    "//modules/video_coding:ave_openh264",
   ]
 }
 

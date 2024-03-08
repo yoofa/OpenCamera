@@ -7,7 +7,7 @@
 
 #include "video_sink_wrapper.h"
 
-namespace avp {
+namespace ave {
 
 VideoSinkWrapper::VideoSinkWrapper(
     std::shared_ptr<VideoSinkInterface<EncodedImage>> sink) {
@@ -19,4 +19,4 @@ std::shared_ptr<VideoSinkInterface<EncodedImage>> VideoSinkWrapper::Create(
   return std::make_shared<VideoSinkWrapper>(sink);
 }
 
-}  // namespace avp
+}  // namespace ave

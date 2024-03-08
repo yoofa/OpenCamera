@@ -18,7 +18,7 @@
 #include "common/media_packet.h"
 #include "media/audio/audio_stream_sender.h"
 
-namespace avp {
+namespace ave {
 class AudioSendStream : public AudioEncoder::EncodedCallback {
  public:
   AudioSendStream(base::TaskRunnerFactory* task_runner_factory_,
@@ -51,6 +51,6 @@ class AudioSendStream : public AudioEncoder::EncodedCallback {
   uint32_t bit_rate_;
   bool pending_reconfigure_encoder_;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_SEND_STREAM_H */

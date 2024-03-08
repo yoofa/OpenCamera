@@ -9,7 +9,7 @@
 #define VIDEO_CODEC_PROPERITY_INITIALIZER_H
 #include "api/video_codecs/video_encoder_config.h"
 
-namespace avp {
+namespace ave {
 
 std::vector<VideoStreamConfig> CreateVideoStreamConfig(
     size_t width,
@@ -21,6 +21,6 @@ bool SetupVideoCodecProperity(
     const std::vector<VideoStreamConfig>& stream_configs,
     VideoCodecProperty* codec_properity);
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_CODEC_PROPERITY_INITIALIZER_H */

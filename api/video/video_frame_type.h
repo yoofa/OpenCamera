@@ -8,7 +8,7 @@
 #ifndef VIDEO_FRAME_TYPE_H
 #define VIDEO_FRAME_TYPE_H
 
-namespace avp {
+namespace ave {
 enum class VideoFrameType {
   kEmptyFrame = 0,
   // Wire format for MultiplexEncodedImagePacker seems to depend on numerical

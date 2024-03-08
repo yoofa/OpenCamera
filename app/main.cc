@@ -13,8 +13,8 @@
 #include "base/types.h"
 #include "conductor.h"
 
-using avp::AppConfig;
-using avp::oc::Conductor;
+using ave::AppConfig;
+using ave::oc::Conductor;
 
 #define DEFAULT_CONFIG_PATH "/etc/open-camera/open_camera.ini"
 
@@ -37,7 +37,7 @@ static struct option long_options[] = {
     {0, 0, 0, 0}};
 
 int main(int argc, char** argv) {
-  avp::LogMessage::LogToDebug(avp::LogSeverity::LS_DEBUG);
+  ave::base::LogMessage::LogToDebug(ave::LS_DEBUG);
 
   std::string configFile(DEFAULT_CONFIG_PATH);
   int opt;
@@ -61,10 +61,10 @@ int main(int argc, char** argv) {
 
   AppConfig config = AppConfig::CreateAppConfigFromFile(configFile.c_str());
 
-  LOG(avp::LS_INFO) << "app version: " << config.version;
+  AVE_LOG(ave::LS_INFO) << "app version: " << config.version;
 
   auto conductor = std::make_shared<Conductor>(config);
-  if (conductor->Init() != avp::OK) {
+  if (conductor->Init() != ave::OK) {
     return -1;
   }
 

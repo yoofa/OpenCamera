@@ -13,7 +13,7 @@
 #include "base/task_util/default_task_runner_factory.h"
 #include "common/codec_id.h"
 
-namespace avp {
+namespace ave {
 namespace {
 static const uint32_t kEncoderMinBitrateKbps = 30;
 static const int kDefaultVideoMaxFramerate = 60;
@@ -84,12 +84,12 @@ bool SetupVideoCodecProperity(
     const VideoEncoderConfig& video_encoder_config,
     const std::vector<VideoStreamConfig>& stream_configs,
     VideoCodecProperty* codec_properity) {
-  LOG(LS_INFO) << "SetupVideoCodecProperity";
+  AVE_LOG(LS_INFO) << "SetupVideoCodecProperity";
   if (!codec_properity) {
     return false;
   }
 
-  DCHECK_GT(video_encoder_config.min_bitrate_kbps, 0);
+  AVE_DCHECK_GT(video_encoder_config.min_bitrate_kbps, 0);
 
   codec_properity->codec_id = video_encoder_config.codec_id;
   codec_properity->mode = VideoCodecMode::kRealtimeVideo;
@@ -122,7 +122,7 @@ bool SetupVideoCodecProperity(
       std::max(codec_properity->bit_rate_range.max, kEncoderMinBitrateKbps);
 
   codec_properity->bit_rate = codec_properity->bit_rate_range.max;
-  LOG(LS_INFO) << "bitrate:" << codec_properity->bit_rate;
+  AVE_LOG(LS_INFO) << "bitrate:" << codec_properity->bit_rate;
 
   codec_properity->frame_rate = max_framerate;
 
@@ -150,4 +150,4 @@ bool SetupVideoCodecProperity(
 
   return true;
 }
-}  // namespace avp
+}  // namespace ave

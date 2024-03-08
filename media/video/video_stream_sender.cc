@@ -11,12 +11,12 @@
 #include "base/checks.h"
 #include "base/logging.h"
 
-namespace avp {
+namespace ave {
 
 VideoStreamSender::VideoStreamSender(base::TaskRunner* transport_runner)
     : transport_runner_(transport_runner) {
   // TODO(youfa) transport_runner_ not used, check to ignore build warning
-  DCHECK(transport_runner_);
+  AVE_DCHECK(transport_runner_);
 }
 VideoStreamSender::~VideoStreamSender() {}
 
@@ -49,4 +49,4 @@ void VideoStreamSender::RemoveVideoSink(
   sinks_.erase(std::remove(sinks_.begin(), sinks_.end(), sink), sinks_.end());
 }
 
-}  // namespace avp
+}  // namespace ave

@@ -16,7 +16,7 @@
 
 #include "api/video/video_frame_buffer.h"
 
-namespace avp {
+namespace ave {
 
 class VideoFrame {
  public:
@@ -72,10 +72,10 @@ class VideoFrame {
     return rect_.value_or(Rect{0, 0, width(), height()});
   }
   void set_rect(std::optional<Rect>& rect) {
-    DCHECK_GE(rect->offset_x, 0);
-    DCHECK_GE(rect->offset_y, 0);
-    DCHECK_LE(rect->offset_x + rect->width, width());
-    DCHECK_LE(rect->offset_y + rect->height, height());
+    AVE_DCHECK_GE(rect->offset_x, 0);
+    AVE_DCHECK_GE(rect->offset_y, 0);
+    AVE_DCHECK_LE(rect->offset_x + rect->width, width());
+    AVE_DCHECK_LE(rect->offset_y + rect->height, height());
 
     rect_ = rect;
   }
@@ -86,6 +86,6 @@ class VideoFrame {
   uint64_t timestamp_us_;
   std::optional<Rect> rect_;
 };
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_FRAME_H */

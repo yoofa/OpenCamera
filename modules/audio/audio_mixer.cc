@@ -7,7 +7,7 @@
 
 #include "audio_mixer.h"
 
-namespace avp {
+namespace ave {
 
 void AudioMixer::DownMix(const int16_t* src,
                          size_t src_channels,
@@ -25,4 +25,4 @@ void AudioMixer::UpMix(const int16_t* src,
   // TODO(youfa)
 }
 
-}  // namespace avp
+}  // namespace ave

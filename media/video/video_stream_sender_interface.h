@@ -10,13 +10,13 @@
 
 #include "api/video_codecs/video_encoder.h"
 
-namespace avp {
+namespace ave {
 
 class VideoStreamSenderInterface : public EncodedImageCallback {
  public:
   virtual Result OnEncodedImage(const EncodedImage& encoded_image) = 0;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_STREAM_SENDER_INTERFACE_H */

@@ -13,7 +13,7 @@
 #include "base/types.h"
 #include "modules/audio_device/audio_device_buffer.h"
 
-namespace avp {
+namespace ave {
 
 class AudioDeviceGeneric {
  public:
@@ -115,6 +115,6 @@ class AudioDeviceGeneric {
   virtual void AttachAudioBuffer(AudioDeviceBuffer* audioBuffer) = 0;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_DEVICE_GENERIC_H */

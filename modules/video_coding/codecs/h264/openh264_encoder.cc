@@ -19,7 +19,7 @@
 #include "third_party/openh264/src/codec/api/svc/codec_def.h"
 #include "third_party/openh264/src/codec/api/svc/codec_ver.h"
 
-namespace avp {
+namespace ave {
 
 namespace {
 VideoFrameType ConvertToVideoFrameType(EVideoFrameType type) {
@@ -54,7 +54,7 @@ OpenH264Encoder::~OpenH264Encoder() {
 
 status_t OpenH264Encoder::InitEncoder(const VideoCodecProperty& codec_property,
                                       const Settings& encoder_settings) {
-  LOG(LS_INFO) << "InitEncoder";
+  AVE_LOG(LS_INFO) << "InitEncoder";
   if (codec_property.codec_id != CodecId::AV_CODEC_ID_H264 ||
       codec_property.width <= 0 || codec_property.height <= 0 ||
       codec_property.frame_rate == 0) {
@@ -73,12 +73,12 @@ status_t OpenH264Encoder::InitEncoder(const VideoCodecProperty& codec_property,
   //  create opehh264 encoder
   ISVCEncoder* encoder;
   if (WelsCreateSVCEncoder(&encoder) != 0) {
-    LOG(LS_ERROR) << "Failed to create openh264 encoder";
-    DCHECK(encoder == nullptr);
+    AVE_LOG(LS_ERROR) << "Failed to create openh264 encoder";
+    AVE_DCHECK(encoder == nullptr);
     Release();
     return UNKNOWN_ERROR;
   }
-  DCHECK(encoder != nullptr);
+  AVE_DCHECK(encoder != nullptr);
 
   // int trace_level = WELS_LOG_DETAIL;
   // encoder->SetOption(ENCODER_OPTION_TRACE_LEVEL, &trace_level);
@@ -100,7 +100,7 @@ status_t OpenH264Encoder::InitEncoder(const VideoCodecProperty& codec_property,
 
   // initialize encoder
   if (encoder_->InitializeExt(&encoder_params) != 0) {
-    LOG(LS_ERROR) << "Failed to initialize openh264 encoder";
+    AVE_LOG(LS_ERROR) << "Failed to initialize openh264 encoder";
     Release();
     return UNKNOWN_ERROR;
   }
@@ -140,11 +140,12 @@ status_t OpenH264Encoder::Encode(const std::shared_ptr<VideoFrame>& frame) {
   auto frame_buffer = frame->video_frame_buffer()->ToI420();
 
   if (!frame_buffer) {
-    LOG(LS_ERROR) << "Failed to convert frame buffer to I420";
+    AVE_LOG(LS_ERROR) << "Failed to convert frame buffer to I420";
     return BAD_VALUE;
   }
-  CHECK(frame_buffer->pixel_format() == VideoFrameBuffer::PixelFormat::kI420 ||
-        frame_buffer->pixel_format() == VideoFrameBuffer::PixelFormat::kI420A);
+  AVE_CHECK(
+      frame_buffer->pixel_format() == VideoFrameBuffer::PixelFormat::kI420 ||
+      frame_buffer->pixel_format() == VideoFrameBuffer::PixelFormat::kI420A);
 
   bool send_key_frame = false;
   if (configuration_.key_frame_request && configuration_.sending) {
@@ -177,12 +178,12 @@ status_t OpenH264Encoder::Encode(const std::shared_ptr<VideoFrame>& frame) {
   // Encode!
   int enc_ret = encoder_->EncodeFrame(&picture_, &info);
   if (enc_ret != 0) {
-    LOG(LS_ERROR) << "OpenH264 frame encoding failed, EncodeFrame returned "
-                  << enc_ret << ".";
+    AVE_LOG(LS_ERROR) << "OpenH264 frame encoding failed, EncodeFrame returned "
+                      << enc_ret << ".";
     return UNKNOWN_ERROR;
   }
 
-  // LOG(LS_VERBOSE) << "encode, pts:" << picture_.uiTimeStamp
+  // AVE_LOG(LS_VERBOSE) << "encode, pts:" << picture_.uiTimeStamp
   //                 << ", size:" << info.iFrameSizeInBytes
   //                 << ", layer num:" << info.iLayerNum;
 
@@ -206,10 +207,10 @@ void OpenH264Encoder::PacketizeEncodedImage(EncodedImage* image,
   for (int layer = 0; layer < info->iLayerNum; ++layer) {
     const SLayerBSInfo& layerInfo = info->sLayerInfo[layer];
     for (int nal = 0; nal < layerInfo.iNalCount; ++nal, ++fragments_count) {
-      CHECK_GE(layerInfo.pNalLengthInByte[nal], 0);
+      AVE_CHECK_GE(layerInfo.pNalLengthInByte[nal], 0);
       // Ensure `required_capacity` will not overflow.
-      CHECK_LE(static_cast<size_t>(layerInfo.pNalLengthInByte[nal]),
-               std::numeric_limits<size_t>::max() - required_capacity);
+      AVE_CHECK_LE(static_cast<size_t>(layerInfo.pNalLengthInByte[nal]),
+                   std::numeric_limits<size_t>::max() - required_capacity);
       required_capacity += layerInfo.pNalLengthInByte[nal];
     }
   }
@@ -227,18 +228,18 @@ void OpenH264Encoder::PacketizeEncodedImage(EncodedImage* image,
     for (int nal = 0; nal < layerInfo.iNalCount; ++nal, ++frag) {
       // Because the sum of all layer lengths, `required_capacity`, fits in a
       // `size_t`, we know that any indices in-between will not overflow.
-      DCHECK_GE(layerInfo.pNalLengthInByte[nal], 4);
-      DCHECK_EQ(layerInfo.pBsBuf[layer_len + 0], start_code[0]);
-      DCHECK_EQ(layerInfo.pBsBuf[layer_len + 1], start_code[1]);
-      DCHECK_EQ(layerInfo.pBsBuf[layer_len + 2], start_code[2]);
-      DCHECK_EQ(layerInfo.pBsBuf[layer_len + 3], start_code[3]);
+      AVE_DCHECK_GE(layerInfo.pNalLengthInByte[nal], 4);
+      AVE_DCHECK_EQ(layerInfo.pBsBuf[layer_len + 0], start_code[0]);
+      AVE_DCHECK_EQ(layerInfo.pBsBuf[layer_len + 1], start_code[1]);
+      AVE_DCHECK_EQ(layerInfo.pBsBuf[layer_len + 2], start_code[2]);
+      AVE_DCHECK_EQ(layerInfo.pBsBuf[layer_len + 3], start_code[3]);
       layer_len += layerInfo.pNalLengthInByte[nal];
     }
     // Copy the entire layer's data (including start codes).
     memcpy(buffer->Data() + image->Size(), layerInfo.pBsBuf, layer_len);
     image->SetSize(image->Size() + layer_len);
   }
-  // LOG(LS_VERBOSE) << "PacketEncodedImage, pts:" <<
+  // AVE_LOG(LS_VERBOSE) << "PacketEncodedImage, pts:" <<
   // encoded_image_.timestamp_us_
   //                 << ", size:" << encoded_image_.Size();
 }
@@ -277,20 +278,22 @@ SEncParamExt OpenH264Encoder::CreateEncoderParams() const {
   encoder_params.eSpsPpsIdStrategy = SPS_LISTING;
   encoder_params.uiMaxNalSize = 0;
 
-  LOG(LS_INFO) << "CreateEncoderParams, width:" << encoder_params.iPicWidth
-               << ", height:" << encoder_params.iPicHeight
-               << ", target bitrate:" << encoder_params.iTargetBitrate
-               << ", max bitrate:" << encoder_params.iMaxBitrate
-               << ", max frame rate:" << encoder_params.fMaxFrameRate
-               << ", frame dropping:"
-               << (encoder_params.bEnableFrameSkip ? "on" : "off")
-               << ", key frame interval:" << encoder_params.uiIntraPeriod
-               << ", temporal layer num:" << encoder_params.iTemporalLayerNum
-               << ", spatial layer num:" << encoder_params.iSpatialLayerNum
-               << ", usage type:" << encoder_params.iUsageType
-               << ", rc mode:" << encoder_params.iRCMode
-               << ", sps pps id strategy:" << encoder_params.eSpsPpsIdStrategy
-               << ", max nal size:" << encoder_params.uiMaxNalSize;
+  AVE_LOG(LS_INFO) << "CreateEncoderParams, width:" << encoder_params.iPicWidth
+                   << ", height:" << encoder_params.iPicHeight
+                   << ", target bitrate:" << encoder_params.iTargetBitrate
+                   << ", max bitrate:" << encoder_params.iMaxBitrate
+                   << ", max frame rate:" << encoder_params.fMaxFrameRate
+                   << ", frame dropping:"
+                   << (encoder_params.bEnableFrameSkip ? "on" : "off")
+                   << ", key frame interval:" << encoder_params.uiIntraPeriod
+                   << ", temporal layer num:"
+                   << encoder_params.iTemporalLayerNum
+                   << ", spatial layer num:" << encoder_params.iSpatialLayerNum
+                   << ", usage type:" << encoder_params.iUsageType
+                   << ", rc mode:" << encoder_params.iRCMode
+                   << ", sps pps id strategy:"
+                   << encoder_params.eSpsPpsIdStrategy
+                   << ", max nal size:" << encoder_params.uiMaxNalSize;
 
   //  encoder_params.iMaxQp = 40;
   //  encoder_params.iMinQp = 10;
@@ -312,8 +315,8 @@ SEncParamExt OpenH264Encoder::CreateEncoderParams() const {
     // theoretically use all available reference buffers.
     encoder_params.iNumRefFrame = encoder_params.iTemporalLayerNum - 1;
   }
-  LOG(LS_INFO) << "OpenH264 version is " << OPENH264_MAJOR << "."
-               << OPENH264_MINOR;
+  AVE_LOG(LS_INFO) << "OpenH264 version is " << OPENH264_MAJOR << "."
+                   << OPENH264_MINOR;
   encoder_params.sSpatialLayers[0].sSliceArgument.uiSliceNum = 1;
   encoder_params.sSpatialLayers[0].sSliceArgument.uiSliceMode =
       SM_SIZELIMITED_SLICE;
@@ -331,4 +334,4 @@ void OpenH264Encoder::LayerConfig::SetStreamState(bool send_stream) {
   sending = send_stream;
 }
 
-}  // namespace avp
+}  // namespace ave

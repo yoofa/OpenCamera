@@ -7,7 +7,7 @@
 
 #include "frame_utils.h"
 
-namespace avp {
+namespace ave {
 namespace test {
 
 bool EqualPlane(const uint8_t* data1,
@@ -84,4 +84,4 @@ std::shared_ptr<I420Buffer> ReadI420Buffer(int width, int height, FILE* f) {
 }
 
 }  // namespace test
-}  // namespace avp
+}  // namespace ave

@@ -14,7 +14,7 @@
 #include "test/frame_utils.h"
 #include "test/gtest.h"
 
-namespace avp {
+namespace ave {
 
 namespace {
 int GetY(std::shared_ptr<NV12BufferInterface>& buf, size_t col, size_t row) {
@@ -103,4 +103,4 @@ TEST(NV12BufferTest, ToI420) {
   EXPECT_TRUE(test::FrameBufsEqual(ref_i420_buffer, i420_buffer));
 }
 
-}  // namespace avp
+}  // namespace ave

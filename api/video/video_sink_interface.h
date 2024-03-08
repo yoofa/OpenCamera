@@ -8,7 +8,7 @@
 #ifndef VIDEO_SINK_INTERFACE_H
 #define VIDEO_SINK_INTERFACE_H
 
-namespace avp {
+namespace ave {
 
 template <typename VideoFrameT>
 class VideoSinkInterface {
@@ -18,6 +18,6 @@ class VideoSinkInterface {
   virtual void OnFrame(const VideoFrameT& frame) = 0;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_SINK_INTERFACE_H */

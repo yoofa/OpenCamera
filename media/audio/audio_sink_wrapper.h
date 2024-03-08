@@ -13,7 +13,7 @@
 #include "api/audio/audio_sink_interface.h"
 #include "common/message.h"
 
-namespace avp {
+namespace ave {
 
 template <typename AudioFrameT>
 class AudioSinkWrapper : public AudioSinkInterface<AudioFrameT>,
@@ -51,6 +51,6 @@ class AudioSinkWrapper : public AudioSinkInterface<AudioFrameT>,
   std::shared_ptr<AudioSinkInterface<AudioFrameT>> sink_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_SINK_WRAPPER_H */

@@ -7,7 +7,7 @@
 
 #include "motion_detector.h"
 
-namespace avp {
+namespace ave {
 
 MotionDetector::MotionDetector() {}
 
@@ -21,4 +21,4 @@ void MotionDetector::OnFps(int32_t fps) {
 
 void MotionDetector::OnFrame(std::shared_ptr<Buffer> buffer) {}
 
-}  // namespace avp
+}  // namespace ave

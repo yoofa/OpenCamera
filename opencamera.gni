@@ -43,7 +43,7 @@ oc_prod_configs = [ oc_root + ":oc_prod_config" ]
 
 oc_library_impl_config = [ oc_root + ":library_impl_config" ]
 
-avp_include_test = true
+ave_include_test = true
 
 set_defaults("oc_test") {
   configs = oc_add_configs

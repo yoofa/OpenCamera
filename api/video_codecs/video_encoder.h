@@ -14,7 +14,7 @@
 #include "api/video/video_frame.h"
 #include "common/video_codec_property.h"
 
-namespace avp {
+namespace ave {
 
 class EncodedImageCallback {
  public:
@@ -104,6 +104,6 @@ class VideoEncoder {
   virtual void RequestKeyFrame() = 0;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_ENCODER_H */

@@ -7,7 +7,7 @@
 
 #include "alsasymboltable_linux.h"
 
-namespace avp {
+namespace ave {
 namespace adm_linux_alsa {
 
 LATE_BINDING_SYMBOL_TABLE_DEFINE_BEGIN(AlsaSymbolTable, "libasound.so.2")
@@ -17,4 +17,4 @@ ALSA_SYMBOLS_LIST
 LATE_BINDING_SYMBOL_TABLE_DEFINE_END(AlsaSymbolTable)
 
 }  // namespace adm_linux_alsa
-}  // namespace avp
+}  // namespace ave

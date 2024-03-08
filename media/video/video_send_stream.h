@@ -17,7 +17,7 @@
 #include "media/media_stream.h"
 #include "media/video/video_stream_sender.h"
 
-namespace avp {
+namespace ave {
 
 class VideoSendStream : public MediaStream,
                         public VideoStreamEncoderInterface::EncoderSink {
@@ -55,6 +55,6 @@ class VideoSendStream : public MediaStream,
   std::unique_ptr<VideoStreamEncoderInterface> video_stream_encoder_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_SEND_STREAM_H */

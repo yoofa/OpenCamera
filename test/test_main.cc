@@ -12,7 +12,7 @@
 int main(int argc, char* argv[]) {
   testing::InitGoogleMock(&argc, argv);
 
-  std::unique_ptr<avp::TestMain> main = avp::TestMain::Create();
+  std::unique_ptr<ave::TestMain> main = ave::TestMain::Create();
   int err_code = main->Init();
   if (err_code != 0) {
     return err_code;

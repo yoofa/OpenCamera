@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-namespace avp {
+namespace ave {
 
 // Class to initialize test environment and run tests.
 class TestMain {
@@ -33,6 +33,6 @@ class TestMain {
   TestMain() = default;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif  // TEST_TEST_MAIN_LIB_H_

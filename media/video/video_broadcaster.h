@@ -13,7 +13,7 @@
 #include "base/thread_annotation.h"
 #include "media/video/video_source_base.h"
 
-namespace avp {
+namespace ave {
 
 template <typename VideoFrameT>
 class VideoBroadcaster : public VideoSourceBase<VideoFrameT>,
@@ -28,13 +28,13 @@ class VideoBroadcaster : public VideoSourceBase<VideoFrameT>,
   // VideoSourceInterface implementation.
   void AddOrUpdateSink(VideoSinkInterface<VideoFrameT>* sink,
                        const VideoSinkWants& wants) override {
-    DCHECK(sink != nullptr);
+    AVE_DCHECK(sink != nullptr);
     lock_guard l(lock_);
     VideoSourceBase<VideoFrameT>::AddOrUpdateSink(sink, wants);
   }
 
   void RemoveSink(VideoSinkInterface<VideoFrameT>* sink) override {
-    DCHECK(sink != nullptr);
+    AVE_DCHECK(sink != nullptr);
     lock_guard l(lock_);
     VideoSourceBase<VideoFrameT>::RemoveSink(sink);
   }
@@ -51,6 +51,6 @@ class VideoBroadcaster : public VideoSourceBase<VideoFrameT>,
   mutable Mutex lock_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_BROADCASTER_H */

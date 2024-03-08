@@ -15,7 +15,7 @@
 #include "media/audio/audio_send_stream.h"
 #include "modules/audio_device/audio_device_defines.h"
 
-namespace avp {
+namespace ave {
 
 class AudioFlinger : public AudioTransport {
  public:
@@ -51,6 +51,6 @@ class AudioFlinger : public AudioTransport {
   size_t num_channels_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !AUDIO_FLINGER_H */

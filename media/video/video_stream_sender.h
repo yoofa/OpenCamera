@@ -17,7 +17,7 @@
 #include "media/video/video_broadcaster.h"
 #include "media/video/video_stream_sender_interface.h"
 
-namespace avp {
+namespace ave {
 
 class VideoStreamSender : public VideoStreamSenderInterface {
  public:
@@ -43,6 +43,6 @@ class VideoStreamSender : public VideoStreamSenderInterface {
   VideoBroadcaster<EncodedImage> broadcaster_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_STREAM_SENDER_H */

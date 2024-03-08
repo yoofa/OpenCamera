@@ -1,6 +1,6 @@
 import("//opencamera.gni")
 
-oc_library("avp_openh264") {
+oc_library("ave_openh264") {
   visibility = [ "*" ]
   sources = [
     "codecs/h264/h264.cc",

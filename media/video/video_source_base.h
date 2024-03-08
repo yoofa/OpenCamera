@@ -12,7 +12,7 @@
 #include "api/video/video_source_interface.h"
 #include "base/logging.h"
 
-namespace avp {
+namespace ave {
 
 template <typename VideoFrameT>
 class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
@@ -22,7 +22,7 @@ class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
 
   virtual void AddOrUpdateSink(VideoSinkInterface<VideoFrameT>* sink,
                                const VideoSinkWants& wants) override {
-    DCHECK(sink != nullptr);
+    AVE_DCHECK(sink != nullptr);
     SinkPair* sink_pair = FindSinkPair(sink);
     if (sink_pair) {
       sink_pair->wants = wants;
@@ -32,7 +32,7 @@ class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
   }
 
   virtual void RemoveSink(VideoSinkInterface<VideoFrameT>* sink) override {
-    DCHECK(FindSinkPair(sink));
+    AVE_DCHECK(FindSinkPair(sink));
     sinks_.erase(std::remove_if(sinks_.begin(), sinks_.end(),
                                 [sink](const SinkPair& sink_pair) {
                                   return sink_pair.sink == sink;
@@ -48,7 +48,7 @@ class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
   };
 
   SinkPair* FindSinkPair(const VideoSinkInterface<VideoFrameT>* sink) {
-    DCHECK(sink != nullptr);
+    AVE_DCHECK(sink != nullptr);
 
     auto sink_pair_it = std::find_if(
         sinks_.begin(), sinks_.end(),
@@ -66,6 +66,6 @@ class VideoSourceBase : public VideoSourceInterface<VideoFrameT> {
   std::vector<SinkPair> sinks_;
 };
 
-}  // namespace avp
+}  // namespace ave
 
 #endif /* !VIDEO_SOURCE_BASE_H */

@@ -26,9 +26,9 @@ vars = {
 deps = {
   # avp module
   'src/base':
-    'https://github.com:yoofa/base.git@3f69082763375f50f401a19416cb3945ba21311b',
+    'https://github.com/yoofa/base.git@3f69082763375f50f401a19416cb3945ba21311b',
   'src/common':
-    'https://github.com:yoofa/media_common.git@28f186f35d78a75a32069cfe03bb5cecf1ec3c4c',
+    'https://github.com/yoofa/media_common.git@28f186f35d78a75a32069cfe03bb5cecf1ec3c4c',
 
   # my third_party
   # inih
@@ -41,15 +41,15 @@ deps = {
 
   # openssl
   'src/third_party/openssl':
-    'https://github.com:yoofa/third_party_openssl.git@cebc6ad07de0de260d41771692b216574c61d677',
+    'https://github.com/yoofa/third_party_openssl.git@cebc6ad07de0de260d41771692b216574c61d677',
 
   # gsoap
   'src/third_party/gsoap/src':
-    'https://github.com:yoofa/gsoap.git@0a6ee6c2a69c5f8c50cc390e2253a9a2154bfd08',
+    'https://github.com/yoofa/gsoap.git@0a6ee6c2a69c5f8c50cc390e2253a9a2154bfd08',
 
   # onvif_srvd
   'src/third_party/onvif_srvd/src':
-    'https://github.com:yoofa/onvif_srvd.git@9c8c9bdad2438129a592440c9ada620372dc3c39',
+    'https://github.com/yoofa/onvif_srvd.git@9c8c9bdad2438129a592440c9ada620372dc3c39',
 
   # chromium 
   'src/build':

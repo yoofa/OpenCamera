@@ -6,6 +6,8 @@ import("//build/config/sysroot.gni")
 import("//build/config/ui.gni")
 import("//build_overrides/build.gni")
 
+import("//base/build/ave.gni")
+
 declare_args() {
   enable_ffmpeg = true
   enable_ffmpeg_demuxer = true
@@ -32,12 +34,7 @@ oc_common_inherited_config = oc_root + ":common_inherited_config"
 # Common configs to remove or add in all oc targets.
 oc_remove_configs = []
 
-if (is_clang) {
-  oc_remove_configs += [ "//build/config/clang:find_bad_constructs" ]
-}
 oc_add_configs = oc_common_configs
-
-#oc_add_configs += [ "//build/config/compiler:rtti" ]
 
 oc_prod_configs = [ oc_root + ":oc_prod_config" ]
 
@@ -80,6 +77,7 @@ oc_default_visibility = [ oc_root + "/*" ]
 import("testing/test.gni")
 
 template("oc_test") {
+  #FIXME(youfa) should use ave_test here, but there is a compile error
   test(target_name) {
     forward_variables_from(invoker,
                            "*",
@@ -99,7 +97,8 @@ template("oc_test") {
     configs += invoker.configs
     configs -= oc_remove_configs
     configs -= invoker.suppressed_configs
-    public_configs = [ oc_common_inherited_config ]
+    public_configs = []
+    public_configs += [ oc_common_inherited_config ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }
@@ -117,7 +116,7 @@ template("oc_test") {
 }
 
 template("oc_source_set") {
-  source_set(target_name) {
+  ave_source_set(target_name) {
     forward_variables_from(invoker,
                            "*",
                            [
@@ -139,7 +138,8 @@ template("oc_source_set") {
     configs += oc_library_impl_config
     configs -= oc_remove_configs
     configs -= invoker.suppressed_configs
-    public_configs = [ oc_common_inherited_config ]
+    public_configs = []
+    public_configs += [ oc_common_inherited_config ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }
@@ -147,7 +147,7 @@ template("oc_source_set") {
 }
 
 template("oc_static_library") {
-  static_library(target_name) {
+  ave_static_library(target_name) {
     forward_variables_from(invoker,
                            "*",
                            [
@@ -169,7 +169,8 @@ template("oc_static_library") {
     configs += oc_library_impl_config
     configs -= oc_remove_configs
     configs -= invoker.suppressed_configs
-    public_configs = [ oc_common_inherited_config ]
+    public_configs = []
+    public_configs += [ oc_common_inherited_config ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }
@@ -178,9 +179,9 @@ template("oc_static_library") {
 
 template("oc_library") {
   if (is_component_build || (defined(invoker.testonly) && invoker.testonly)) {
-    target_type = "source_set"
+    target_type = "ave_source_set"
   } else {
-    target_type = "static_library"
+    target_type = "ave_static_library"
   }
   target(target_type, target_name) {
     forward_variables_from(invoker,
@@ -204,7 +205,8 @@ template("oc_library") {
     configs += oc_library_impl_config
     configs -= oc_remove_configs
     configs -= invoker.suppressed_configs
-    public_configs = [ oc_common_inherited_config ]
+    public_configs = []
+    public_configs += [ oc_common_inherited_config ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }
@@ -212,7 +214,7 @@ template("oc_library") {
 }
 
 template("oc_executable") {
-  executable(target_name) {
+  ave_executable(target_name) {
     forward_variables_from(invoker,
                            "*",
                            [
@@ -231,7 +233,8 @@ template("oc_executable") {
     configs -= invoker.suppressed_configs
     deps = invoker.deps
 
-    public_configs = [ oc_common_inherited_config ]
+    public_configs = []
+    public_configs += [ oc_common_inherited_config ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }
@@ -239,7 +242,7 @@ template("oc_executable") {
 }
 
 template("oc_shared_library") {
-  shared_library(target_name) {
+  ave_shared_library(target_name) {
     forward_variables_from(invoker,
                            "*",
                            [
@@ -256,7 +259,8 @@ template("oc_shared_library") {
     configs += invoker.configs
     configs -= oc_remove_configs
     configs -= invoker.suppressed_configs
-    public_configs = [ oc_common_inherited_config ]
+    public_configs = []
+    public_configs += [ oc_common_inherited_config ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }
